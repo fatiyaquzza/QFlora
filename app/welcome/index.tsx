@@ -1,25 +1,56 @@
 import React from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Image, Pressable } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 
 export default function App() {
-  return (
-    <View className="flex-1 items-center text-poppins">
-      <View className="absolute bottom-28 p-4 items-center justify-center">
-        <Text className="text-6xl py-3 leading-[45px] text-white font-poppinsSemiBold">
-          Belajar Statistika Lebih Mudah Dengan RwikiStat
-        </Text>
-      </View>
+  const router = useRouter();
 
-      <View className="bottom-0 mb-20 absolute w-full px-6">
+  return (
+    <LinearGradient
+      colors={["#BECC85", "#98B46D", "#0B2D12"]}
+      locations={[0, 0.25, 0.7]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+      style={{ flex: 1 }}
+    >
+      <StatusBar style="light" />
+      {/* Kontainer Utama */}
+      <View className="items-center flex-1 px-6 mt-20">
+        {/* Header */}
+        <Text className="text-2xl text-[#B76732] font-poppinsSemiBold">
+          QFlora
+        </Text>
+
+        {/* Judul */}
+        <Text className="mt-20 text-4xl text-center text-[#0B2D12] font-poppinsSemiBold">
+          Siap {"\n"} untuk Menelusuri?
+        </Text>
+
+        {/* Gambar */}
+        <Image
+          source={require("../../assets/images/Alquran.png")}
+          className="w-96 h-96"
+          resizeMode="contain"
+        />
+
+        {/* Subtitle */}
+        <Text className="text-xl text-center text-white font-poppins">
+          Temukan informasi mendalam mengenai tumbuhan yang disebutkan dalam
+          Al-Quran
+        </Text>
+
+        {/* Tombol */}
         <Pressable
-          //   onPress={() => router.push("../auth")}
-          className="bg-white rounded-lg py-3 px-6 w-full"
+          onPress={() => router.push("../auth")}
+          className="w-full px-6 py-4 mt-20 bg-[#BECC85] rounded-lg"
         >
-          <Text className="text-[#00726B] font-poppinsSemiBold text-center text-xl">
-            Belajar Sekarang
+          <Text className="text-[#0B2D12] font-poppinsSemiBold text-center text-lg">
+            Telusuri Sekarang
           </Text>
         </Pressable>
       </View>
-    </View>
+    </LinearGradient>
   );
 }
