@@ -1,14 +1,8 @@
 import React from "react";
-import { Stack } from "expo-router";
+import { Slot } from "expo-router";
 
 const HomeLayout = () => {
-  return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-      }}
-    />
-  );
+  return <Slot />;
 };
 
 export default HomeLayout;

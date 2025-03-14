@@ -1,43 +1,90 @@
-import React, { useEffect, useCallback } from "react";
-import {
-  ScrollView,
-  Text,
-  View,
-  TouchableOpacity,
-  RefreshControl,
-  StatusBar,
-  useColorScheme,
-} from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { Stack, useRouter } from "expo-router";
+import React, { useState } from "react";
+import { View, Text, Image, ScrollView } from "react-native";
+import { StatusBar } from "expo-status-bar";
+import FavoriteCard from "./Card/FavoriteCard";
+import { Plant } from "./Card/FavoriteCard";
 
-const Favorite = () => {
-  const router = useRouter();
-  const [modules, setModules] = React.useState([]);
-  const [refreshing, setRefreshing] = React.useState(false);
-  const scheme = useColorScheme();
+const FavoritePage: React.FC = () => {
+  const [plants, setPlants] = useState<Plant[]>([
+    {
+      id: "1",
+      name: "Anggur",
+      image: require("../../../assets/images/tumbuhan/anggur.jpg"),
+      liked: true,
+      verses: [
+        { surah: "Al-Baqarah", ayat: "26" },
+        { surah: "Yusuf", ayat: "36,49" },
+      ],
+    },
+    {
+      id: "2",
+      name: "Kurma",
+      image: require("../../../assets/images/tumbuhan/kurma.jpg"),
+      liked: true,
+      verses: [
+        { surah: "Al-Baqarah", ayat: "266" },
+        { surah: "Al-An'am", ayat: "11" },
+      ],
+    },
+    {
+      id: "4",
+      name: "Semangka",
+      image: require("../../../assets/images/tumbuhan/semangka.jpg"),
+      liked: true,
+      verses: [{ surah: "Al-Baqarah", ayat: "26" }],
+    },
+    {
+      id: "5",
+      name: "Delima",
+      image: require("../../../assets/images/tumbuhan/delima.jpg"),
+      liked: true,
+      verses: [{ surah: "Al-Baqarah", ayat: "26" }],
+    },
+  ]);
+
+  const handleToggleFavorite = (id: string) => {
+    setPlants(
+      plants.map((plant) =>
+        plant.id === id ? { ...plant, liked: !plant.liked } : plant
+      )
+    );
+  };
+
+  // Filter plants for favorites
+  const favoritePlants = plants.filter((plant) => plant.liked);
 
   return (
     <>
-      <StatusBar
-        barStyle={scheme === "dark" ? "dark-content" : "dark-content"}
-        backgroundColor="#ffffff"
-        translucent
-      />
-   
-      <ScrollView
-        className="flex-1 p-5 bg-gray-100"
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            colors={["#38B68D"]}
-            tintColor="#38B68D"
-          />
-        }
-      >
+      <StatusBar style="dark" />
+      <ScrollView>
+        <View className="flex-1 px-3 mt-12 bg-gray-100">
+          <View className="flex-row items-end my-4">
+            <Image
+              source={require("../../../assets/images/logo.png")}
+              className="w-16 h-16 mx-2"
+            />
+            <Text className="text-2xl font-poppinsSemiBold text-primary">
+              Tumbuhan Favorit
+            </Text>
+          </View>
+
+          {/* Favorite Plants */}
+          {favoritePlants.length > 0 ? (
+            <FavoriteCard
+              plants={favoritePlants}
+              onToggleFavorite={handleToggleFavorite}
+            />
+          ) : (
+            <View className="items-center justify-center py-20">
+              <Text className="text-gray-400 font-poppinsSemiBold">
+                Belum ada tumbuhan favorit
+              </Text>
+            </View>
+          )}
+        </View>
       </ScrollView>
     </>
   );
 };
 
-export default Favorite;
+export default FavoritePage;

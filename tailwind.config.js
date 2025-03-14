@@ -9,7 +9,7 @@ module.exports = {
       poppinsItalic: ["poppinsItalic"],
     },
     colors: {
-      primary: "#00726B",
+      primary: "#12321D",
       secondary: "#38B68D",
       white: "#FBFBFB",
       black: "#000000",

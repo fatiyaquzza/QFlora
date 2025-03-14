@@ -23,28 +23,30 @@ export default function App() {
           QFlora
         </Text>
 
-        {/* Judul */}
-        <Text className="mt-20 text-4xl text-center text-[#0B2D12] font-poppinsSemiBold">
-          Siap {"\n"} untuk Menelusuri?
-        </Text>
+        <View className="flex items-center justify-center ">
+          {/* Judul */}
+          <Text className="mt-20 text-4xl text-center text-[#0B2D12] font-poppinsSemiBold">
+            Siap {"\n"} untuk Menelusuri?
+          </Text>
 
-        {/* Gambar */}
-        <Image
-          source={require("../../assets/images/Alquran.png")}
-          className="w-96 h-96"
-          resizeMode="contain"
-        />
+          {/* Gambar */}
+          <Image
+            source={require("../../assets/images/Alquran.png")}
+            className="w-96 h-96"
+            resizeMode="contain"
+          />
 
-        {/* Subtitle */}
-        <Text className="text-xl text-center text-white font-poppins">
-          Temukan informasi mendalam mengenai tumbuhan yang disebutkan dalam
-          Al-Quran
-        </Text>
+          {/* Subtitle */}
+          <Text className="text-xl text-center text-white font-poppins">
+            Temukan informasi mendalam mengenai tumbuhan yang disebutkan dalam
+            Al-Quran
+          </Text>
+        </View>
 
         {/* Tombol */}
         <Pressable
           onPress={() => router.push("../auth")}
-          className="w-full px-6 py-4 mt-20 bg-[#BECC85] rounded-lg"
+          className="absolute bottom-0 w-full px-6 py-4 mb-20 bg-[#BECC85] rounded-lg"
         >
           <Text className="text-[#0B2D12] font-poppinsSemiBold text-center text-lg">
             Telusuri Sekarang

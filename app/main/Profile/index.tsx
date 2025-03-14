@@ -31,7 +31,7 @@ const Profile = () => {
         <ScrollView>
           {/* Menu */}
           <View className="p-4 mx-6 mt-6 bg-white rounded-md shadow-md">
-            {[
+            {/* {[
               {
                 name: "Personal Data",
                 icon: "person",
@@ -73,7 +73,78 @@ const Profile = () => {
                   color="gray"
                 />
               </TouchableOpacity>
-            ))}
+            ))} */}
+            <TouchableOpacity 
+            className="flex-row items-center justify-between py-5 border-b border-gray-300"
+            onPress={() => router.push("../auth")}
+            >
+              <View className="flex-row items-center">
+                  <View className="w-10 h-10 bg-[#12321D] rounded-md items-center justify-center ">
+                    <MaterialIcons
+                      name={"person"}
+                      size={24}
+                      color="white"
+                    />
+                  </View>
+                  <Text className="pl-4 text-lg text-black font-poppins">
+                  Personal Data
+                  </Text>
+                </View>
+                <MaterialIcons
+                  name="keyboard-arrow-right"
+                  size={24}
+                  color="gray"
+                />
+
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+            className="flex-row items-center justify-between py-5 border-b border-gray-300"
+            onPress={() => router.push("../auth")}
+            >
+              <View className="flex-row items-center">
+                  <View className="w-10 h-10 bg-[#12321D] rounded-md items-center justify-center ">
+                    <MaterialIcons
+                      name={"android"}
+                      size={24}
+                      color="white"
+                    />
+                  </View>
+                  <Text className="pl-4 text-lg text-black font-poppins">
+                    Apps Info
+                  </Text>
+                </View>
+                <MaterialIcons
+                  name="keyboard-arrow-right"
+                  size={24}
+                  color="gray"
+                />
+
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+            className="flex-row items-center justify-between py-5"
+            onPress={() => router.push("../auth")}
+            >
+              <View className="flex-row items-center">
+                  <View className="w-10 h-10 bg-[#12321D] rounded-md items-center justify-center ">
+                    <MaterialIcons
+                      name={"info"}
+                      size={24}
+                      color="white"
+                    />
+                  </View>
+                  <Text className="pl-4 text-lg text-black font-poppins">
+                    About
+                  </Text>
+                </View>
+                <MaterialIcons
+                  name="keyboard-arrow-right"
+                  size={24}
+                  color="gray"
+                />
+
+            </TouchableOpacity>
           </View>
 
           {/* Tombol Logout */}
