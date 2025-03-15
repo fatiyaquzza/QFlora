@@ -1,7 +1,7 @@
 import React from "react";
 import { Stack } from "expo-router";
 
-const ProfileLayout = () => {
+const DetailLayout = () => {
   return (
     <Stack
       screenOptions={{
@@ -11,4 +11,4 @@ const ProfileLayout = () => {
   );
 };
 
-export default ProfileLayout;
+export default DetailLayout;

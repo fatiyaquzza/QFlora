@@ -8,36 +8,39 @@ import {
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 
-export interface Plant {
+export enum PlantCategory {
+  Buah = "Buah",
+  Sayur = "Sayur",
+  Bunga = "Bunga",
+}
+
+export interface SearchPlant {
   id: string;
   name: string;
   image: ImageSourcePropType;
   liked: boolean;
+  category: PlantCategory;
   verses?: {
     surah: string;
     ayat: string;
   }[];
 }
 
-interface FavoriteCardProps {
-  plants: Plant[];
+interface SearchCardProps {
+  plants: SearchPlant[];
   onToggleFavorite: (id: string) => void;
 }
 
-const FavoriteCard: React.FC<FavoriteCardProps> = ({
-  plants,
-  onToggleFavorite,
-}) => {
+const SearchCard: React.FC<SearchCardProps> = ({ plants, onToggleFavorite }) => {
   const truncateText = (text: string, maxLength: number) => {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + "...";
+    return text.length <= maxLength ? text : text.substring(0, maxLength) + "...";
   };
 
   const combineVerses = (verses: { surah: string; ayat: string }[]) => {
-    const versesText = verses
-      .map((verse) => `QS ${verse.surah}: ${verse.ayat}`)
-      .join("; ");
-    return truncateText(versesText, 30);
+    return truncateText(
+      verses.map((verse) => `QS ${verse.surah}: ${verse.ayat}`).join("; "),
+      30
+    );
   };
 
   return (
@@ -45,7 +48,7 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({
       {plants.map((plant) => (
         <View
           key={plant.id}
-          className="w-11/12 mb-4 overflow-hidden rounded-lg shadow-md"
+          className="w-11/12 mb-4 overflow-hidden rounded-lg shadow-md bg-primary"
           style={{
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 2 },
@@ -54,12 +57,8 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({
             elevation: 3,
           }}
         >
-          <Image
-            source={plant.image}
-            className="w-full h-36"
-            resizeMode="cover"
-          />
-          <View className="p-3 bg-primary">
+          <Image source={plant.image} className="w-full h-36" resizeMode="cover" />
+          <View className="p-3">
             <View className="flex-row items-center justify-between">
               <View className="flex-1 mr-2">
                 <Text className="mx-2 mt-1 text-2xl text-white font-poppinsSemiBold">
@@ -72,23 +71,8 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({
                 )}
               </View>
 
-              <TouchableOpacity
-                className="m-2"
-                onPress={() => onToggleFavorite(plant.id)}
-              >
-                <View style={{ position: "relative" }}>
-                  <FontAwesome name="heart" size={26} color="red" />
-
-                  <View
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                    }}
-                  >
-                    <FontAwesome name="heart-o" size={26} color="white" />
-                  </View>
-                </View>
+              <TouchableOpacity className="m-2" onPress={() => onToggleFavorite(plant.id)}>
+                <FontAwesome name={plant.liked ? "heart" : "heart-o"} size={26} color={plant.liked ? "red" : "white"} />
               </TouchableOpacity>
             </View>
           </View>
@@ -98,4 +82,4 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({
   );
 };
 
-export default FavoriteCard;
+export default SearchCard;

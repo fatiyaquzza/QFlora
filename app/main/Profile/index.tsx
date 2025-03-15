@@ -13,6 +13,11 @@ const Profile = () => {
 
   return (
     <>
+     <Stack.Screen
+        options={{
+          headerShown : false
+        }}
+      />
       <View className="flex-1 bg-gray-100">
         {/* Header */}
         <View className="bg-[#12321D] py-12 items-center rounded-b-3xl">
@@ -31,49 +36,6 @@ const Profile = () => {
         <ScrollView>
           {/* Menu */}
           <View className="p-4 mx-6 mt-6 bg-white rounded-md shadow-md">
-            {/* {[
-              {
-                name: "Personal Data",
-                icon: "person",
-                route: "./Profile/personal-data",
-              },
-              {
-                name: "Apps Info",
-                icon: "android",
-                route: "./Profile/apps-info",
-              },
-              {
-                name: "About",
-                icon: "info",
-                route: "./Profile/about",
-              },
-            ].map((item, index) => (
-              <TouchableOpacity
-                key={index}
-                className={`flex-row items-center justify-between py-5 ${
-                  index < 2 ? "border-b border-gray-300" : ""
-                }`}
-                // onPress={() => router.push(item.route)}
-              >
-                <View className="flex-row items-center">
-                  <View className="w-10 h-10 bg-[#12321D] rounded-md items-center justify-center">
-                    <MaterialIcons
-                      name={item.icon as any}
-                      size={24}
-                      color="white"
-                    />
-                  </View>
-                  <Text className="pl-4 text-lg text-black font-poppins">
-                    {item.name}
-                  </Text>
-                </View>
-                <MaterialIcons
-                  name="keyboard-arrow-right"
-                  size={24}
-                  color="gray"
-                />
-              </TouchableOpacity>
-            ))} */}
             <TouchableOpacity 
             className="flex-row items-center justify-between py-5 border-b border-gray-300"
             onPress={() => router.push("../auth")}
@@ -100,7 +62,7 @@ const Profile = () => {
 
             <TouchableOpacity 
             className="flex-row items-center justify-between py-5 border-b border-gray-300"
-            onPress={() => router.push("../auth")}
+            onPress={() => router.push("./Profile/appinfo")}
             >
               <View className="flex-row items-center">
                   <View className="w-10 h-10 bg-[#12321D] rounded-md items-center justify-center ">
@@ -124,7 +86,7 @@ const Profile = () => {
 
             <TouchableOpacity 
             className="flex-row items-center justify-between py-5"
-            onPress={() => router.push("../auth")}
+            onPress={() => router.push("./Profile/About")}
             >
               <View className="flex-row items-center">
                   <View className="w-10 h-10 bg-[#12321D] rounded-md items-center justify-center ">

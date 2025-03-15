@@ -4,7 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import FavoriteCard from "./Card/FavoriteCard";
 import { Plant } from "./Card/FavoriteCard";
 
-const FavoritePage: React.FC = () => {
+const FavoritePage = (): JSX.Element => { 
   const [plants, setPlants] = useState<Plant[]>([
     {
       id: "1",
@@ -63,7 +63,7 @@ const FavoritePage: React.FC = () => {
               source={require("../../../assets/images/logo.png")}
               className="w-16 h-16 mx-2"
             />
-            <Text className="text-2xl font-poppinsSemiBold text-primary">
+            <Text className="text-2xl mb-2 font-poppinsSemiBold text-primary">
               Tumbuhan Favorit
             </Text>
           </View>

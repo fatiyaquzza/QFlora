@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 const { width } = Dimensions.get("window");
 const cardWidth = width * 0.34;
@@ -47,6 +48,7 @@ const PlantsCard: React.FC<PlantsCardProps> = ({
             key={plant.id}
             activeOpacity={0.9}
             className="pr-4 my-2"
+            onPress={() => router.push("../../Detail")}
           >
             <View
               style={{ width: cardWidth }}

@@ -30,7 +30,7 @@ export default function MainLayout() {
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: "#23483C",
+          tabBarActiveTintColor: "#12321D",
           tabBarInactiveTintColor: "#9e9e9e",
           tabBarStyle: {
             backgroundColor: "#ffffff",
@@ -72,7 +72,7 @@ export default function MainLayout() {
           options={{
             tabBarIcon: ({ size }) => (
               <LinearGradient
-                colors={["#23483C", "#23483C"]}
+                colors={["#12321D", "#12321D"]}
                 style={{
                   borderRadius: 50,
                   borderWidth: 10,
