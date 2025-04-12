@@ -48,7 +48,9 @@ const PlantsCard: React.FC<PlantsCardProps> = ({
             key={plant.id}
             activeOpacity={0.9}
             className="pr-4 my-2"
-            onPress={() => router.push("../../Detail")}
+            onPress={() =>
+              router.push("../../components/DetailPage/Detail")
+            }
           >
             <View
               style={{ width: cardWidth }}

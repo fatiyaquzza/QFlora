@@ -4,7 +4,6 @@ import { useNavigation, useRouter } from "expo-router";
 type User = {
   uid: string;
   name: string;
-  npm: string;
   profilePicture: string;
 };
 

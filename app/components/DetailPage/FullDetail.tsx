@@ -76,7 +76,7 @@ const FullDetail = () => {
         <View className="">
           <View className="mx-8 my-8 overflow-hidden rounded-xl">
             <Image
-              source={require("../../assets/images/tumbuhan/kurma.jpg")}
+              source={require("../../../assets/images/tumbuhan/kurma.jpg")}
               className="w-full h-80"
               style={{ resizeMode: "cover" }}
             />
@@ -245,7 +245,7 @@ const FullDetail = () => {
             </TouchableOpacity>
             {sections.manfaat && (
               <ImageBackground
-                source={require("../../assets/images/bg-manfaat.png")}
+                source={require("../../../assets/images/bg-manfaat.png")}
                 className="mx-4 mb-4 overflow-hidden border rounded-lg "
                 resizeMode="cover"
               >

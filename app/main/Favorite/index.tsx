@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, Image, ScrollView } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import FavoriteCard from "./Card/FavoriteCard";
-import { Plant } from "./Card/FavoriteCard";
+import FavoriteCard from "../../components/Card/FavoriteCard";
+import { Plant } from "../../components/Card/FavoriteCard";
 
-const FavoritePage = (): JSX.Element => { 
+const FavoritePage = (): JSX.Element => {
   const [plants, setPlants] = useState<Plant[]>([
     {
       id: "1",
@@ -56,18 +56,19 @@ const FavoritePage = (): JSX.Element => {
   return (
     <>
       <StatusBar style="dark" />
-      <ScrollView>
-        <View className="flex-1 px-3 mt-12 bg-gray-100">
-          <View className="flex-row items-end my-4">
-            <Image
-              source={require("../../../assets/images/logo.png")}
-              className="w-16 h-16 mx-2"
-            />
-            <Text className="text-2xl mb-2 font-poppinsSemiBold text-primary">
-              Tumbuhan Favorit
-            </Text>
-          </View>
 
+      <View className="flex-row items-end p-4 mt-10 border-b border-gray">
+        <Image
+          source={require("../../../assets/images/logo.png")}
+          className="w-16 h-16 mx-2"
+        />
+        <Text className="text-2xl font-poppinsSemiBold text-primary">
+          Tumbuhan Favorit
+        </Text>
+      </View>
+
+      <ScrollView>
+        <View className="flex-1 px-3 mt-6 bg-gray-100">
           {/* Favorite Plants */}
           {favoritePlants.length > 0 ? (
             <FavoriteCard

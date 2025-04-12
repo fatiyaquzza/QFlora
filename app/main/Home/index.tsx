@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
-import TimeCard from "./Card/TimeCard";
-import PlantsCard from "./Card/PlantsCard";
+import TimeCard from "../../components/Card/TimeCard";
+import PlantsCard from "../../components/Card/PlantsCard";
 import { StatusBar } from "expo-status-bar";
 
 // Define the Plant interface
@@ -62,19 +62,19 @@ const Home: React.FC = () => {
   return (
     <>
       <StatusBar style="dark" />
-      <ScrollView>
-        <View className="flex-1 px-3 mt-12 bg-gray-100">
-          {/* Header */}
-          <View className="flex-row items-end my-4">
-            <Image
-              source={require("../../../assets/images/logo.png")}
-              className="w-16 h-16 mx-2"
-            />
-            <Text className="text-2xl font-poppinsSemiBold text-primary">
-              Halo, <Text className="font-poppinsBold text-primary">User</Text>
-            </Text>
-          </View>
 
+      <View className="flex-row items-end p-4 mt-10 border-b border-gray">
+        <Image
+          source={require("../../../assets/images/logo.png")}
+          className="w-16 h-16 mx-2"
+        />
+        <Text className="text-2xl font-poppinsSemiBold text-primary">
+          Halo, <Text className="font-poppinsBold text-primary">User</Text>
+        </Text>
+      </View>
+
+      <ScrollView>
+        <View className="flex-1 px-3 mt-6 bg-gray-100">
           {/* Time Card */}
           <TimeCard />
 

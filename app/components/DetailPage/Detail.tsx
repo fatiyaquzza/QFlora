@@ -59,7 +59,7 @@ const Detail = () => {
         <View className="p-6 pt-8 bg-primary">
           <View className="relative m-2 overflow-hidden border-2 border-white rounded-xl">
             <Image
-              source={require("../../assets/images/tumbuhan/kurma.jpg")}
+              source={require("../../../assets/images/tumbuhan/kurma.jpg")}
               className="w-full h-64"
               resizeMode="cover"
             />
@@ -123,7 +123,9 @@ const Detail = () => {
             <TouchableOpacity
               className="px-4 py-2 rounded-lg bg-secondary"
               style={{ alignSelf: "center", marginLeft: 10 }}
-              onPress={() => router.push("../Detail/FullDetail")}
+              onPress={() =>
+                router.push("../../components/DetailPage/FullDetail")
+              }
             >
               <Text className="text-base text-center font-poppinsSemiBold text-primary">
                 Informasi{"\n"}Tumbuhan

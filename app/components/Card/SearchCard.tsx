@@ -9,8 +9,8 @@ import {
 import { FontAwesome } from "@expo/vector-icons";
 
 export enum PlantCategory {
-  Buah = "Buah",
-  Sayur = "Sayur",
+  Buah = "Buah-Buahan",
+  Sayur = "Sayur-Sayuran",
   Bunga = "Bunga",
 }
 
@@ -31,9 +31,14 @@ interface SearchCardProps {
   onToggleFavorite: (id: string) => void;
 }
 
-const SearchCard: React.FC<SearchCardProps> = ({ plants, onToggleFavorite }) => {
+const SearchCard: React.FC<SearchCardProps> = ({
+  plants,
+  onToggleFavorite,
+}) => {
   const truncateText = (text: string, maxLength: number) => {
-    return text.length <= maxLength ? text : text.substring(0, maxLength) + "...";
+    return text.length <= maxLength
+      ? text
+      : text.substring(0, maxLength) + "...";
   };
 
   const combineVerses = (verses: { surah: string; ayat: string }[]) => {
@@ -57,7 +62,11 @@ const SearchCard: React.FC<SearchCardProps> = ({ plants, onToggleFavorite }) => 
             elevation: 3,
           }}
         >
-          <Image source={plant.image} className="w-full h-36" resizeMode="cover" />
+          <Image
+            source={plant.image}
+            className="w-full h-36"
+            resizeMode="cover"
+          />
           <View className="p-3">
             <View className="flex-row items-center justify-between">
               <View className="flex-1 mr-2">
@@ -71,8 +80,15 @@ const SearchCard: React.FC<SearchCardProps> = ({ plants, onToggleFavorite }) => 
                 )}
               </View>
 
-              <TouchableOpacity className="m-2" onPress={() => onToggleFavorite(plant.id)}>
-                <FontAwesome name={plant.liked ? "heart" : "heart-o"} size={26} color={plant.liked ? "red" : "white"} />
+              <TouchableOpacity
+                className="m-2"
+                onPress={() => onToggleFavorite(plant.id)}
+              >
+                <FontAwesome
+                  name={plant.liked ? "heart" : "heart-o"}
+                  size={26}
+                  color={plant.liked ? "red" : "white"}
+                />
               </TouchableOpacity>
             </View>
           </View>

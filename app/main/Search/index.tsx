@@ -6,14 +6,20 @@ import {
   Image,
   TextInput,
   TouchableOpacity,
+  SafeAreaView,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; 
+import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-import SearchCard, { SearchPlant, PlantCategory } from "./Card/SearchCard";
+import SearchCard, {
+  SearchPlant,
+  PlantCategory,
+} from "../../components/Card/SearchCard";
 
 const SearchPage = (): JSX.Element => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState<PlantCategory | "Semua">("Semua");
+  const [selectedFilter, setSelectedFilter] = useState<PlantCategory | "Semua">(
+    "Semua"
+  );
 
   const [plants, setPlants] = useState<SearchPlant[]>([
     {
@@ -65,53 +71,82 @@ const SearchPage = (): JSX.Element => {
   );
 
   return (
-    <>
+    <SafeAreaView className="flex-1 bg-white">
       <StatusBar style="dark" />
-      <ScrollView>
-        <View className="flex-1 px-3 mt-12 bg-gray-100">
-          <View className="flex-row items-end my-4">
-            <Image
-              source={require("../../../assets/images/logo.png")}
-              className="w-16 h-16 mx-2"
-            />
-            <Text className="text-xl mb-2 font-poppinsSemiBold text-primary">
-              Telusuri Tumbuh-Tumbuhan
-            </Text>
-          </View>
+      <View className="flex-row items-end px-4 pb-4 border-b border-gray">
+        <Image
+          source={require("../../../assets/images/logo.png")}
+          className="w-16 h-16 mx-2"
+        />
+        <Text className="text-xl font-poppinsSemiBold text-primary">
+          Telusuri Tumbuh-Tumbuhan
+        </Text>
+      </View>
 
-          {/* Search Bar */}
-          <View className="flex flex-row items-center bg-gray-100 rounded-xl px-4 py-3 border border-primary mx-4 mb-4">
+      <View className="flex-1 bg-gray-100">
+        {/* Search Bar */}
+        <View className="px-4 pt-4">
+          <View className="flex flex-row items-center px-4 mx-4 bg-gray-100 border rounded-xl border-primary">
             <Ionicons name="search" size={18} color="gray" />
             <TextInput
               placeholder="Cari tumbuhan atau ayat al quran"
               value={searchQuery}
               onChangeText={setSearchQuery}
-              className="flex-1 ml-2 text-gray-700"
+              className="flex-1 py-2 ml-2 text-gray-700 font-poppins"
             />
           </View>
+        </View>
 
-          {/* Filter Buttons */}
-          <View className="flex-row justify-center space-x-2 mb-6">
-            {["Semua", PlantCategory.Buah, PlantCategory.Sayur, PlantCategory.Bunga].map((filter) => (
+        {/* Filter Buttons - Fixed position */}
+        <View className="px-4 mx-5 mt-4">
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingRight: 20 }}
+          >
+            {[
+              "Semua",
+              PlantCategory.Buah,
+              PlantCategory.Sayur,
+              PlantCategory.Bunga,
+            ].map((filter) => (
               <TouchableOpacity
                 key={filter}
-                onPress={() => setSelectedFilter(filter as PlantCategory | "Semua")}
-                className={`px-4 py-2 rounded-lg border mx-2 ${
-                  selectedFilter === filter ? "bg-primary text-white" : "bg-white text-gray-800 border-gray-400"
+                onPress={() =>
+                  setSelectedFilter(filter as PlantCategory | "Semua")
+                }
+                className={`px-5 py-2 rounded-lg border mr-3 ${
+                  selectedFilter === filter
+                    ? "bg-primary text-white"
+                    : "bg-white text-gray-800 border-gray-400"
                 }`}
               >
-                <Text className={selectedFilter === filter ? "text-white font-poppinsSemiBold" : "text-gray-800 font-poppins"}>
+                <Text
+                  className={
+                    selectedFilter === filter
+                      ? "text-white font-poppinsSemiBold"
+                      : "text-gray-800 font-poppins"
+                  }
+                >
                   {filter}
                 </Text>
               </TouchableOpacity>
             ))}
-          </View>
-
-          {/* Menampilkan daftar tanaman dengan SearchCard */}
-          <SearchCard plants={filteredPlants} onToggleFavorite={handleToggleFavorite} />
+          </ScrollView>
         </View>
-      </ScrollView>
-    </>
+
+        {/* Plants List */}
+        <ScrollView
+          className="px-4 mt-4"
+          contentContainerStyle={{ paddingBottom: 20 }}
+        >
+          <SearchCard
+            plants={filteredPlants}
+            onToggleFavorite={handleToggleFavorite}
+          />
+        </ScrollView>
+      </View>
+    </SafeAreaView>
   );
 };
 

@@ -28,7 +28,7 @@ const TimeCard = () => {
   return (
     <View className="items-center ">
       <ImageBackground
-        source={require("../../../../assets/images/mesjid.png")}
+        source={require("../../../assets/images/mesjid.png")}
         resizeMode="cover"
         className="w-11/12 h-48 overflow-hidden rounded-2xl"
       >
