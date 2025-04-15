@@ -3,6 +3,7 @@ import { View, Text, Image, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function App() {
   const router = useRouter();
@@ -45,7 +46,14 @@ export default function App() {
 
         {/* Tombol */}
         <Pressable
-          onPress={() => router.push("../auth")}
+          onPress={async () => {
+            const isLoggedIn = await AsyncStorage.getItem("isLoggedIn");
+            if (isLoggedIn === "true") {
+              router.replace("/main/Home");
+            } else {
+              router.replace("/auth");
+            }
+          }}
           className="absolute bottom-0 w-full px-6 py-4 mb-20 bg-[#BECC85] rounded-lg"
         >
           <Text className="text-[#0B2D12] font-poppinsSemiBold text-center text-lg">

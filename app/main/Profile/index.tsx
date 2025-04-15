@@ -1,16 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useAuth } from "../../../context/authContext";
 
 const Profile = () => {
-  const profile = require("../../../assets/images/profile.jpg");
-  const [user, setUser] = useState({
-    displayName: "Fatiya Quzza",
-    email: "fatiyaquzzaaa@gmail.com",
-    photoURL: "../../../assets/images/splash.png",
-  });
+  const profile = require("../../../assets/icons/splash-icon.png");
+  const { user, logout, loading } = useAuth();
+  // console.log("👤 Data user di Profile:", user);
 
   return (
     <>
@@ -20,13 +18,13 @@ const Profile = () => {
         <View className="items-center py-16 bg-primary rounded-b-3xl">
           <Image
             source={profile}
-            className="w-32 h-32 mt-16 border-2 border-white rounded-md"
+            className="w-32 h-32 mt-16 bg-white border-2 border-white rounded-md"
           />
           <Text className="mt-6 text-2xl text-white font-poppinsSemiBold">
-            {user.displayName}
+            {user?.name}
           </Text>
           <Text className="mt-1 text-base text-softgray font-poppinsItalic">
-            {user.email}
+            {user?.email}
           </Text>
         </View>
 
@@ -75,7 +73,7 @@ const Profile = () => {
           <View className="mx-6 mt-6">
             <TouchableOpacity
               className="flex-row items-center justify-center py-4 rounded-md shadow-md bg-red"
-              onPress={() => router.push("../auth")}
+              onPress={logout}
             >
               <MaterialIcons name="logout" size={24} color="white" />
               <Text className="ml-2 text-lg text-white font-poppinsSemiBold">
