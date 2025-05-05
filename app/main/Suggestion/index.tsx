@@ -1,97 +1,88 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import {
-  ScrollView,
-  Text,
   View,
+  Text,
+  ScrollView,
   Image,
-  KeyboardAvoidingView,
   TextInput,
-  Platform,
   TouchableOpacity,
+  SafeAreaView,
 } from "react-native";
-import { useRouter } from "expo-router";
-import RadioGroup, { RadioButtonProps } from "react-native-radio-buttons-group";
+import { Ionicons } from "@expo/vector-icons";
+import { StatusBar } from "expo-status-bar";
+import UmumCard, {
+  SearchPlant,
+} from "../../components/Card/UmumCard";
 
-const Suggestion = () => {
-  const router = useRouter();
-  const radioButtons: RadioButtonProps[] = useMemo(
-    () => [
-      {
-        id: "Kritik",
-        label: "Kritik",
-        value: "Kritik",
-      },
-      {
-        id: "Saran",
-        label: "Saran",
-        value: "Saran",
-      },
-      {
-        id: "Pertanyaan",
-        label: "Pertanyaan",
-        value: "Pertanyaan",
-      },
-    ],
-    []
-  );
-  const [selectedId, setSelectedId] = useState<string | undefined>();
-  const [desc, setDesc] = useState("");
+const Suggestion = (): JSX.Element => {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const [plants, setPlants] = useState<SearchPlant[]>([
+    {
+      id: "1",
+      name: "Anggur",
+      image: require("../../../assets/images/tumbuhan/anggur.jpg"),
+      liked: false,
+      verses: [{ surah: "Al-Baqarah", ayat: "26" }],
+    },
+    {
+      id: "2",
+      name: "Kurma",
+      image: require("../../../assets/images/tumbuhan/kurma.jpg"),
+      liked: true,
+      verses: [{ surah: "Al-Baqarah", ayat: "266" }],
+    },
+    {
+      id: "3",
+      name: "Bayam",
+      image: require("../../../assets/images/tumbuhan/delima.jpg"),
+      liked: false,
+      verses: [{ surah: "An-Nahl", ayat: "11" }],
+    },
+    {
+      id: "4",
+      name: "Mawar",
+      image: require("../../../assets/images/tumbuhan/semangka.jpg"),
+      liked: true,
+      verses: [{ surah: "Ar-Rahman", ayat: "48" }],
+    },
+  ]);
+
+  const handleToggleFavorite = (id: string) => {
+    setPlants(
+      plants.map((plant) =>
+        plant.id === id ? { ...plant, liked: !plant.liked } : plant
+      )
+    );
+  };
+
+  const umumPlants = plants.forEach;
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1 }}
-    >
-      <View className="flex-row items-center p-4 mt-10 border-b border-gray">
+    <SafeAreaView className="flex-1 bg-white">
+      <StatusBar style="dark" />
+      <View className="flex-row items-end px-4 pb-4 border-b border-gray">
         <Image
           source={require("../../../assets/images/logo.png")}
           className="w-16 h-16 mx-2"
         />
-        <View className="flex-col mt-2">
-          <Text className="text-2xl font-poppinsSemiBold text-primary">
-            Form Saran
-          </Text>
-          <Text className="text-sm font-poppins text-gray">
-            Berikan kritik dan saran dibawah ini
-          </Text>
-        </View>
+        <Text className="text-xl font-poppinsSemiBold text-primary">
+          Kategori Umum
+        </Text>
       </View>
-      <ScrollView className="px-8 mt-6 bg-gray-100">
-        <View>
-          <Text className="text-lg font-poppinsSemiBold">Tipe</Text>
-          <View className="justify-start flex-1 mt-2">
-            <RadioGroup
-              layout="row"
-              radioButtons={radioButtons.map((button) => ({
-                ...button,
-                labelStyle: { fontFamily: "poppins" },
-              }))}
-              onPress={setSelectedId}
-              selectedId={selectedId}
-            />
-            <Text className="mt-4 text-lg font-poppinsSemiBold">Deskripsi</Text>
-            <TextInput
-              value={desc}
-              onChangeText={setDesc}
-              placeholder="Deskripsi..."
-              placeholderTextColor="#9e9e9e"
-              className="w-full p-4 mt-2 text-black border rounded-md bg-softgray font-poppins min-h-80"
-              multiline={true}
-              numberOfLines={8}
-              textAlignVertical="top"
-            />
-            <TouchableOpacity
-              onPress={() => router.push("../main")}
-              className="mt-8 w-full p-4 mb-4 bg-[#0B2D12] rounded-md"
-            >
-              <Text className="text-lg text-center text-white font-poppinsSemiBold">
-                Submit
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+
+      <View className="flex-1">
+
+        {/* Plants List */}
+        <ScrollView
+          className="px-4 mt-4"
+          contentContainerStyle={{ paddingBottom: 20 }}
+        >
+          <UmumCard
+            onToggleFavorite={handleToggleFavorite} plants={plants}          />
+        </ScrollView>
+      </View>
+    </SafeAreaView>
   );
 };
 

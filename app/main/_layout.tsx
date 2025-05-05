@@ -42,7 +42,7 @@ export default function MainLayout() {
           },
           tabBarLabelStyle: {
             fontFamily: "poppinsSemiBold",
-            fontSize: 12,
+            fontSize: 10,
             marginBottom: -5,
           },
         }}
@@ -77,8 +77,8 @@ export default function MainLayout() {
                   borderRadius: 50,
                   borderWidth: 10,
                   borderColor: "#EFEFEF",
-                  height: 80,
-                  width: 80,
+                  height: 70,
+                  width: 70,
                   justifyContent: "center",
                   alignItems: "center",
                   marginBottom: 30,
@@ -95,9 +95,9 @@ export default function MainLayout() {
           name="Suggestion"
           options={{
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="create" color={color} size={size} />
+              <Ionicons name="grid" color={color} size={size} />
             ),
-            title: "Saran",
+            title: "Umum",
           }}
         />
 

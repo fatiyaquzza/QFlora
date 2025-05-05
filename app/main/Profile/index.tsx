@@ -4,6 +4,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useAuth } from "../../../context/authContext";
+import SearchPage from "../../components/DetailPage/Saran"
 
 const Profile = () => {
   const profile = require("../../../assets/icons/splash-icon.png");
@@ -50,7 +51,7 @@ const Profile = () => {
               />
             </TouchableOpacity>
             <TouchableOpacity
-              className="flex-row items-center justify-between py-5 "
+              className="flex-row items-center justify-between py-5 border-b border-gray-300"
               onPress={() => router.push("../../components/DetailPage/AppInfo")}
             >
               <View className="flex-row items-center">
@@ -59,6 +60,24 @@ const Profile = () => {
                 </View>
                 <Text className="pl-4 text-lg text-black font-poppins">
                   Apps Info
+                </Text>
+              </View>
+              <MaterialIcons
+                name="keyboard-arrow-right"
+                size={24}
+                color="gray"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              className="flex-row items-center justify-between py-5"
+              onPress={() => router.push("../../components/DetailPage/Saran")}
+            >
+              <View className="flex-row items-center">
+              <View className="items-center justify-center w-10 h-10 rounded-md bg-primary ">
+                  <MaterialIcons name={"create"} size={24} color="white" />
+                </View>
+                <Text className="pl-4 text-lg text-black font-poppins">
+                  Saran
                 </Text>
               </View>
               <MaterialIcons

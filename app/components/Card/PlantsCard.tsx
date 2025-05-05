@@ -11,7 +11,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
 
 const { width } = Dimensions.get("window");
-const cardWidth = width * 0.34;
+const cardWidth = width * 0.36;
 const cardMargin = 10;
 
 // Define types

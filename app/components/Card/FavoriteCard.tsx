@@ -7,6 +7,7 @@ import {
   ImageSourcePropType,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 export interface Plant {
   id: string;
@@ -54,11 +55,19 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({
             elevation: 3,
           }}
         >
+          <TouchableOpacity
+              className="flex-row flex-1"
+              activeOpacity={0.8}
+              onPress={() =>
+                router.push("../../components/DetailPage/Detail")
+              }
+            >
           <Image
             source={plant.image}
             className="w-full h-36"
             resizeMode="cover"
           />
+          </TouchableOpacity>
           <View className="p-3 bg-primary">
             <View className="flex-row items-center justify-between">
               <View className="flex-1 mr-2">
@@ -71,7 +80,7 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({
                   </Text>
                 )}
               </View>
-
+              
               <TouchableOpacity
                 className="m-2"
                 onPress={() => onToggleFavorite(plant.id)}
