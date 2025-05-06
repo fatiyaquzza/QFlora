@@ -37,3 +37,5 @@ app.use("/specific-plants", specificPlantRoutes);
 const favoriteRoutes = require("./routes/favorites");
 app.use("/favorites", favoriteRoutes);
 
+const userRoutes = require("./routes/users");
+app.use("/users", require("./routes/users"));
