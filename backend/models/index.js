@@ -1,22 +1,70 @@
-const Sequelize = require('sequelize');
-const sequelize = require('../config/db');
+// models/index.js
+const Sequelize = require("sequelize");
+const sequelize = require("../config/db");
 
-const User = require('./User')(sequelize, Sequelize.DataTypes);
-const GeneralCategory = require('./GeneralCategory')(sequelize, Sequelize.DataTypes);
-const SpecificPlant = require('./SpecificPlant')(sequelize, Sequelize.DataTypes);
-const Favorite = require('./Favorite')(sequelize, Sequelize.DataTypes);
+const User = require("./User")(sequelize, Sequelize.DataTypes);
+
+const SpecificPlant = require("./SpecificPlant")(
+  sequelize,
+  Sequelize.DataTypes
+);
+const Favorite = require("./Favorite")(sequelize, Sequelize.DataTypes);
+
+const GeneralCategory = require("./GeneralCategory")(
+  sequelize,
+  Sequelize.DataTypes
+);
+
+const GeneralCategoryVerse = require("./GeneralCategoryVerse")(
+  sequelize,
+  Sequelize.DataTypes
+);
+
+const SpecificPlantVerse = require("./SpecificPlantVerse")(
+  sequelize,
+  Sequelize.DataTypes
+);
+
+const SpecificPlantClassification = require("./SpecificPlantClassification")(
+  sequelize,
+  Sequelize.DataTypes
+);
 
 // Relasi
-User.hasMany(Favorite, { foreignKey: 'user_id' });
-Favorite.belongsTo(User, { foreignKey: 'user_id' });
+GeneralCategory.hasMany(GeneralCategoryVerse, {
+  foreignKey: "general_category_id",
+  as: "verses",
+});
 
-SpecificPlant.hasMany(Favorite, { foreignKey: 'specific_plant_id' });
-Favorite.belongsTo(SpecificPlant, { foreignKey: 'specific_plant_id' });
+GeneralCategoryVerse.belongsTo(GeneralCategory, {
+  foreignKey: "general_category_id",
+});
+
+SpecificPlant.hasMany(SpecificPlantVerse, {
+  foreignKey: "specific_plant_id",
+  as: "verses",
+});
+
+SpecificPlantVerse.belongsTo(SpecificPlant, {
+  foreignKey: "specific_plant_id",
+});
+
+SpecificPlant.hasMany(SpecificPlantClassification, {
+  foreignKey: "specific_plant_id",
+  as: "classifications",
+});
+
+SpecificPlantClassification.belongsTo(SpecificPlant, {
+  foreignKey: "specific_plant_id",
+});
 
 module.exports = {
   sequelize,
   User,
-  GeneralCategory,
   SpecificPlant,
-  Favorite
+  SpecificPlantVerse,
+  SpecificPlantClassification,
+  Favorite,
+  GeneralCategory,
+  GeneralCategoryVerse,
 };
