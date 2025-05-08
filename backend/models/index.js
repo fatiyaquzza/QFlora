@@ -30,6 +30,13 @@ const SpecificPlantClassification = require("./SpecificPlantClassification")(
   Sequelize.DataTypes
 );
 
+const GeneralFavorite = require("./GeneralFavorite")(
+  sequelize,
+  Sequelize.DataTypes
+);
+
+const Suggestion = require("./Suggestion")(sequelize, Sequelize.DataTypes);
+
 // Relasi
 GeneralCategory.hasMany(GeneralCategoryVerse, {
   foreignKey: "general_category_id",
@@ -58,6 +65,30 @@ SpecificPlantClassification.belongsTo(SpecificPlant, {
   foreignKey: "specific_plant_id",
 });
 
+// Relasi Favorite dengan SpecificPlant
+Favorite.belongsTo(SpecificPlant, {
+  foreignKey: "specific_plant_id",
+});
+
+SpecificPlant.hasMany(Favorite, {
+  foreignKey: "specific_plant_id",
+});
+
+Favorite.belongsTo(User, {
+  foreignKey: "user_id",
+});
+
+User.hasMany(GeneralFavorite, { foreignKey: "user_id" });
+GeneralFavorite.belongsTo(User, { foreignKey: "user_id" });
+
+GeneralCategory.hasMany(GeneralFavorite, { foreignKey: "general_category_id" });
+GeneralFavorite.belongsTo(GeneralCategory, {
+  foreignKey: "general_category_id",
+});
+
+Suggestion.belongsTo(User, { foreignKey: "user_id" });
+User.hasMany(Suggestion, { foreignKey: "user_id" });
+
 module.exports = {
   sequelize,
   User,
@@ -67,4 +98,6 @@ module.exports = {
   Favorite,
   GeneralCategory,
   GeneralCategoryVerse,
+  GeneralFavorite,
+  Suggestion,
 };

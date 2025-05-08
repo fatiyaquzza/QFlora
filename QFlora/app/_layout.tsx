@@ -1,10 +1,11 @@
+import React from "react";
 import { Slot } from "expo-router";
 import { useEffect } from "react";
 import { useFonts } from "expo-font";
 import "../global.css";
 import * as SplashScreen from "expo-splash-screen";
 import { ActivityIndicator } from "react-native";
-import React from "react";
+import { FavoriteProvider } from "../context/FavoriteContext";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -25,5 +26,9 @@ export default function RootLayout() {
   if (!fontsLoaded) {
     return <ActivityIndicator />;
   }
-  return <Slot />;
+  return (
+    <FavoriteProvider>
+      <Slot />
+    </FavoriteProvider>
+  );
 }

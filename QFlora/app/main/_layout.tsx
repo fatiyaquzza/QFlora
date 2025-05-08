@@ -92,7 +92,7 @@ export default function MainLayout() {
         />
 
         <Tabs.Screen
-          name="Suggestion"
+          name="General"
           options={{
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="grid" color={color} size={size} />

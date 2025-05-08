@@ -1,57 +1,101 @@
-import React, { useState } from "react";
-import { View, Text, Image, ScrollView } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, Image, ScrollView, ActivityIndicator } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import FavoriteCard from "../../components/Card/FavoriteCard";
-import { Plant } from "../../components/Card/FavoriteCard";
+import FavoriteCard, { Plant } from "../../components/Card/FavoriteCard";
+import axiosClient from "../../../api/axioxClient";
+import { auth } from "../../../firebase";
 
-const FavoritePage = (): JSX.Element => {
-  const [plants, setPlants] = useState<Plant[]>([
-    {
-      id: "1",
-      name: "Anggur",
-      image: require("../../../assets/images/tumbuhan/anggur.jpg"),
-      liked: true,
-      verses: [
-        { surah: "Al-Baqarah", ayat: "26" },
-        { surah: "Yusuf", ayat: "36,49" },
-      ],
-    },
-    {
-      id: "2",
-      name: "Kurma",
-      image: require("../../../assets/images/tumbuhan/kurma.jpg"),
-      liked: true,
-      verses: [
-        { surah: "Al-Baqarah", ayat: "266" },
-        { surah: "Al-An'am", ayat: "11" },
-      ],
-    },
-    {
-      id: "4",
-      name: "Semangka",
-      image: require("../../../assets/images/tumbuhan/semangka.jpg"),
-      liked: true,
-      verses: [{ surah: "Al-Baqarah", ayat: "26" }],
-    },
-    {
-      id: "5",
-      name: "Delima",
-      image: require("../../../assets/images/tumbuhan/delima.jpg"),
-      liked: true,
-      verses: [{ surah: "Al-Baqarah", ayat: "26" }],
-    },
-  ]);
+const Favorite = () => {
+  const [mappedPlants, setMappedPlants] = useState<Plant[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleToggleFavorite = (id: string) => {
-    setPlants(
-      plants.map((plant) =>
-        plant.id === id ? { ...plant, liked: !plant.liked } : plant
-      )
-    );
+  const fetchFavorites = async () => {
+    try {
+      const token = await auth.currentUser?.getIdToken();
+
+      // Fetch specific favorites
+      const specificRes = await axiosClient.get("/favorites", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const specificPlants: Plant[] = specificRes.data.map((fav: any) => ({
+        id: fav.SpecificPlant.id.toString(),
+        name: fav.SpecificPlant.name,
+        liked: true,
+        image: { uri: fav.SpecificPlant.image_url },
+        verses: fav.SpecificPlant.verses.map((v: any) => ({
+          surah: v.surah,
+          ayat: v.quran_verse,
+        })),
+        type: "specific",
+      }));
+
+      // Fetch general favorites
+      const generalRes = await axiosClient.get("/general-favorites", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const generalPlants: Plant[] = generalRes.data.map((fav: any) => ({
+        id: fav.GeneralCategory.id.toString(),
+        name: fav.GeneralCategory.name,
+        liked: true,
+        image: { uri: fav.GeneralCategory.image_url },
+        verses: fav.GeneralCategory.verses.map((v: any) => ({
+          surah: v.surah,
+          ayat: v.verse_number,
+        })),
+        type: "general",
+      }));
+
+      setMappedPlants([...specificPlants, ...generalPlants]);
+    } catch (error) {
+      console.error("❌ Gagal fetch semua favorites", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Filter plants for favorites
-  const favoritePlants = plants.filter((plant) => plant.liked);
+  const handleToggleFavorite = async (
+    id: string,
+    type: "specific" | "general"
+  ) => {
+    try {
+      const token = await auth.currentUser?.getIdToken();
+
+      if (type === "specific") {
+        await axiosClient.delete(`/favorites/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setMappedPlants((prev) =>
+          prev.filter((item) => !(item.id === id && item.type === "specific"))
+        );
+      } else {
+        await axiosClient.delete(`/general-favorites/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setMappedPlants((prev) =>
+          prev.filter((item) => !(item.id === id && item.type === "general"))
+        );
+      }
+    } catch (error) {
+      console.error("❌ Gagal menghapus favorit", error);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchFavorites();
+    }, [])
+  );
+
+  if (loading) {
+    return (
+      <View className="items-center justify-center flex-1">
+        <ActivityIndicator size="large" color="#0B2D12" />
+      </View>
+    );
+  }
 
   return (
     <>
@@ -69,10 +113,9 @@ const FavoritePage = (): JSX.Element => {
 
       <ScrollView>
         <View className="flex-1 px-3 mt-6 bg-gray-100">
-          {/* Favorite Plants */}
-          {favoritePlants.length > 0 ? (
+          {mappedPlants.length > 0 ? (
             <FavoriteCard
-              plants={favoritePlants}
+              plants={mappedPlants}
               onToggleFavorite={handleToggleFavorite}
             />
           ) : (
@@ -88,4 +131,4 @@ const FavoritePage = (): JSX.Element => {
   );
 };
 
-export default FavoritePage;
+export default Favorite;

@@ -6,6 +6,7 @@ import GeneralCategoriesPage from "./pages/GeneralCategoriesPage";
 import SpecificPlantsPage from "./pages/SpecificPlantsPage";
 import UserListPage from "./pages/UserListPage";
 import DashboardPage from "./pages/DashboardPage";
+import SuggestionsPage from "./pages/SuggestionPage";
 function App() {
   return (
     <AuthProvider>
@@ -41,6 +42,14 @@ function App() {
             element={
               <PrivateRoute>
                 <UserListPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/suggestions"
+            element={
+              <PrivateRoute>
+                <SuggestionsPage />
               </PrivateRoute>
             }
           />

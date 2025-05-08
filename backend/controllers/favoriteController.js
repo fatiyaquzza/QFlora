@@ -3,17 +3,23 @@ const { Favorite, User, SpecificPlant } = require("../models");
 exports.getFavorites = async (req, res) => {
   try {
     const firebase_uid = req.firebase_uid;
-    let user = await User.findOne({ where: { firebase_uid } });
+    const user = await User.findOne({ where: { firebase_uid } });
 
     if (!user) return res.status(404).json({ error: "User tidak ditemukan" });
 
     const favorites = await Favorite.findAll({
       where: { user_id: user.id },
-      include: [SpecificPlant],
+      include: [
+        {
+          model: SpecificPlant,
+          include: ["verses"],
+        },
+      ],
     });
 
     res.json(favorites);
   } catch (err) {
+    console.error("❌ Error getFavorites:", err);
     res.status(500).json({ error: "Gagal mengambil data favorit" });
   }
 };
@@ -23,10 +29,14 @@ exports.addFavorite = async (req, res) => {
     const firebase_uid = req.firebase_uid;
     const { specific_plant_id } = req.body;
 
-    let user = await User.findOrCreate({ where: { firebase_uid } });
-    const user_id = user[0].id;
+    let [user, created] = await User.findOrCreate({
+      where: { firebase_uid },
+      defaults: { firebase_uid },
+    });
 
-    const [favorite, created] = await Favorite.findOrCreate({
+    const user_id = user.id; 
+
+    const [favorite] = await Favorite.findOrCreate({
       where: { user_id, specific_plant_id },
     });
 

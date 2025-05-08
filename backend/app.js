@@ -34,8 +34,17 @@ app.use("/general-categories", generalCategoryRoutes);
 const specificPlantRoutes = require("./routes/specificPlants");
 app.use("/specific-plants", specificPlantRoutes);
 
-const favoriteRoutes = require("./routes/favorites");
+const favoriteRoutes = require("./routes/favorite");
 app.use("/favorites", favoriteRoutes);
 
 const userRoutes = require("./routes/users");
 app.use("/users", require("./routes/users"));
+
+const generalFavoriteRoutes = require("./routes/generalFavorites");
+app.use("/general-favorites", generalFavoriteRoutes);
+
+const plantRoutes = require("./routes/plants");
+app.use("/plants", plantRoutes);
+
+const suggestionRoutes = require("./routes/suggestions");
+app.use("/suggestions", suggestionRoutes);

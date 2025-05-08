@@ -17,6 +17,7 @@ function DashboardPage() {
           axiosClient.get("/users"),
           axiosClient.get("/general-categories"),
           axiosClient.get("/specific-plants"),
+          
         ]);
 
         setStats({
@@ -68,6 +69,8 @@ function DashboardPage() {
               </h2>
               <p className="text-3xl font-bold">{stats.totalSpecific}</p>
             </Link>
+            
+            
           </div>
 
           <p className="text-gray-600">

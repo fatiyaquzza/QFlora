@@ -14,6 +14,7 @@ export interface Plant {
   name: string;
   image: ImageSourcePropType;
   liked: boolean;
+  type: "specific" | "general";
   verses?: {
     surah: string;
     ayat: string;
@@ -22,7 +23,7 @@ export interface Plant {
 
 interface FavoriteCardProps {
   plants: Plant[];
-  onToggleFavorite: (id: string) => void;
+  onToggleFavorite: (id: string, type: "specific" | "general") => void;
 }
 
 const FavoriteCard: React.FC<FavoriteCardProps> = ({
@@ -45,7 +46,7 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({
     <View className="items-center">
       {plants.map((plant) => (
         <View
-          key={plant.id}
+          key={`${plant.type}-${plant.id}`}
           className="w-11/12 mb-4 overflow-hidden rounded-lg shadow-md"
           style={{
             shadowColor: "#000",
@@ -56,18 +57,26 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({
           }}
         >
           <TouchableOpacity
-              className="flex-row flex-1"
-              activeOpacity={0.8}
-              onPress={() =>
-                router.push("../../components/DetailPage/Detail")
-              }
-            >
-          <Image
-            source={plant.image}
-            className="w-full h-36"
-            resizeMode="cover"
-          />
+            className="flex-row flex-1"
+            activeOpacity={0.8}
+            onPress={() =>
+              router.push(
+                plant.type === "specific"
+                  ? `/components/DetailPage/Detail/${plant.id}`
+                  : {
+                      pathname: "/components/DetailPage/DetailUmum",
+                      params: { id: plant.id },
+                    }
+              )
+            }
+          >
+            <Image
+              source={plant.image}
+              className="w-full h-36"
+              resizeMode="cover"
+            />
           </TouchableOpacity>
+
           <View className="p-3 bg-primary">
             <View className="flex-row items-center justify-between">
               <View className="flex-1 mr-2">
@@ -80,24 +89,12 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({
                   </Text>
                 )}
               </View>
-              
+
               <TouchableOpacity
                 className="m-2"
-                onPress={() => onToggleFavorite(plant.id)}
+                onPress={() => onToggleFavorite(plant.id, plant.type)}
               >
-                <View style={{ position: "relative" }}>
-                  <FontAwesome name="heart" size={26} color="red" />
-
-                  <View
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                    }}
-                  >
-                    <FontAwesome name="heart-o" size={26} color="white" />
-                  </View>
-                </View>
+                <FontAwesome name="heart" size={26} color="red" />
               </TouchableOpacity>
             </View>
           </View>

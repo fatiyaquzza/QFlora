@@ -1,19 +1,15 @@
 import axios from "axios";
-import { getAuth } from "firebase/auth";
 
 const axiosClient = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: process.env.EXPO_PUBLIC_API_BASE_URL,
 });
 
 axiosClient.interceptors.request.use(async (config) => {
-  const auth = getAuth();
-  const currentUser = auth.currentUser;
-
-  if (currentUser) {
-    const token = await currentUser.getIdToken(true); 
+  const { auth } = require("../firebase");
+  const token = await auth.currentUser?.getIdToken();
+  if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-
   return config;
 });
 

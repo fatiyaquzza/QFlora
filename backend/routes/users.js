@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const admin = require("firebase-admin");
-const firebaseAuth = require("../middlewares/firebaseAuth");
+const firebaseAuth = require("../middleware/firebaseAuth");
 const path = require("path");
 
 router.get("/", async (req, res) => {

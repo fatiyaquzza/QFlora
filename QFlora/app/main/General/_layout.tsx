@@ -1,7 +1,7 @@
 import React from "react";
 import { Stack } from "expo-router";
 
-const SuggestionLayout = () => {
+const GeneralLayout = () => {
   return (
     <Stack
       screenOptions={{
@@ -11,4 +11,4 @@ const SuggestionLayout = () => {
   );
 };
 
-export default SuggestionLayout;
+export default GeneralLayout;

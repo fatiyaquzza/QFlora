@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -14,55 +14,22 @@ import SearchCard, {
   SearchPlant,
   PlantCategory,
 } from "../../components/Card/SearchCard";
+import axiosClient from "../../../api/axioxClient";
+import { SpecificPlant } from "../../components/type";
+import { router } from "expo-router";
+import { useFavorite } from "../../../context/FavoriteContext";
+import { RefreshControl } from "react-native";
 
-const SearchPage = (): JSX.Element => {
+const Search = (): JSX.Element => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState<PlantCategory | "Semua">(
     "Semua"
   );
+  const { favorites, toggleFavorite, refreshFavorites } = useFavorite();
 
-  const [plants, setPlants] = useState<SearchPlant[]>([
-    {
-      id: "1",
-      name: "Anggur",
-      image: require("../../../assets/images/tumbuhan/anggur.jpg"),
-      liked: false,
-      category: PlantCategory.Buah,
-      verses: [{ surah: "Al-Baqarah", ayat: "26" }],
-    },
-    {
-      id: "2",
-      name: "Kurma",
-      image: require("../../../assets/images/tumbuhan/kurma.jpg"),
-      liked: true,
-      category: PlantCategory.Buah,
-      verses: [{ surah: "Al-Baqarah", ayat: "266" }],
-    },
-    {
-      id: "3",
-      name: "Bayam",
-      image: require("../../../assets/images/tumbuhan/delima.jpg"),
-      liked: false,
-      category: PlantCategory.Sayur,
-      verses: [{ surah: "An-Nahl", ayat: "11" }],
-    },
-    {
-      id: "4",
-      name: "Mawar",
-      image: require("../../../assets/images/tumbuhan/semangka.jpg"),
-      liked: true,
-      category: PlantCategory.Bunga,
-      verses: [{ surah: "Ar-Rahman", ayat: "48" }],
-    },
-  ]);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const handleToggleFavorite = (id: string) => {
-    setPlants(
-      plants.map((plant) =>
-        plant.id === id ? { ...plant, liked: !plant.liked } : plant
-      )
-    );
-  };
+  const [plants, setPlants] = useState<SearchPlant[]>([]);
 
   const filteredPlants = plants.filter(
     (plant) =>
@@ -70,10 +37,54 @@ const SearchPage = (): JSX.Element => {
       plant.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleCardPress = (id: string) => {
+    router.push(`../components/DetailPage/Detail/${id}`);
+  };
+
+  const fetchPlants = async () => {
+    try {
+      const response = await axiosClient.get<SpecificPlant[]>(
+        "/specific-plants"
+      );
+      const mapped = response.data.map(
+        (item): SearchPlant => ({
+          id: item.id.toString(),
+          name: item.name,
+          image: { uri: item.image_url },
+          liked: favorites.includes(item.id),
+          category: item.plant_type as PlantCategory,
+          verses: item.verses.map((v) => ({
+            surah: v.surah,
+            ayat: v.id.toString(),
+          })),
+        })
+      );
+      setPlants(mapped);
+    } catch (err) {
+      console.error("❌ Gagal mengambil data spesifik:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchPlants();
+  }, [favorites]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    setRefreshing(true);
+    await refreshFavorites();
+    await fetchPlants();
+    setRefreshing(false);
+  };
+
+  const handleToggleFavorite = (id: string) => {
+    toggleFavorite(parseInt(id));
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-white">
       <StatusBar style="dark" />
-      <View className="flex-row items-end px-4 pb-4 border-b border-gray">
+      <View className="flex-row items-end px-4 pb-4 border-b mt-14 border-gray">
         <Image
           source={require("../../../assets/images/logo.png")}
           className="w-16 h-16 mx-2"
@@ -97,7 +108,7 @@ const SearchPage = (): JSX.Element => {
           </View>
         </View>
 
-        {/* Filter Buttons - Fixed position */}
+        {/* Filter Buttons */}
         <View className="px-4 mx-5 mt-4">
           <ScrollView
             horizontal
@@ -139,10 +150,14 @@ const SearchPage = (): JSX.Element => {
         <ScrollView
           className="px-4 mt-4"
           contentContainerStyle={{ paddingBottom: 20 }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
         >
           <SearchCard
             plants={filteredPlants}
             onToggleFavorite={handleToggleFavorite}
+            onPressCard={handleCardPress}
           />
         </ScrollView>
       </View>
@@ -150,4 +165,4 @@ const SearchPage = (): JSX.Element => {
   );
 };
 
-export default SearchPage;
+export default Search;

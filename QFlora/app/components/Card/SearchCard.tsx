@@ -9,8 +9,8 @@ import {
 import { FontAwesome } from "@expo/vector-icons";
 
 export enum PlantCategory {
-  Buah = "Buah-Buahan",
-  Sayur = "Sayur-Sayuran",
+  Buah = "Buah",
+  Sayur = "Sayur",
   Bunga = "Bunga",
 }
 
@@ -29,11 +29,13 @@ export interface SearchPlant {
 interface SearchCardProps {
   plants: SearchPlant[];
   onToggleFavorite: (id: string) => void;
+  onPressCard: (id: string) => void;
 }
 
 const SearchCard: React.FC<SearchCardProps> = ({
   plants,
   onToggleFavorite,
+  onPressCard,
 }) => {
   const truncateText = (text: string, maxLength: number) => {
     return text.length <= maxLength
@@ -51,8 +53,9 @@ const SearchCard: React.FC<SearchCardProps> = ({
   return (
     <View className="items-center">
       {plants.map((plant) => (
-        <View
+        <TouchableOpacity
           key={plant.id}
+          onPress={() => onPressCard(plant.id)}
           className="w-11/12 mb-4 overflow-hidden rounded-lg shadow-md bg-primary"
           style={{
             shadowColor: "#000",
@@ -92,7 +95,7 @@ const SearchCard: React.FC<SearchCardProps> = ({
               </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
       ))}
     </View>
   );
