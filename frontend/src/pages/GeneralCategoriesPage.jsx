@@ -107,7 +107,9 @@ function GeneralCategoriesPage() {
       <div className="overflow-x-auto bg-white rounded-xl shadow p-4 font-Poppins">
         <div className="px-2 pt-2">
           <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-bold text-black">Daftar Kategori Umum</h1>
+            <h1 className="mb-6 text-xl font-bold text-black">
+              Daftar Kategori Umum
+            </h1>
             <button
               className="px-4 py-2 text-sm text-white bg-[#004E1D] rounded hover:bg-green-700"
               onClick={() => setShowForm(true)}
@@ -145,12 +147,20 @@ function GeneralCategoriesPage() {
                     <td className="px-2 py-4">
                       {cat.verses?.length > 0 ? (
                         cat.verses.map((v) => (
-                          <div key={v.id} className="mb-2 pb-2 border-b border-gray-200">
+                          <div
+                            key={v.id}
+                            className="mb-2 pb-2 border-b border-gray-200"
+                          >
                             <p>
-                              📖 <b>{v.surah} - {v.verse_number}</b>
+                              📖{" "}
+                              <b>
+                                {v.surah} - {v.verse_number}
+                              </b>
                             </p>
                             <p className="italic">{v.quran_verse}</p>
-                            <p className="text-sm text-gray-700">📘 {v.translation}</p>
+                            <p className="text-sm text-gray-700">
+                              📘 {v.translation}
+                            </p>
                             <audio controls className="w-full mt-1">
                               <source src={v.audio_url} type="audio/mpeg" />
                             </audio>
@@ -176,7 +186,9 @@ function GeneralCategoriesPage() {
                           </div>
                         ))
                       ) : (
-                        <span className="text-sm italic text-gray-400">Belum ada ayat</span>
+                        <span className="text-sm italic text-gray-400">
+                          Belum ada ayat
+                        </span>
                       )}
                     </td>
                     <td className="px-2 py-4 text-center whitespace-nowrap">
@@ -220,7 +232,11 @@ function GeneralCategoriesPage() {
         </div>
 
         {/* Modal Tambah/Edit Kategori */}
-        <Modal show={showForm} title="Tambah Kategori Umum" onClose={() => setShowForm(false)}>
+        <Modal
+          show={showForm}
+          title="Tambah Kategori Umum"
+          onClose={() => setShowForm(false)}
+        >
           <form onSubmit={handleAdd} className="space-y-3">
             {Object.keys(form).map((key) => (
               <input
@@ -233,14 +249,29 @@ function GeneralCategoriesPage() {
               />
             ))}
             <div className="flex justify-end gap-2">
-              <button type="button" className="px-4 py-2 bg-gray-300 rounded" onClick={() => setShowForm(false)}>Batal</button>
-              <button type="submit" className="px-4 py-2 text-white bg-green-600 rounded">Tambah</button>
+              <button
+                type="button"
+                className="px-4 py-2 bg-gray-300 rounded"
+                onClick={() => setShowForm(false)}
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 text-white bg-green-600 rounded"
+              >
+                Tambah
+              </button>
             </div>
           </form>
         </Modal>
 
         {/* Modal Edit Kategori */}
-        <Modal show={!!editing} title={`Edit Kategori: ${editing?.name}`} onClose={() => setEditing(null)}>
+        <Modal
+          show={!!editing}
+          title={`Edit Kategori: ${editing?.name}`}
+          onClose={() => setEditing(null)}
+        >
           <form onSubmit={handleSubmit} className="space-y-3">
             {Object.keys(form).map((key) => (
               <input
@@ -248,13 +279,26 @@ function GeneralCategoriesPage() {
                 type="text"
                 className="w-full p-2 border rounded"
                 value={editing?.[key] || ""}
-                onChange={(e) => setEditing({ ...editing, [key]: e.target.value })}
+                onChange={(e) =>
+                  setEditing({ ...editing, [key]: e.target.value })
+                }
                 placeholder={key.replace(/_/g, " ")}
               />
             ))}
             <div className="flex justify-end gap-2">
-              <button type="button" className="px-4 py-2 bg-gray-300 rounded" onClick={() => setEditing(null)}>Batal</button>
-              <button type="submit" className="px-4 py-2 text-white bg-green-600 rounded">Simpan</button>
+              <button
+                type="button"
+                className="px-4 py-2 bg-gray-300 rounded"
+                onClick={() => setEditing(null)}
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 text-white bg-green-600 rounded"
+              >
+                Simpan
+              </button>
             </div>
           </form>
         </Modal>
@@ -276,14 +320,63 @@ function GeneralCategoriesPage() {
           }}
         >
           <form onSubmit={handleAddVerse} className="space-y-3">
-            <input type="text" className="w-full p-2 border rounded" placeholder="Surah" value={newVerse.surah} onChange={(e) => setNewVerse({ ...newVerse, surah: e.target.value })} />
-            <input type="number" className="w-full p-2 border rounded" placeholder="Nomor Ayat" value={newVerse.verse_number} onChange={(e) => setNewVerse({ ...newVerse, verse_number: e.target.value })} />
-            <textarea className="w-full p-2 border rounded" placeholder="Ayat Al-Qur'an" value={newVerse.quran_verse} onChange={(e) => setNewVerse({ ...newVerse, quran_verse: e.target.value })} />
-            <textarea className="w-full p-2 border rounded" placeholder="Terjemahan" value={newVerse.translation} onChange={(e) => setNewVerse({ ...newVerse, translation: e.target.value })} />
-            <input type="text" className="w-full p-2 border rounded" placeholder="Audio URL" value={newVerse.audio_url} onChange={(e) => setNewVerse({ ...newVerse, audio_url: e.target.value })} />
+            <input
+              type="text"
+              className="w-full p-2 border rounded"
+              placeholder="Surah"
+              value={newVerse.surah}
+              onChange={(e) =>
+                setNewVerse({ ...newVerse, surah: e.target.value })
+              }
+            />
+            <input
+              type="number"
+              className="w-full p-2 border rounded"
+              placeholder="Nomor Ayat"
+              value={newVerse.verse_number}
+              onChange={(e) =>
+                setNewVerse({ ...newVerse, verse_number: e.target.value })
+              }
+            />
+            <textarea
+              className="w-full p-2 border rounded"
+              placeholder="Ayat Al-Qur'an"
+              value={newVerse.quran_verse}
+              onChange={(e) =>
+                setNewVerse({ ...newVerse, quran_verse: e.target.value })
+              }
+            />
+            <textarea
+              className="w-full p-2 border rounded"
+              placeholder="Terjemahan"
+              value={newVerse.translation}
+              onChange={(e) =>
+                setNewVerse({ ...newVerse, translation: e.target.value })
+              }
+            />
+            <input
+              type="text"
+              className="w-full p-2 border rounded"
+              placeholder="Audio URL"
+              value={newVerse.audio_url}
+              onChange={(e) =>
+                setNewVerse({ ...newVerse, audio_url: e.target.value })
+              }
+            />
             <div className="flex justify-end gap-2">
-              <button type="button" className="px-4 py-2 bg-gray-300 rounded" onClick={() => setShowVerseForm(false)}>Batal</button>
-              <button type="submit" className="px-4 py-2 text-white bg-green-600 rounded">Simpan</button>
+              <button
+                type="button"
+                className="px-4 py-2 bg-gray-300 rounded"
+                onClick={() => setShowVerseForm(false)}
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 text-white bg-green-600 rounded"
+              >
+                Simpan
+              </button>
             </div>
           </form>
         </Modal>
@@ -300,13 +393,22 @@ function GeneralCategoriesPage() {
           <div className="space-y-4">
             <p>
               Apakah Anda yakin ingin menghapus kategori{" "}
-              <span className="font-semibold text-red-600">{categoryToDelete?.name}</span>?
+              <span className="font-semibold text-red-600">
+                {categoryToDelete?.name}
+              </span>
+              ?
             </p>
             <div className="flex justify-end gap-2">
-              <button className="px-4 py-2 bg-gray-300 rounded" onClick={() => setShowDeleteModal(false)}>
+              <button
+                className="px-4 py-2 bg-gray-300 rounded"
+                onClick={() => setShowDeleteModal(false)}
+              >
                 Batal
               </button>
-              <button className="px-4 py-2 text-white bg-red-600 rounded" onClick={confirmDeleteCategory}>
+              <button
+                className="px-4 py-2 text-white bg-red-600 rounded"
+                onClick={confirmDeleteCategory}
+              >
                 Hapus
               </button>
             </div>

@@ -53,43 +53,49 @@ function UserListPage() {
   return (
     <>
       <AdminLayout>
-        <div className="p-6">
-          <h1 className="mb-4 text-2xl font-bold">Daftar Akun Firebase</h1>
-          <table className="w-full text-sm border border-gray-300 table-auto">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-2 py-1 border">UID</th>
-                <th className="px-2 py-1 border">Email</th>
-                <th className="px-2 py-1 border">Nama</th>
-                <th className="px-2 py-1 border">Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.uid} className="hover:bg-gray-50">
-                  <td className="px-2 py-1 break-all border">{user.uid}</td>
-                  <td className="px-2 py-1 border">{user.email}</td>
-                  <td className="px-2 py-1 border">{user.displayName}</td>
-                  <td className="px-2 py-1 border">
-                    <div className="flex justify-center gap-2">
-                      <button
-                        onClick={() => setEditing(user)}
-                        className="px-3 py-1 text-white bg-blue-500 rounded hover:bg-blue-600"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => confirmDelete(user)}
-                        className="px-3 py-1 text-white bg-red-500 rounded hover:bg-red-600"
-                      >
-                        Hapus
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="p-6 bg-gray-100 min-h-screen">
+          <div className="bg-white rounded-xl shadow p-6">
+            <h1 className="mb-6 text-xl font-bold text-black">
+              Daftar Akun Firebase
+            </h1>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left border-separate border-spacing-y-4">
+                <thead className="text-gray-600">
+                  <tr>
+                    <th className="px-4 py-2">UID</th>
+                    <th className="px-4 py-2">Email</th>
+                    <th className="px-4 py-2">Nama</th>
+                    <th className="px-4 py-2">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((user) => (
+                    <tr key={user.uid} className="bg-white shadow rounded">
+                      <td className="px-4 py-4 break-all">{user.uid}</td>
+                      <td className="px-4 py-4">{user.email}</td>
+                      <td className="px-4 py-4">{user.displayName}</td>
+                      <td className="px-4 py-4">
+                        <div className="flex justify-center gap-2">
+                          <button
+                            onClick={() => setEditing(user)}
+                            className="px-3 py-1 text-white bg-blue-500 rounded hover:bg-blue-600"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => confirmDelete(user)}
+                            className="px-3 py-1 text-white bg-red-500 rounded hover:bg-red-600"
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </AdminLayout>
 

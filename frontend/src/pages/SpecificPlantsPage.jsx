@@ -1,4 +1,3 @@
-// 📁 src/pages/SpecificPlantsPage.js
 import React, { useEffect, useState } from "react";
 import axiosClient from "../api/axiosClient";
 import Modal from "../components/Modal";
@@ -23,6 +22,8 @@ function SpecificPlantsPage() {
   const [editing, setEditing] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [selectedPlantId, setSelectedPlantId] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [plantToDelete, setPlantToDelete] = useState(null);
 
   const [showVerseForm, setShowVerseForm] = useState(false);
   const [verseEditing, setVerseEditing] = useState(null);
@@ -87,8 +88,18 @@ function SpecificPlantsPage() {
     });
   };
 
-  const handleDelete = (id) => {
-    axiosClient.delete(`/specific-plants/${id}`).then(refreshData);
+  const handleDeleteClick = (plant) => {
+    setPlantToDelete(plant);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeletePlant = async () => {
+    if (plantToDelete) {
+      await axiosClient.delete(`/specific-plants/${plantToDelete.id}`);
+      setShowDeleteModal(false);
+      setPlantToDelete(null);
+      refreshData();
+    }
   };
 
   const handleAddVerse = async (e) => {
@@ -164,138 +175,223 @@ function SpecificPlantsPage() {
 
   return (
     <AdminLayout>
-      <div className="p-6 font-Poppins">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold">Kategori Spesifik</h1>
-          <button
-            className="px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700"
-            onClick={() => setShowForm(true)}
-          >
-            Tambah
-          </button>
-        </div>
+      <div className="mt-4 bg-white rounded-xl p-4 shadow overflow-x-auto max-w-[1200px] font-Poppins">
+        <div className="px-2 pt-2">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="mb-6 text-xl font-bold text-black">
+              Daftar Kategori Spesifik
+            </h1>
+            <button
+              className="px-4 py-2 text-sm text-white bg-[#004E1D] rounded hover:bg-green-700"
+              onClick={() => setShowForm(true)}
+            >
+              Tambah
+            </button>
+          </div>
+          <div className="border-t border-gray-300 mb-4"></div>
 
-        <table className="w-full text-sm border border-gray-300 table-auto">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-2 py-1 border">Nama</th>
-              <th className="px-2 py-1 border">Latin</th>
-              <th className="px-2 py-1 border">Gambar</th>
-              <th className="px-2 py-1 border">Jenis</th>
-              <th className="px-2 py-1 border">Ayat</th>
-              <th className="px-2 py-1 border">Klasifikasi</th>
-              <th className="px-2 py-1 border">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {plants.map((plant) => (
-              <tr key={plant.id} className="hover:bg-gray-50">
-                <td className="px-2 py-1 border">{plant.name}</td>
-                <td className="px-2 py-1 border">{plant.latin_name}</td>
-                <td className="px-2 py-1 border">
-                  <img
-                    src={plant.image_url}
-                    className="object-cover w-20 h-20"
-                    alt="img"
-                  />
-                </td>
-                <td className="px-2 py-1 border">{plant.plant_type}</td>
-                <td className="px-2 py-1 border">
-                  {plant.verses?.map((v) => (
-                    <div key={v.id} className="mb-2">
-                      <p>
-                        📖 {v.surah} - {v.verse_number}
-                      </p>
-                      <p className="text-sm italic">🕋 {v.quran_verse}</p>
-                      <p className="text-sm">📘 {v.translation}</p>
-                      <audio controls className="w-full">
-                        <source src={v.audio_url} type="audio/mpeg" />
-                      </audio>
-                      <div className="flex gap-2 mt-1">
+          <div className="overflow-x-auto max-w-[1190px]">
+            <table className="w-full text-sm text-left border-separate border-spacing-y-4">
+              <thead className="text-gray-700 border-b border-gray-300">
+                <tr>
+                  <th className="px-4 py-2">Nama</th>
+                  <th className="px-4 py-2">Latin</th>
+                  <th className="px-4 py-2">Gambar</th>
+                  <th className="px-4 py-2">Jenis</th>
+                  <th className="px-4 py-2">Ayat</th>
+                  <th className="px-4 py-2">Klasifikasi</th>
+                  <th className="px-4 py-2">Deskripsi</th>
+                  <th className="px-4 py-2">Manfaat</th>
+                  <th className="px-4 py-2">Ciri-ciri</th>
+                  <th className="px-4 py-2">Asal</th>
+                  <th className="px-4 py-2">Kandungan Kimia</th>
+                  <th className="px-4 py-2">Budidaya</th>
+                  <th className="px-4 py-2">Sumber Referensi</th>
+                  <th className="px-4 py-2 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {plants.map((plant) => (
+                  <tr
+                    key={plant.id}
+                    className="bg-white shadow rounded align-top"
+                  >
+                    <td className="px-4 py-4">
+                      <div
+                        className="min-h-40 overflow-y-auto pr-1"
+                        style={{ minHeight: "100px" }}
+                      >
+                        {plant.name}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div
+                        className="min-h-40 overflow-y-auto pr-1"
+                        style={{ minHeight: "100px" }}
+                      >
+                        {plant.latin_name}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 w-40">
+                      <img
+                        src={plant.image_url}
+                        className="w-20 h-20 object-cover rounded-md"
+                        alt="img"
+                      />
+                    </td>
+                    <td className="px-4 py-4 w-28">{plant.plant_type}</td>
+                    <td className="px-4 py-4 max-w-xs">
+                      <div
+                        className="max-h-64 overflow-y-auto pr-2 w-80"
+                        style={{ minHeight: "150px" }}
+                      >
+                        {plant.verses?.map((v) => (
+                          <div
+                            key={v.id}
+                            className="mb-3 border-b border-gray-200 pb-2 last:border-none"
+                          >
+                            <p className="text-sm italic text-right leading-relaxed">
+                              🕋 {v.quran_verse}
+                            </p>
+                            <p className="text-sm text-gray-700">
+                              📘 {v.translation}
+                            </p>
+                            <audio controls className="w-full mt-1">
+                              <source src={v.audio_url} type="audio/mpeg" />
+                            </audio>
+                            <div className="flex gap-2 mt-1">
+                              <button
+                                className="px-2 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
+                                onClick={() => {
+                                  setSelectedPlantId(plant.id);
+                                  setVerseEditing(v);
+                                }}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                className="px-2 py-1 text-sm text-white bg-red-600 rounded hover:bg-red-700"
+                                onClick={() =>
+                                  handleDeleteVerse(plant.id, v.id)
+                                }
+                              >
+                                Hapus
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </td>
+
+                    <td className="px-4 py-4 min-w-80 w-80">
+                      <div className="max-h-64 overflow-y-auto pr-2">
+                        {plant.classifications?.map((cls) => (
+                          <div
+                            key={cls.id}
+                            className="mb-2 border-b border-gray-200 pb-2 last:border-none"
+                          >
+                            <p className="text-sm italic">
+                              🔬 {cls.kingdom}, {cls.family}, {cls.genus},{" "}
+                              {cls.species}
+                            </p>
+                            <div className="flex gap-2 mt-1">
+                              <button
+                                className="px-2 py-1 text-xs text-white bg-blue-600 rounded hover:bg-blue-700"
+                                onClick={() => {
+                                  setSelectedPlantId(plant.id);
+                                  setClassificationEditing(cls);
+                                }}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                className="px-2 py-1 text-xs text-white bg-red-600 rounded hover:bg-red-700"
+                                onClick={() =>
+                                  handleDeleteClassification(plant.id, cls.id)
+                                }
+                              >
+                                Hapus
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 min-w-80 w-80">
+                      <div className="max-h-40 overflow-y-auto pr-1">
+                        {plant.description}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 min-w-80 w-80">
+                      <div className="max-h-40 overflow-y-auto pr-1">
+                        {plant.benefits}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 min-w-80 w-80">
+                      <div className="max-h-40 overflow-y-auto pr-1">
+                        {plant.characteristics}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 min-w-80 w-80">
+                      <div className="max-h-40 overflow-y-auto pr-1">
+                        {plant.origin}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 min-w-80 w-80">
+                      <div className="max-h-40 overflow-y-auto pr-1">
+                        {plant.chemical_comp}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 min-w-80 w-80">
+                      <div className="max-h-40 overflow-y-auto pr-1">
+                        {plant.cultivation}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 min-w-80 w-80">
+                      <div className="max-h-40 overflow-y-auto pr-1">
+                        {plant.source_ref}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-center min-w-40 w-40">
+                      <div className="flex flex-col gap-1">
                         <button
-                          className="px-2 py-1 text-sm text-white bg-blue-600 rounded"
+                          className="px-3 py-1 text-white bg-green-600 rounded hover:bg-green-700"
                           onClick={() => {
                             setSelectedPlantId(plant.id);
-                            setVerseEditing(v);
+                            setShowVerseForm(true);
                           }}
+                        >
+                          Tambah Ayat
+                        </button>
+                        <button
+                          className="px-3 py-1 text-white bg-green-700 rounded hover:bg-green-800"
+                          onClick={() => {
+                            setSelectedPlantId(plant.id);
+                            setShowClassificationForm(true);
+                          }}
+                        >
+                          Tambah Klasifikasi
+                        </button>
+                        <button
+                          className="px-3 py-1 text-white bg-blue-600 rounded hover:bg-blue-700"
+                          onClick={() => setEditing(plant)}
                         >
                           Edit
                         </button>
                         <button
-                          className="px-2 py-1 text-sm text-white bg-red-600 rounded"
-                          onClick={() => handleDeleteVerse(plant.id, v.id)}
+                          className="px-3 py-1 text-white bg-red-600 rounded hover:bg-red-700"
+                          onClick={() => handleDeleteClick(plant)}
                         >
                           Hapus
                         </button>
                       </div>
-                    </div>
-                  ))}
-                </td>
-                <td className="px-2 py-1 border">
-                  {plant.classifications?.map((cls) => (
-                    <div key={cls.id} className="mb-2">
-                      <p className="text-sm italic">
-                        🔬 {cls.kingdom}, {cls.family}, {cls.genus},{" "}
-                        {cls.species}
-                      </p>
-                      <button
-                        className="px-2 py-1 mr-2 text-xs text-white bg-blue-600 rounded"
-                        onClick={() => {
-                          setSelectedPlantId(plant.id);
-                          setClassificationEditing(cls);
-                        }}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="px-2 py-1 text-xs text-white bg-red-600 rounded"
-                        onClick={() =>
-                          handleDeleteClassification(plant.id, cls.id)
-                        }
-                      >
-                        Hapus
-                      </button>
-                    </div>
-                  ))}
-                </td>
-                <td className="px-2 py-1 border">
-                  <div className="flex flex-col gap-1">
-                    <button
-                      className="px-3 py-1 text-white bg-green-600 rounded"
-                      onClick={() => {
-                        setSelectedPlantId(plant.id);
-                        setShowVerseForm(true);
-                      }}
-                    >
-                      Tambah Ayat
-                    </button>
-                    <button
-                      className="px-3 py-1 text-white bg-green-700 rounded"
-                      onClick={() => {
-                        setSelectedPlantId(plant.id);
-                        setShowClassificationForm(true);
-                      }}
-                    >
-                      Tambah Klasifikasi
-                    </button>
-                    <button
-                      className="px-3 py-1 text-white bg-blue-600 rounded"
-                      onClick={() => setEditing(plant)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="px-3 py-1 text-white bg-red-600 rounded"
-                      onClick={() => handleDelete(plant.id)}
-                    >
-                      Hapus
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       <Modal
@@ -496,6 +592,42 @@ function SpecificPlantsPage() {
             Update
           </button>
         </form>
+      </Modal>
+
+      <Modal
+        show={showDeleteModal}
+        title="Konfirmasi Hapus"
+        onClose={() => {
+          setShowDeleteModal(false);
+          setPlantToDelete(null);
+        }}
+      >
+        <div className="space-y-4">
+          <p>
+            Apakah Anda yakin ingin menghapus tumbuhan{" "}
+            <span className="font-semibold text-red-600">
+              {plantToDelete?.name}
+            </span>
+            ?
+          </p>
+          <div className="flex justify-end gap-2">
+            <button
+              className="px-4 py-2 bg-gray-300 rounded"
+              onClick={() => {
+                setShowDeleteModal(false);
+                setPlantToDelete(null);
+              }}
+            >
+              Batal
+            </button>
+            <button
+              className="px-4 py-2 text-white bg-red-600 rounded"
+              onClick={confirmDeletePlant}
+            >
+              Hapus
+            </button>
+          </div>
+        </div>
       </Modal>
     </AdminLayout>
   );
