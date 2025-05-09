@@ -7,9 +7,13 @@ const axiosClient = axios.create({
 axiosClient.interceptors.request.use(async (config) => {
   const { auth } = require("../firebase");
   const token = await auth.currentUser?.getIdToken();
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  } else {
+    delete config.headers.Authorization;
   }
+
   return config;
 });
 

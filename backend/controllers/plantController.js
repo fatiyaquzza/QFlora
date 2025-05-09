@@ -13,20 +13,15 @@ exports.getAllPlants = async (req, res) => {
     const specifics = await SpecificPlant.findAll();
     const generals = await GeneralCategory.findAll();
 
-    const combined = [
-      ...specifics
-        .filter((p) => isValidUrl(p.image_url))
-        .map((p) => ({
-          ...p.toJSON(),
-          type: "specific",
-        })),
-      ...generals
-        .filter((p) => isValidUrl(p.image_url))
-        .map((p) => ({
-          ...p.toJSON(),
-          type: "general",
-        })),
-    ];
+    const specificPlants = specifics
+      .filter((p) => isValidUrl(p.image_url))
+      .map((p) => ({ ...p.toJSON(), type: "specific" }));
+
+    const generalPlants = generals
+      .filter((p) => isValidUrl(p.image_url))
+      .map((p) => ({ ...p.toJSON(), type: "general" }));
+
+    const combined = [...specificPlants, ...generalPlants];
 
     res.json(combined);
   } catch (err) {
@@ -38,39 +33,58 @@ exports.getAllPlants = async (req, res) => {
 exports.getPopularPlants = async (req, res) => {
   try {
     const topSpecific = await Favorite.findAll({
-      attributes: ["specific_plant_id", [sequelize.fn("COUNT", "id"), "likes"]],
-      group: ["specific_plant_id"],
+      attributes: [
+        "specific_plant_id",
+        [sequelize.fn("COUNT", sequelize.col("specific_plant_id")), "likes"],
+      ],
+      include: [
+        {
+          model: SpecificPlant,
+          as: "SpecificPlant", // ⬅️ sesuai dengan alias di relasi model
+          required: true,
+        },
+      ],
+      group: ["specific_plant_id", "SpecificPlant.id"],
       order: [[sequelize.literal("likes"), "DESC"]],
       limit: 10,
-      include: [{ model: SpecificPlant }],
     });
 
     const topGeneral = await GeneralFavorite.findAll({
       attributes: [
         "general_category_id",
-        [sequelize.fn("COUNT", "id"), "likes"],
+        [sequelize.fn("COUNT", sequelize.col("general_category_id")), "likes"],
       ],
-      group: ["general_category_id"],
+      include: [
+        {
+          model: GeneralCategory,
+          as: "GeneralCategory", // ⬅️ sesuai dengan alias di relasi model
+          required: true,
+        },
+      ],
+      group: ["general_category_id", "GeneralCategory.id"],
       order: [[sequelize.literal("likes"), "DESC"]],
       limit: 10,
-      include: [{ model: GeneralCategory }],
     });
 
-    const combined = [
-      ...topSpecific.map((fav) => ({
-        ...fav.SpecificPlant.toJSON(),
-        type: "specific",
-        likes: fav.dataValues.likes,
-      })),
-      ...topGeneral.map((fav) => ({
-        ...fav.GeneralCategory.toJSON(),
-        type: "general",
-        likes: fav.dataValues.likes,
-      })),
-    ];
+    const specificMapped = topSpecific.map((fav) => ({
+      ...fav.SpecificPlant.toJSON(),
+      type: "specific",
+      likes: parseInt(fav.dataValues.likes),
+    }));
 
-    res.json(combined.sort((a, b) => b.likes - a.likes));
+    const generalMapped = topGeneral.map((fav) => ({
+      ...fav.GeneralCategory.toJSON(),
+      type: "general",
+      likes: parseInt(fav.dataValues.likes),
+    }));
+
+    const combined = [...specificMapped, ...generalMapped].sort(
+      (a, b) => b.likes - a.likes
+    );
+
+    res.json(combined);
   } catch (err) {
+    console.error("❌ Error getPopularPlants:", err);
     res.status(500).json({ error: "Gagal mengambil tumbuhan populer" });
   }
 };

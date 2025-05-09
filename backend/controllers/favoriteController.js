@@ -12,7 +12,8 @@ exports.getFavorites = async (req, res) => {
       include: [
         {
           model: SpecificPlant,
-          include: ["verses"],
+          as: "SpecificPlant", // ✅ Tambahkan alias sesuai model
+          include: ["verses"], // Jika verses pakai alias juga, harus pakai as: "verses"
         },
       ],
     });
@@ -34,14 +35,13 @@ exports.addFavorite = async (req, res) => {
       defaults: { firebase_uid },
     });
 
-    const user_id = user.id; 
+    const user_id = user.id;
 
-    const [favorite] = await Favorite.findOrCreate({
+    const [favorite, isNew] = await Favorite.findOrCreate({
       where: { user_id, specific_plant_id },
     });
 
-    if (!created)
-      return res.status(200).json({ message: "Sudah difavoritkan" });
+    if (!isNew) return res.status(200).json({ message: "Sudah difavoritkan" });
 
     res.status(201).json({ message: "Favorit ditambahkan", favorite });
   } catch (err) {

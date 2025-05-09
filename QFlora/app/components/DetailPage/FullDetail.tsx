@@ -48,6 +48,13 @@ const FullDetail = () => {
     setIsFavorite((prev) => !prev); // opsional (ubah icon langsung)
   };
 
+  const parseChemicalComp = (text: string) => {
+    return text
+      .split("-")
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0);
+  };
+
   useEffect(() => {
     const fetchDetail = async () => {
       try {
@@ -271,12 +278,34 @@ const FullDetail = () => {
             </TouchableOpacity>
             {sections.komposisiKimia && (
               <View className="px-4 pb-4">
-                <Text
-                  className="text-gray-700 font-poppins"
-                  style={{ textAlign: "justify" }}
-                >
-                  {plant?.chemical_comp || "Tidak tersedia"}
-                </Text>
+                {plant?.chemical_comp ? (
+                  <View className="flex flex-wrap flex-row gap-2">
+                    {parseChemicalComp(plant.chemical_comp).map(
+                      (comp, index) => (
+                        <View
+                          key={index}
+                          className={`px-3 py-2 rounded-xl ${
+                            index % 2 === 0
+                              ? "bg-[#004E1D]"
+                              : "bg-white border border-[#004E1D]"
+                          }`}
+                        >
+                          <Text
+                            className={`text-sm font-poppinsSemiBold text-center ${
+                              index % 2 === 0 ? "text-white" : "text-[#004E1D]"
+                            }`}
+                          >
+                            {comp}
+                          </Text>
+                        </View>
+                      )
+                    )}
+                  </View>
+                ) : (
+                  <Text className="text-gray-700 font-poppins">
+                    Tidak tersedia
+                  </Text>
+                )}
               </View>
             )}
           </View>

@@ -232,10 +232,10 @@ function SpecificPlantsPage() {
                         {plant.latin_name}
                       </div>
                     </td>
-                    <td className="px-4 py-4 w-40">
+                    <td className="px-4 py-4 w-44 min-w-44">
                       <img
                         src={plant.image_url}
-                        className="w-20 h-20 object-cover rounded-md"
+                        className="w-40 h-40 object-cover rounded-md"
                         alt="img"
                       />
                     </td>

@@ -1,26 +1,27 @@
-const {
-  GeneralFavorite,
-  User,
-  GeneralCategory,
-  GeneralCategoryVerse,
-} = require("../models");
+const { GeneralFavorite, User, GeneralCategory } = require("../models");
 
 exports.getGeneralFavorites = async (req, res) => {
   try {
-    const user = await User.findOne({
-      where: { firebase_uid: req.firebase_uid },
-    });
+    const firebase_uid = req.firebase_uid;
+    const user = await User.findOne({ where: { firebase_uid } });
+
     if (!user) return res.status(404).json({ error: "User tidak ditemukan" });
 
     const favorites = await GeneralFavorite.findAll({
       where: { user_id: user.id },
-      include: [{ model: GeneralCategory, include: ["verses"] }],
+      include: [
+        {
+          model: GeneralCategory,
+          as: "GeneralCategory",
+          include: ["verses"],
+        },
+      ],
     });
 
     res.json(favorites);
-  } catch (error) {
-    console.error("❌ Gagal get general favorites:", error);
-    res.status(500).json({ error: "Gagal mengambil favorit umum" });
+  } catch (err) {
+    console.error("❌ Gagal get general favorites:", err);
+    res.status(500).json({ error: "Gagal mengambil data general favorites" });
   }
 };
 

@@ -134,64 +134,70 @@ function GeneralCategoriesPage() {
               <tbody>
                 {categories.map((cat) => (
                   <tr key={cat.id} className="bg-white shadow rounded">
-                    <td className="px-2 py-4">{cat.name}</td>
-                    <td className="px-2 py-4">{cat.latin_name}</td>
-                    <td className="px-2 py-4">
+                    <td className="px-2 py-4 min-w-20 w-20">{cat.name}</td>
+                    <td className="px-2 py-4 min-w-40 w-40">
+                      {cat.latin_name}
+                    </td>
+                    <td className="px-2 py-4 min-w-44 w-44">
                       <img
                         src={cat.image_url}
                         alt="img"
                         className="object-cover w-40 h-40 rounded-md"
                       />
                     </td>
-                    <td className="px-2 py-4">{cat.overview}</td>
-                    <td className="px-2 py-4">
-                      {cat.verses?.length > 0 ? (
-                        cat.verses.map((v) => (
-                          <div
-                            key={v.id}
-                            className="mb-2 pb-2 border-b border-gray-200"
-                          >
-                            <p>
-                              📖{" "}
-                              <b>
-                                {v.surah} - {v.verse_number}
-                              </b>
-                            </p>
-                            <p className="italic">{v.quran_verse}</p>
-                            <p className="text-sm text-gray-700">
-                              📘 {v.translation}
-                            </p>
-                            <audio controls className="w-full mt-1">
-                              <source src={v.audio_url} type="audio/mpeg" />
-                            </audio>
-                            <div className="flex gap-2 mt-2">
-                              <button
-                                onClick={() => {
-                                  setSelectedCategoryId(cat.id);
-                                  setEditingVerse(v);
-                                  setNewVerse(v);
-                                  setShowVerseForm(true);
-                                }}
-                                className="px-2 py-1 text-xs text-white bg-blue-500 rounded"
-                              >
-                                Edit
-                              </button>
-                              <button
-                                onClick={() => handleDeleteVerse(cat.id, v.id)}
-                                className="px-2 py-1 text-xs text-white bg-red-500 rounded"
-                              >
-                                Hapus
-                              </button>
+                    <td className="px-2 py-4 min-w-40 w-40">{cat.overview}</td>
+                    <td className="px-2 py-4 min-w-40 w-60">
+                      <div className="max-h-64 overflow-y-auto pr-2 w-60">
+                        {cat.verses?.length > 0 ? (
+                          cat.verses.map((v) => (
+                            <div
+                              key={v.id}
+                              className="mb-2 pb-2 border-b border-gray-200"
+                            >
+                              <p>
+                                📖{" "}
+                                <b>
+                                  {v.surah} - {v.verse_number}
+                                </b>
+                              </p>
+                              <p className="italic">{v.quran_verse}</p>
+                              <p className="text-sm text-gray-700">
+                                📘 {v.translation}
+                              </p>
+                              <audio controls className="w-full mt-1">
+                                <source src={v.audio_url} type="audio/mpeg" />
+                              </audio>
+                              <div className="flex gap-2 mt-2">
+                                <button
+                                  onClick={() => {
+                                    setSelectedCategoryId(cat.id);
+                                    setEditingVerse(v);
+                                    setNewVerse(v);
+                                    setShowVerseForm(true);
+                                  }}
+                                  className="px-2 py-1 text-xs text-white bg-blue-500 rounded"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleDeleteVerse(cat.id, v.id)
+                                  }
+                                  className="px-2 py-1 text-xs text-white bg-red-500 rounded"
+                                >
+                                  Hapus
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        ))
-                      ) : (
-                        <span className="text-sm italic text-gray-400">
-                          Belum ada ayat
-                        </span>
-                      )}
+                          ))
+                        ) : (
+                          <span className="text-sm italic text-gray-400">
+                            Belum ada ayat
+                          </span>
+                        )}
+                      </div>
                     </td>
-                    <td className="px-2 py-4 text-center whitespace-nowrap">
+                    <td className="px-2 py-4 min-w-40 w-40 text-center whitespace-nowrap">
                       <div className="flex flex-col items-center gap-2">
                         <button
                           onClick={() => {

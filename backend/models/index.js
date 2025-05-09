@@ -68,6 +68,7 @@ SpecificPlantClassification.belongsTo(SpecificPlant, {
 // Relasi Favorite dengan SpecificPlant
 Favorite.belongsTo(SpecificPlant, {
   foreignKey: "specific_plant_id",
+  as: "SpecificPlant",
 });
 
 SpecificPlant.hasMany(Favorite, {
@@ -81,8 +82,11 @@ Favorite.belongsTo(User, {
 User.hasMany(GeneralFavorite, { foreignKey: "user_id" });
 GeneralFavorite.belongsTo(User, { foreignKey: "user_id" });
 
-GeneralCategory.hasMany(GeneralFavorite, { foreignKey: "general_category_id" });
 GeneralFavorite.belongsTo(GeneralCategory, {
+  foreignKey: "general_category_id",
+  as: "GeneralCategory",
+});
+GeneralCategory.hasMany(GeneralFavorite, {
   foreignKey: "general_category_id",
 });
 
