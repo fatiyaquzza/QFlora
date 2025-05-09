@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Stack, useLocalSearchParams, router } from "expo-router";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import axiosClient from "../../../api/axioxClient";
 import { useFavorite } from "../../../context/FavoriteContext";
+import { Audio } from "expo-av";
 
 const DetailUmum = () => {
   const [plant, setPlant] = useState<any>(null);
@@ -12,13 +13,15 @@ const DetailUmum = () => {
   const { id } = useLocalSearchParams();
   const { generalFavorites, toggleGeneralFavorite } = useFavorite();
 
+  const [playingIndex, setPlayingIndex] = useState<number | null>(null);
+  const soundRef = useRef<Audio.Sound | null>(null);
+
   // Ambil data tanaman dan status favorit
   useEffect(() => {
     const fetchPlant = async () => {
       try {
         const res = await axiosClient.get(`/general-categories/${id}`);
         setPlant(res.data);
-
         if (res.data?.id) {
           setIsFavorite(generalFavorites.includes(res.data.id));
         }
@@ -39,6 +42,52 @@ const DetailUmum = () => {
   const handleBack = () => {
     router.replace("../../main/General");
   };
+
+  const handleAudioPress = async (audioUrl: string, index: number) => {
+    try {
+      // Jika sedang diputar dan tombol yang sama ditekan → stop
+      if (playingIndex === index) {
+        await soundRef.current?.stopAsync();
+        await soundRef.current?.unloadAsync();
+        soundRef.current = null;
+        setPlayingIndex(null);
+        return;
+      }
+
+      // Jika sedang ada audio → hentikan dulu
+      if (soundRef.current) {
+        await soundRef.current.stopAsync();
+        await soundRef.current.unloadAsync();
+        soundRef.current = null;
+      }
+
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: audioUrl },
+        { shouldPlay: true }
+      );
+
+      soundRef.current = sound;
+      setPlayingIndex(index);
+
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (!status.isLoaded) return;
+        if (status.didJustFinish) {
+          sound.unloadAsync();
+          soundRef.current = null;
+          setPlayingIndex(null);
+        }
+      });
+    } catch (error) {
+      console.error("❌ Gagal memutar audio:", error);
+    }
+  };
+
+  // Cleanup saat keluar dari halaman
+  useEffect(() => {
+    return () => {
+      soundRef.current?.unloadAsync();
+    };
+  }, []);
 
   if (!plant) return null;
 
@@ -101,10 +150,16 @@ const DetailUmum = () => {
                   <Text className="text-lg font-poppinsBold">
                     Surah {verse.surah} : {verse.verse_number}
                   </Text>
-                  <TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleAudioPress(verse.audio_url, index)}
+                  >
                     <Ionicons
-                      name="play-circle-outline"
-                      size={20}
+                      name={
+                        playingIndex === index
+                          ? "stop-circle-outline"
+                          : "play-circle-outline"
+                      }
+                      size={24}
                       color="#333"
                     />
                   </TouchableOpacity>
