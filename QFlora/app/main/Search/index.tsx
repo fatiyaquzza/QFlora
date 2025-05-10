@@ -19,6 +19,7 @@ import { SpecificPlant } from "../../components/type";
 import { router } from "expo-router";
 import { useFavorite } from "../../../context/FavoriteContext";
 import { RefreshControl } from "react-native";
+import Fuse from "fuse.js";
 
 const Search = (): JSX.Element => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,12 +31,13 @@ const Search = (): JSX.Element => {
   const [refreshing, setRefreshing] = useState(false);
 
   const [plants, setPlants] = useState<SearchPlant[]>([]);
+  const [fuseResults, setFuseResults] = useState<SearchPlant[]>([]);
 
-  const filteredPlants = plants.filter(
+  const filteredPlants = fuseResults.filter(
     (plant) =>
-      (selectedFilter === "Semua" || plant.category === selectedFilter) &&
-      plant.name.toLowerCase().includes(searchQuery.toLowerCase())
+      selectedFilter === "Semua" || plant.category === selectedFilter
   );
+  
 
   const handleCardPress = (id: string) => {
     router.push(`../components/DetailPage/Detail/${id}`);
@@ -80,6 +82,29 @@ const Search = (): JSX.Element => {
   const handleToggleFavorite = (id: string) => {
     toggleFavorite(parseInt(id));
   };
+
+  useEffect(() => {
+    if (!searchQuery || plants.length === 0) {
+      setFuseResults(plants); // tampilkan semua kalau belum ada input
+      return;
+    }
+  
+    const fuse = new Fuse(plants, {
+      keys: [
+        'name',
+        'verses.surah', 
+        'verses.ayat',   
+      ],
+      includeScore: true,
+      threshold: 0.4,
+      minMatchCharLength: 2,
+      ignoreLocation: true,
+    });
+  
+    const results = fuse.search(searchQuery).map((res) => res.item);
+    setFuseResults(results);
+  }, [searchQuery, plants]);
+  
 
   return (
     <SafeAreaView className="flex-1 bg-white">

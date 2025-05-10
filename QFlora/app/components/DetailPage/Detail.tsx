@@ -1,49 +1,94 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { router, Stack } from "expo-router";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
+import axiosClient from "../../../api/axioxClient";
+import { Audio } from "expo-av";
 
 const Detail = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const { id } = useLocalSearchParams(); // ID dari URL
+  const [plant, setPlant] = useState<any>(null);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [playingIndex, setPlayingIndex] = useState<number | null>(null);
+  const soundRef = useRef<Audio.Sound | null>(null);
 
-  // Sample data for verses (to make it dynamic)
-  const verses = [
-    {
-      surah: "Al-Insan",
-      number: "76",
-      arabicText: "وَيُسْقَوْنَ فِيهَا كَأْسًا كَانَ مِزَاجُهَا زَنْجَبِيلًا",
-      translation: "Dan di sana mereka diberi segelas minuman bercampur jahe.",
-    },
-    {
-      surah: "Al-Insan",
-      number: "76",
-      arabicText: "عَيْنًا فِيهَا تُسَمَّىٰ سَلْسَبِيلًا",
-      translation: "Dan di sana mereka diberi segelas minuman bercampur jahe.",
-    },
-    {
-      surah: "Al-Insan",
-      number: "76",
-      arabicText: "عَيْنًا فِيهَا تُسَمَّىٰ سَلْسَبِيلًا",
-      translation: "Dan di sana mereka diberi segelas minuman bercampur jahe.",
-    },
-  ];
+  // Ambil data dari backend
+  useEffect(() => {
+    const fetchPlant = async () => {
+      try {
+        const res = await axiosClient.get(`/specific-plants/${id}`);
+        setPlant(res.data);
+      } catch (err) {
+        console.error("❌ Gagal ambil detail spesifik:", err);
+      }
+    };
+
+    fetchPlant();
+  }, [id]);
 
   const toggleFavorite = () => {
-    setIsFavorite(!isFavorite);
+    setIsFavorite((prev) => !prev);
   };
 
   const handleBack = () => {
     router.back();
   };
 
+  const handleAudioPress = async (audioUrl: string, index: number) => {
+    try {
+      // Jika sedang diputar dan tombol yang sama ditekan → stop
+      if (playingIndex === index) {
+        await soundRef.current?.stopAsync();
+        await soundRef.current?.unloadAsync();
+        soundRef.current = null;
+        setPlayingIndex(null);
+        return;
+      }
+
+      // Jika sedang ada audio → hentikan dulu
+      if (soundRef.current) {
+        await soundRef.current.stopAsync();
+        await soundRef.current.unloadAsync();
+        soundRef.current = null;
+      }
+
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: audioUrl },
+        { shouldPlay: true }
+      );
+
+      soundRef.current = sound;
+      setPlayingIndex(index);
+
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (!status.isLoaded) return;
+        if (status.didJustFinish) {
+          sound.unloadAsync();
+          soundRef.current = null;
+          setPlayingIndex(null);
+        }
+      });
+    } catch (error) {
+      console.error("❌ Gagal memutar audio:", error);
+    }
+  };
+
+  // Cleanup saat keluar dari halaman
+  useEffect(() => {
+    return () => {
+      soundRef.current?.unloadAsync();
+    };
+  }, []);
+
+  if (!plant) return null;
+
   return (
     <>
       <StatusBar style="dark" />
       <Stack.Screen
         options={{
-          title: "Posisi Tumbuhan dalam Al-Quran",
+          title: "Posisi Tumbuhan dalam Al-Qur’an",
           headerTintColor: "#333",
           headerTitleStyle: { fontFamily: "poppinsSemiBold", fontSize: 16 },
           headerTitleAlign: "center",
@@ -55,74 +100,44 @@ const Detail = () => {
         }}
       />
       <View className="flex-1 bg-white">
-        {/* Plant Image with Heart Icon */}
+        {/* Gambar + Favorite */}
         <View className="p-6 pt-8 bg-primary">
           <View className="relative m-2 overflow-hidden border-2 border-white rounded-xl">
             <Image
-              source={require("../../../assets/images/tumbuhan/kurma.jpg")}
+              source={{ uri: plant.image_url }}
               className="w-full h-64"
               resizeMode="cover"
             />
-            {/* Dark overlay to make icons more visible */}
             <View
               className="absolute top-0 bottom-0 left-0 right-0"
-              style={{
-                height: 360,
-                backgroundColor: "rgba(0,0,0,0.5)",
-              }}
+              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
             />
             <TouchableOpacity
               className="absolute m-2 bottom-2 right-2"
               onPress={toggleFavorite}
             >
-              <View style={{ position: "relative" }}>
-                {isFavorite ? (
-                  <View style={{ position: "relative" }}>
-                    <FontAwesome name="heart" size={26} color="red" />
-
-                    <View
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                      }}
-                    >
-                      <FontAwesome name="heart-o" size={26} color="white" />
-                    </View>
-                  </View>
-                ) : (
-                  <View>
-                    <FontAwesome name="heart" size={26} color="transparent" />
-                    <View
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                      }}
-                    >
-                      <FontAwesome name="heart-o" size={26} color="white" />
-                    </View>
-                  </View>
-                )}
-              </View>
+              <FontAwesome
+                name={isFavorite ? "heart" : "heart-o"}
+                size={26}
+                color={isFavorite ? "red" : "white"}
+              />
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Plant Name and Info Button */}
+        {/* Nama dan tombol info */}
         <View className="px-8 pt-2 pb-6 bg-primary">
           <View className="flex-row items-center justify-between">
             <View>
               <Text className="text-3xl font-poppinsBold text-secondary">
-                Jahe
+                {plant.name}
               </Text>
               <Text className="text-base text-white font-poppinsItalic">
-                Zingiber officinale Roscoe
+                {plant.scientific_name}
               </Text>
             </View>
             <TouchableOpacity
               className="px-4 py-2 rounded-lg bg-secondary"
-              style={{ alignSelf: "center", marginLeft: 10 }}
               onPress={() =>
                 router.push("../../components/DetailPage/FullDetail")
               }
@@ -134,17 +149,14 @@ const Detail = () => {
           </View>
         </View>
 
-        {/* Overview Section */}
+        {/* Overview dan Ayat */}
         <ScrollView className="mx-4">
           <View className="p-5">
             <Text className="mb-2 text-2xl font-poppinsBold">Overview</Text>
-            <Text className="text-gray-800 font-poppins">
-              Disebutkan dalam Al-Qur'an pada Surah Al-Insan 76 dan ayat 17.
-            </Text>
+            <Text className="text-gray-800 font-poppins">{plant.overview}</Text>
           </View>
 
-          {/* Dynamic Quran Verse Cards */}
-          {verses.map((verse, index) => (
+          {plant.verses?.map((verse: any, index: number) => (
             <View className="px-4 mb-4" key={index}>
               <View
                 className="p-4 border border-gray-200 rounded-xl"
@@ -157,35 +169,27 @@ const Detail = () => {
                   backgroundColor: "white",
                 }}
               >
-                {/* Surah and Controls */}
                 <View className="flex-row items-center justify-between mb-4">
                   <Text className="text-lg font-poppinsBold">
-                    Surah {verse.surah} : {verse.number}
+                    Surah {verse.surah} : {verse.verse_number}
                   </Text>
-                  <View className="flex-row">
-                    <TouchableOpacity className="mr-4">
-                      <Ionicons
-                        name="share-social-outline"
-                        size={20}
-                        color="#333"
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity>
-                      <Ionicons
-                        name="play-circle-outline"
-                        size={20}
-                        color="#333"
-                      />
-                    </TouchableOpacity>
-                  </View>
+                  <TouchableOpacity
+                    onPress={() => handleAudioPress(verse.audio_url, index)}
+                  >
+                    <Ionicons
+                      name={
+                        playingIndex === index
+                          ? "stop-circle-outline"
+                          : "play-circle-outline"
+                      }
+                      size={24}
+                      color="#444"
+                    />
+                  </TouchableOpacity>
                 </View>
-
-                {/* Arabic Text */}
                 <Text className="mb-3 text-2xl leading-10 text-right font-poppins">
-                  {verse.arabicText}
+                  {verse.quran_verse}
                 </Text>
-
-                {/* Translation */}
                 <Text className="text-gray-700 font-poppins">
                   {verse.translation}
                 </Text>

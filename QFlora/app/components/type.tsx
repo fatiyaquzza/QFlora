@@ -7,8 +7,10 @@ export interface FavoritePlant {
 export interface SpecificVerse {
   id: number;
   surah: string;
+  verse_number: number;
   quran_verse: string;
   translation: string;
+  audio_url: string;
 }
 
 export interface SpecificPlantClassification {

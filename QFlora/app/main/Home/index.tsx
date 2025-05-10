@@ -5,6 +5,9 @@ import PlantsCard from "../../components/Card/PlantsCard";
 import { StatusBar } from "expo-status-bar";
 import axiosClient from "../../../api/axioxClient";
 import { useAuth } from "../../../context/authContext";
+import { useFavorite } from "../../../context/FavoriteContext";
+import { useLocalSearchParams } from "expo-router";
+
 
 // Define the Plant interface
 export interface Plant {
@@ -19,20 +22,33 @@ const Home: React.FC = () => {
   const [allPlants, setAllPlants] = useState<Plant[]>([]);
   const [popularPlants, setPopularPlants] = useState<Plant[]>([]);
   const { user } = useAuth();
+  const { favorites, generalFavorites, toggleFavorite, toggleGeneralFavorite } = useFavorite();
 
-  const handleToggleFavorite = (id: string) => {
+
+
+  const handleToggleFavorite = async (id: string, type: "general" | "specific") => {
+    const numericId = Number(id);
+  
+    if (type === "general") {
+      await toggleGeneralFavorite(numericId);
+    } else {
+      await toggleFavorite(numericId);
+    }
+  
     setAllPlants((prev) =>
       prev.map((plant) =>
         plant.id === id ? { ...plant, liked: !plant.liked } : plant
       )
     );
-
+  
     setPopularPlants((prev) =>
       prev.map((plant) =>
         plant.id === id ? { ...plant, liked: !plant.liked } : plant
       )
     );
   };
+  
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,13 +57,24 @@ const Home: React.FC = () => {
         const resPop = await axiosClient.get("/plants/popular");
 
         const format = (items: any[]): Plant[] =>
-          items.map((p) => ({
-            id: p.id.toString(),
+        items.map((p) => {
+          const id = p.id.toString(); 
+          const numericId = Number(p.id); 
+      
+          const isLiked =
+            p.type === "general"
+              ? generalFavorites.includes(numericId)
+              : favorites.includes(numericId);
+      
+          return {
+            id,
             name: p.name,
-            liked: false,
+            liked: isLiked,
             type: p.type || "specific",
             image: { uri: p.image_url },
-          }));
+          };
+        });
+      
 
         setAllPlants(format(resAll.data));
         setPopularPlants(format(resPop.data));
@@ -57,7 +84,8 @@ const Home: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [generalFavorites]);
+
 
   return (
     <>
@@ -87,7 +115,10 @@ const Home: React.FC = () => {
           <PlantsCard
             plants={allPlants}
             showFavoriteIcon={true}
-            onToggleFavorite={handleToggleFavorite}
+            onToggleFavorite={(id) => {
+              const plant = popularPlants.find((p) => p.id === id);
+              if (plant) handleToggleFavorite(id, plant.type);
+            }}
           />
 
           <View className="flex-row items-center justify-between mx-5 mt-5">
@@ -99,7 +130,10 @@ const Home: React.FC = () => {
           <PlantsCard
             plants={popularPlants}
             showFavoriteIcon={true}
-            onToggleFavorite={handleToggleFavorite}
+            onToggleFavorite={(id) => {
+              const plant = allPlants.find((p) => p.id === id);
+              if (plant) handleToggleFavorite(id, plant.type);
+            }}
           />
         </View>
       </ScrollView>

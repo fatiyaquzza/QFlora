@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import axiosClient from "../../../../api/axioxClient";
 import { SpecificPlant } from "../../type";
 import { useFavorite } from "../../../../context/FavoriteContext";
+import { Audio } from "expo-av";
 
 const Detail = () => {
   const { id } = useLocalSearchParams();
@@ -20,8 +21,9 @@ const Detail = () => {
   const [loading, setLoading] = useState(true);
   const { favorites, toggleFavorite } = useFavorite();
   const [isFavorite, setIsFavorite] = useState(false);
+  const [playingIndex, setPlayingIndex] = useState<number | null>(null);
+  const soundRef = useRef<Audio.Sound | null>(null);
 
-  // Ambil data plant
   useEffect(() => {
     const fetchDetail = async () => {
       try {
@@ -36,7 +38,6 @@ const Detail = () => {
     fetchDetail();
   }, [id]);
 
-  // Sync status favorite
   useEffect(() => {
     if (plant) {
       setIsFavorite(favorites.includes(plant.id));
@@ -46,13 +47,57 @@ const Detail = () => {
   const toggle = async () => {
     if (!plant) return;
     await toggleFavorite(plant.id);
-    setIsFavorite((prev) => !prev); // opsional (untuk langsung berubah)
+    setIsFavorite((prev) => !prev);
   };
 
   const handleBack = () => {
     router.replace("../../../main/Search");
   };
 
+  const handleAudioPress = async (audioUrl: string, index: number) => {
+    try {
+      if (playingIndex === index) {
+        await soundRef.current?.stopAsync();
+        await soundRef.current?.unloadAsync();
+        soundRef.current = null;
+        setPlayingIndex(null);
+        return;
+      }
+
+      if (soundRef.current) {
+        await soundRef.current.stopAsync();
+        await soundRef.current.unloadAsync();
+        soundRef.current = null;
+      }
+
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: audioUrl },
+        { shouldPlay: true }
+      );
+
+      soundRef.current = sound;
+      setPlayingIndex(index);
+
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (!status.isLoaded) return;
+        if (status.didJustFinish) {
+          sound.unloadAsync();
+          soundRef.current = null;
+          setPlayingIndex(null);
+        }
+      });
+    } catch (error) {
+      console.error("❌ Gagal memutar audio:", error);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      soundRef.current?.unloadAsync();
+    };
+  }, []);
+
+  // ✅ Blok perlindungan awal render
   if (loading || !plant) {
     return (
       <View className="items-center justify-center flex-1">
@@ -78,7 +123,6 @@ const Detail = () => {
         }}
       />
       <View className="flex-1 bg-white">
-        {/* Header Image */}
         <View className="p-6 pt-8 bg-primary">
           <View className="relative m-2 overflow-hidden border-2 border-white rounded-xl">
             <Image
@@ -100,7 +144,6 @@ const Detail = () => {
           </View>
         </View>
 
-        {/* Nama dan tombol full detail */}
         <View className="px-8 pt-2 pb-6 bg-primary">
           <View className="flex-row items-center justify-between">
             <View>
@@ -128,19 +171,33 @@ const Detail = () => {
         </View>
 
         <ScrollView className="mx-4">
-          {/* Overview */}
           <View className="p-5">
             <Text className="mb-2 text-2xl font-poppinsBold">Overview</Text>
             <Text className="text-gray-800 font-poppins">{plant.overview}</Text>
           </View>
 
-          {/* Ayat */}
-          {plant.verses.map((verse, index) => (
+          {/* ✅ Ayat dengan audio */}
+          {(plant.verses || []).map((verse, index) => (
             <View className="px-4 mb-4" key={index}>
               <View className="p-4 bg-white border border-gray-200 shadow-sm rounded-xl">
-                <Text className="mb-2 text-lg font-poppinsBold">
-                  Surah {verse.surah}
-                </Text>
+                <View className="flex-row items-center justify-between mb-4">
+                  <Text className="text-lg font-poppinsBold">
+                    Surah {verse.surah} : {verse.verse_number}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => handleAudioPress(verse.audio_url, index)}
+                  >
+                    <Ionicons
+                      name={
+                        playingIndex === index
+                          ? "stop-circle-outline"
+                          : "play-circle-outline"
+                      }
+                      size={24}
+                      color="#444"
+                    />
+                  </TouchableOpacity>
+                </View>
                 <Text className="mb-3 text-2xl leading-10 text-right font-poppins">
                   {verse.quran_verse}
                 </Text>
