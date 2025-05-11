@@ -101,7 +101,7 @@ const Favorite = () => {
     <>
       <StatusBar style="dark" />
 
-      <View className="flex-row items-end p-4 mt-10 border-b border-gray">
+      <View className="flex-row items-end p-4 pt-10 border-b border-gray bg-background">
         <Image
           source={require("../../../assets/images/logo.png")}
           className="w-16 h-16 mx-2"
@@ -112,7 +112,7 @@ const Favorite = () => {
       </View>
 
       <ScrollView>
-        <View className="flex-1 px-3 mt-6 bg-gray-100">
+        <View className="flex-1 px-3 pt-6 bg-background">
           {mappedPlants.length > 0 ? (
             <FavoriteCard
               plants={mappedPlants}

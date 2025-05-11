@@ -163,7 +163,7 @@ const Detail = () => {
                 })
               }
             >
-              <Text className="text-base text-center font-poppinsSemiBold text-primary">
+              <Text className="text-sm text-center font-poppinsSemiBold text-primary">
                 Informasi{"\n"}Tumbuhan
               </Text>
             </TouchableOpacity>
@@ -173,7 +173,7 @@ const Detail = () => {
         <ScrollView className="mx-4">
           <View className="p-5">
             <Text className="mb-2 text-2xl font-poppinsBold">Overview</Text>
-            <Text className="text-gray-800 font-poppins">{plant.overview}</Text>
+            <Text className="text-gray-800 font-poppins text-justify">{plant.overview}</Text>
           </View>
 
           {/* ✅ Ayat dengan audio */}

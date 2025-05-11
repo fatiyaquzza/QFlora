@@ -14,7 +14,7 @@ const Profile = () => {
   return (
     <>
       <StatusBar style="light"></StatusBar>
-      <View className="flex-1 bg-gray-100">
+      <View className="flex-1 bg-background">
         {/* Header */}
         <View className="items-center py-16 bg-primary rounded-b-3xl">
           <Image
@@ -31,9 +31,9 @@ const Profile = () => {
 
         <ScrollView>
           {/* Menu */}
-          <View className="p-4 mx-6 mt-8 bg-white rounded-md shadow-md">
+          <View className="p-4 mx-6 mt-8 bg-white rounded-md shadow-lg">
             <TouchableOpacity
-              className="flex-row items-center justify-between py-5 border-b border-gray-300"
+              className="flex-row items-center justify-between py-5 border-b border-gray"
               onPress={() => router.push("../../components/DetailPage/About")}
             >
               <View className="flex-row items-center">
@@ -51,7 +51,7 @@ const Profile = () => {
               />
             </TouchableOpacity>
             <TouchableOpacity
-              className="flex-row items-center justify-between py-5 border-b border-gray-300"
+              className="flex-row items-center justify-between py-5 border-b border-gray"
               onPress={() => router.push("../../components/DetailPage/AppInfo")}
             >
               <View className="flex-row items-center">

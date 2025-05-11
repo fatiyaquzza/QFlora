@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, Image, TouchableOpacity, ScrollView, RefreshControl } from "react-native";
 import TimeCard from "../../components/Card/TimeCard";
 import PlantsCard from "../../components/Card/PlantsCard";
 import { StatusBar } from "expo-status-bar";
@@ -23,7 +23,7 @@ const Home: React.FC = () => {
   const [popularPlants, setPopularPlants] = useState<Plant[]>([]);
   const { user } = useAuth();
   const { favorites, generalFavorites, toggleFavorite, toggleGeneralFavorite } = useFavorite();
-
+  const [refreshing, setRefreshing] = useState(false);
 
 
   const handleToggleFavorite = async (id: string, type: "general" | "specific") => {
@@ -47,25 +47,21 @@ const Home: React.FC = () => {
       )
     );
   };
-  
-  
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const resAll = await axiosClient.get("/plants/all");
-        const resPop = await axiosClient.get("/plants/popular");
-
-        const format = (items: any[]): Plant[] =>
+  const fetchData = async () => {
+    try {
+      const resAll = await axiosClient.get("/plants/all");
+      const resPop = await axiosClient.get("/plants/popular");
+  
+      const format = (items: any[]): Plant[] =>
         items.map((p) => {
-          const id = p.id.toString(); 
-          const numericId = Number(p.id); 
-      
+          const id = p.id.toString();
+          const numericId = Number(p.id);
           const isLiked =
             p.type === "general"
               ? generalFavorites.includes(numericId)
               : favorites.includes(numericId);
-      
+  
           return {
             id,
             name: p.name,
@@ -74,24 +70,32 @@ const Home: React.FC = () => {
             image: { uri: p.image_url },
           };
         });
-      
+  
+      setAllPlants(format(resAll.data));
+      setPopularPlants(format(resPop.data));
+    } catch (err) {
+      console.error("❌ Gagal ambil data home:", err);
+    }
+  };
+  
 
-        setAllPlants(format(resAll.data));
-        setPopularPlants(format(resPop.data));
-      } catch (err) {
-        console.error("❌ Gagal ambil data home:", err);
-      }
-    };
-
+  useEffect(() => {
     fetchData();
   }, [generalFavorites]);
+  
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchData(); 
+    setRefreshing(false);
+  };
+  
 
 
   return (
     <>
       <StatusBar style="dark" />
 
-      <View className="flex-row items-end p-4 mt-10 border-b border-gray">
+      <View className="flex-row items-end p-4 pt-10 border-b border-gray bg-background">
         <Image
           source={require("../../../assets/images/logo.png")}
           className="w-16 h-16 mx-2"
@@ -102,8 +106,13 @@ const Home: React.FC = () => {
         </Text>
       </View>
 
-      <ScrollView>
-        <View className="flex-1 px-3 mt-6 bg-gray-100">
+      <ScrollView
+  contentContainerStyle={{ flexGrow: 1 }}
+  refreshControl={
+    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+  }
+>
+        <View className="flex-1 px-3 pt-6 bg-background">
           <TimeCard />
 
           <View className="flex-row items-center justify-between mx-5 mt-10">

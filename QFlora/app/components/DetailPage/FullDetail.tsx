@@ -45,7 +45,7 @@ const FullDetail = () => {
   const handleToggleFavorite = async () => {
     if (!plant) return;
     await toggleFavorite(plant.id);
-    setIsFavorite((prev) => !prev); // opsional (ubah icon langsung)
+    setIsFavorite((prev) => !prev); 
   };
 
   const parseChemicalComp = (text: string) => {
@@ -92,38 +92,40 @@ const FullDetail = () => {
         }}
       />
       <View className="flex-1 bg-softgrey">
-        <View className="mx-8 my-8 overflow-hidden rounded-xl">
-          <Image
-            source={{ uri: plant?.image_url }}
-            className="w-full h-80"
-            style={{ resizeMode: "cover" }}
-          />
-          <View className="absolute inset-0 bg-black/50">
-            <TouchableOpacity
-              className="absolute p-2 top-4 left-4"
-              onPress={handleToggleFavorite}
-            >
-              <View style={{ position: "relative" }}>
-                {isFavorite ? (
-                  <FontAwesome name="heart" size={26} color="red" />
-                ) : (
-                  <FontAwesome name="heart-o" size={26} color="white" />
-                )}
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
+<View className="mx-8 mt-8 mb-2 overflow-hidden rounded-xl">
+  <Image
+    source={{ uri: plant?.image_url }}
+    className="w-full h-80"
+    style={{ resizeMode: "cover" }}
+  />
+  <View className="absolute inset-0 bg-black/50">
+    <TouchableOpacity
+      className="absolute p-2 top-4 left-4"
+      onPress={handleToggleFavorite}
+    >
+      <View style={{ position: "relative" }}>
+        {isFavorite ? (
+          <FontAwesome name="heart" size={26} color="red" />
+        ) : (
+          <FontAwesome name="heart-o" size={26} color="white" />
+        )}
+      </View>
+    </TouchableOpacity>
+  </View>
+</View>
 
-        <View className="items-center justify-center mb-4">
-          <View className="px-10 py-5 overflow-hidden rounded-t-lg bg-primary rounded-xl">
-            <Text className="text-2xl text-center text-white font-poppinsBold">
-              {plant?.name}
-            </Text>
-            <Text className="text-center text-white font-poppinsItalic">
-              {plant?.latin_name}
-            </Text>
-          </View>
-        </View>
+{/* Teks menimpa sedikit bagian bawah gambar */}
+<View className="items-center -mt-12 mb-10">
+  <View className="px-6 py-5 min-w-80 bg-primary rounded-xl shadow-md items-center">
+    <Text className="text-2xl text-center text-white font-poppinsBold">
+      {plant?.name}
+    </Text>
+    <Text className="text-center text-white font-poppinsItalic">
+      {plant?.latin_name}
+    </Text>
+  </View>
+</View>
+
 
         <ScrollView className="mx-4">
           {/* Deskripsi */}
@@ -227,7 +229,7 @@ const FullDetail = () => {
                 resizeMode="cover"
               >
                 <View className="p-6">
-                  <Text className="text-sm text-center text-black font-poppins">
+                  <Text className="text-sm text-black font-poppins text-justify">
                     {plant?.benefits}
                   </Text>
                 </View>
@@ -279,12 +281,12 @@ const FullDetail = () => {
             {sections.komposisiKimia && (
               <View className="px-4 pb-4">
                 {plant?.chemical_comp ? (
-                  <View className="flex flex-wrap flex-row gap-2">
+                  <View className="flex flex-wrap flex-row gap-2 ">
                     {parseChemicalComp(plant.chemical_comp).map(
                       (comp, index) => (
                         <View
                           key={index}
-                          className={`px-3 py-2 rounded-xl ${
+                          className={`px-4 py-4 min-w-44 rounded-lg ${
                             index % 2 === 0
                               ? "bg-[#004E1D]"
                               : "bg-white border border-[#004E1D]"
