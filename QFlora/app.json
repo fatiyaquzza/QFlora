@@ -15,12 +15,15 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "backgroundColor": "#ffffff",
+        "googleServicesFile": "./google-services.json"
+      },
+      "package": "com.qflora.QFlora"
     },
     "web": {
       "bundler": "metro",
       "output": "static",
+      "package": "com.usk.qflora",
       "favicon": "./assets/icons/icon.png"
     },
     "plugins": [
@@ -37,6 +40,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "353e16cc-9759-4567-b351-71e57450d870"
+      }
     }
   }
 }

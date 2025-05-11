@@ -45,7 +45,7 @@ const FullDetail = () => {
   const handleToggleFavorite = async () => {
     if (!plant) return;
     await toggleFavorite(plant.id);
-    setIsFavorite((prev) => !prev); 
+    setIsFavorite((prev) => !prev);
   };
 
   const parseChemicalComp = (text: string) => {
@@ -92,40 +92,39 @@ const FullDetail = () => {
         }}
       />
       <View className="flex-1 bg-softgrey">
-<View className="mx-8 mt-8 mb-2 overflow-hidden rounded-xl">
-  <Image
-    source={{ uri: plant?.image_url }}
-    className="w-full h-80"
-    style={{ resizeMode: "cover" }}
-  />
-  <View className="absolute inset-0 bg-black/50">
-    <TouchableOpacity
-      className="absolute p-2 top-4 left-4"
-      onPress={handleToggleFavorite}
-    >
-      <View style={{ position: "relative" }}>
-        {isFavorite ? (
-          <FontAwesome name="heart" size={26} color="red" />
-        ) : (
-          <FontAwesome name="heart-o" size={26} color="white" />
-        )}
-      </View>
-    </TouchableOpacity>
-  </View>
-</View>
+        <View className="mx-8 mt-8 mb-2 overflow-hidden rounded-xl">
+          <Image
+            source={{ uri: plant?.image_url }}
+            className="w-full h-80"
+            style={{ resizeMode: "cover" }}
+          />
+          <View className="absolute inset-0 bg-black/50">
+            <TouchableOpacity
+              className="absolute p-2 top-4 left-4"
+              onPress={handleToggleFavorite}
+            >
+              <View style={{ position: "relative" }}>
+                {isFavorite ? (
+                  <FontAwesome name="heart" size={26} color="red" />
+                ) : (
+                  <FontAwesome name="heart-o" size={26} color="white" />
+                )}
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
 
-{/* Teks menimpa sedikit bagian bawah gambar */}
-<View className="items-center -mt-12 mb-10">
-  <View className="px-6 py-5 min-w-80 bg-primary rounded-xl shadow-md items-center">
-    <Text className="text-2xl text-center text-white font-poppinsBold">
-      {plant?.name}
-    </Text>
-    <Text className="text-center text-white font-poppinsItalic">
-      {plant?.latin_name}
-    </Text>
-  </View>
-</View>
-
+        {/* Teks menimpa sedikit bagian bawah gambar */}
+        <View className="items-center -mt-12 mb-10">
+          <View className="px-6 py-5 min-w-80 bg-primary rounded-xl shadow-md items-center">
+            <Text className="text-2xl text-center text-white font-poppinsBold">
+              {plant?.name}
+            </Text>
+            <Text className="text-center text-white font-poppinsItalic">
+              {plant?.latin_name}
+            </Text>
+          </View>
+        </View>
 
         <ScrollView className="mx-4">
           {/* Deskripsi */}
@@ -144,13 +143,24 @@ const FullDetail = () => {
               />
             </TouchableOpacity>
             {sections.deskripsi && (
-              <View className="px-4 pb-4">
-                <Text
-                  className="text-gray-700 font-poppins"
-                  style={{ textAlign: "justify" }}
-                >
-                  {plant?.description}
-                </Text>
+              <View className="flex-row flex-wrap justify-between px-4 pb-4">
+                <Text className="font-poppins text-justify mb-3">{plant?.description}</Text>
+                  <View className="w-[48%] bg-softgreen rounded-lg p-3 mb-2">
+                    <Text className="text-center font-poppinsSemiBold">
+                      Bahasa Arab
+                    </Text>
+                    <Text className="text-center font-poppinsItalic">
+                      Al-Zanjabeel
+                    </Text>
+                  </View>
+                  <View className="w-[48%] bg-softgreen rounded-lg p-3 mb-2">
+                    <Text className="text-center font-poppinsSemiBold">
+                      Bahasa Inggris
+                    </Text>
+                    <Text className="text-center font-poppinsItalic">
+                      Ginger
+                    </Text>
+                  </View>
               </View>
             )}
           </View>

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "533251574081",
+    "project_id": "qflora-17242",
+    "storage_bucket": "qflora-17242.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:533251574081:android:20ed7e2bd039a14f1779c0",
+        "android_client_info": {
+          "package_name": "com.usk.qflora"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "533251574081-3cq3cto6jaoqplobg2k07dkesrn5k5qf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.usk.qflora",
+            "certificate_hash": "0710d41128c8f1b3c35e2d7112c121de60cee54f"
+          }
+        },
+        {
+          "client_id": "533251574081-k6ro02mrh45hji2ee5p4om39lqejk88k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.usk.qflora",
+            "certificate_hash": "20f9556bc3c46d4d0ece415236edd14ee81f43ae"
+          }
+        },
+        {
+          "client_id": "533251574081-5694829mloelspotjjidlgopug870uuv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtthvVWIbluvd2fXFVZPXO3xVwL-FzXg8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "533251574081-5694829mloelspotjjidlgopug870uuv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

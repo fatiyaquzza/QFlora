@@ -5,10 +5,13 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   updateProfile,
+  GoogleAuthProvider,
+  signInWithCredential,
 } from "firebase/auth";
 import { auth } from "../firebase";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 type User = {
   uid: string;
@@ -29,6 +32,7 @@ interface AuthContextType {
     username: string
   ) => Promise<void>;
   logout: () => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -38,6 +42,7 @@ const AuthContext = createContext<AuthContextType>({
   register: async () => {},
   logout: async () => {},
   loading: false,
+  loginWithGoogle: async () => {},
 });
 
 export const AuthProvider = ({ children }: any) => {
@@ -55,11 +60,14 @@ export const AuthProvider = ({ children }: any) => {
   };
 
   useEffect(() => {
+    GoogleSignin.configure({
+      webClientId:
+        "533251574081-5694829mloelspotjjidlgopug870uuv.apps.googleusercontent.com",
+      offlineAccess: false,
+    });
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       const isLoggedIn = await getLoginStatus();
-      // console.log("🔁 Firebase user berubah:", firebaseUser);
-      // console.log("✅ Status login tersimpan di AsyncStorage:", isLoggedIn);
-
       if (firebaseUser && isLoggedIn) {
         const userData = {
           uid: firebaseUser.uid,
@@ -70,17 +78,12 @@ export const AuthProvider = ({ children }: any) => {
           profilePicture: firebaseUser.photoURL ?? "",
           email: firebaseUser.email ?? "email tidak ditemukan",
         };
-
-        // console.log("📦 User data diset ke context:", userData);
-
         setUser(userData);
         setIsAuth(true);
       } else {
-        // console.log("🚫 Tidak ada user yang login atau status tidak tersimpan");
         setUser(null);
         setIsAuth(false);
       }
-
       setLoading(false);
     });
 
@@ -110,7 +113,6 @@ export const AuthProvider = ({ children }: any) => {
       await setLoginStatus(true);
       router.replace("../main/Home");
     } catch (error: any) {
-      // 🟡 Cek error code untuk tampilan modal yang spesifik
       if (error.code === "auth/user-not-found") {
         throw new Error("Email tidak ditemukan.");
       }
@@ -124,6 +126,41 @@ export const AuthProvider = ({ children }: any) => {
     }
   };
 
+  const loginWithGoogle = async () => {
+    try {
+      await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
+
+      const googleUser = await GoogleSignin.signIn();
+      const { idToken } = await GoogleSignin.getTokens();
+
+      if (!idToken)
+        throw new Error("idToken tidak ditemukan dari GoogleSignin");
+
+      const credential = GoogleAuthProvider.credential(idToken);
+      const userCredential = await signInWithCredential(auth, credential);
+      const firebaseUser = userCredential.user;
+
+      setUser({
+        uid: firebaseUser.uid,
+        name:
+          firebaseUser.displayName ||
+          firebaseUser.email?.split("@")[0] ||
+          "Pengguna",
+        profilePicture: firebaseUser.photoURL ?? "",
+        email: firebaseUser.email ?? "email tidak ditemukan",
+      });
+
+      setIsAuth(true);
+      await setLoginStatus(true);
+      router.replace("../main/Home");
+    } catch (error: any) {
+      console.error("❌ Login Google error:", error);
+      throw new Error("Login Google gagal. Coba lagi.");
+    }
+  };
+
   const register = async (
     email: string,
     password: string,
@@ -131,7 +168,7 @@ export const AuthProvider = ({ children }: any) => {
     username: string
   ) => {
     if (password !== confirmPassword) {
-      throw new Error("Password dan konfirmasi password tidak sama.");
+      throw new Error("Password dan konfirmasi tidak sama.");
     }
 
     try {
@@ -160,17 +197,16 @@ export const AuthProvider = ({ children }: any) => {
       await setLoginStatus(true);
       router.replace("../main/Home");
     } catch (error: any) {
-      // 🟡 Tambahkan pengecekan error code Firebase di sini:
       if (error.code === "auth/email-already-in-use") {
-        throw new Error("Email sudah digunakan. Silakan gunakan email lain.");
+        throw new Error("Email sudah digunakan.");
       }
       if (error.code === "auth/invalid-email") {
-        throw new Error("Format email tidak valid.");
+        throw new Error("Email tidak valid.");
       }
       if (error.code === "auth/weak-password") {
-        throw new Error("Password terlalu lemah. Minimal 6 karakter.");
+        throw new Error("Password terlalu lemah (min. 6 karakter).");
       }
-      throw new Error(error.message || "Terjadi kesalahan saat mendaftar.");
+      throw new Error(error.message || "Gagal daftar.");
     }
   };
 
@@ -188,7 +224,15 @@ export const AuthProvider = ({ children }: any) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuth, loading, login, register, logout }}
+      value={{
+        user,
+        isAuth,
+        loading,
+        login,
+        register,
+        logout,
+        loginWithGoogle,
+      }}
     >
       {!loading && children}
     </AuthContext.Provider>

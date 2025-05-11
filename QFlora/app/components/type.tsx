@@ -11,6 +11,7 @@ export interface SpecificVerse {
   quran_verse: string;
   translation: string;
   audio_url: string;
+  keyword_arab: string;
 }
 
 export interface SpecificPlantClassification {

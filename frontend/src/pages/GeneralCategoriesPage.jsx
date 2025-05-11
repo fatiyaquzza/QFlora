@@ -24,6 +24,7 @@ function GeneralCategoriesPage() {
     quran_verse: "",
     translation: "",
     audio_url: "",
+    keyword_arab: "",
   });
 
   // 🔴 Tambahan state untuk konfirmasi hapus
@@ -89,7 +90,9 @@ function GeneralCategoriesPage() {
       quran_verse: "",
       translation: "",
       audio_url: "",
+      keyword_arab: "",
     });
+
     setEditingVerse(null);
     setShowVerseForm(false);
     fetchCategories();
@@ -155,18 +158,27 @@ function GeneralCategoriesPage() {
                               className="mb-2 pb-2 border-b border-gray-200"
                             >
                               <p>
-                                📖{" "}
+                                {" "}
                                 <b>
                                   {v.surah} - {v.verse_number}
                                 </b>
                               </p>
-                              <p className="italic">{v.quran_verse}</p>
+                              <p className="text-sm text-right">{v.quran_verse}</p>
                               <p className="text-sm text-gray-700">
-                                📘 {v.translation}
+                                {v.translation}
                               </p>
                               <audio controls className="w-full mt-1">
                                 <source src={v.audio_url} type="audio/mpeg" />
                               </audio>
+                              {v.keyword_arab && (
+  <p className="text-sm text-amber-800 mt-1">
+    🔍 <span className="font-semibold">Kata kunci Arab:</span>{" "}
+    <span className="bg-yellow-100 px-1 py-0.5 rounded text-black">
+      {v.keyword_arab}
+    </span>
+  </p>
+)}
+
                               <div className="flex gap-2 mt-2">
                                 <button
                                   onClick={() => {
@@ -209,6 +221,7 @@ function GeneralCategoriesPage() {
                               quran_verse: "",
                               translation: "",
                               audio_url: "",
+                              keyword_arab: "",
                             });
                             setShowVerseForm(true);
                           }}
@@ -322,6 +335,7 @@ function GeneralCategoriesPage() {
               quran_verse: "",
               translation: "",
               audio_url: "",
+              keyword_arab: "",
             });
           }}
         >
@@ -369,6 +383,16 @@ function GeneralCategoriesPage() {
                 setNewVerse({ ...newVerse, audio_url: e.target.value })
               }
             />
+            <input
+              type="text"
+              className="w-full p-2 border rounded"
+              placeholder="Kata kunci Arab"
+              value={newVerse.keyword_arab}
+              onChange={(e) =>
+                setNewVerse({ ...newVerse, keyword_arab: e.target.value })
+              }
+            />
+
             <div className="flex justify-end gap-2">
               <button
                 type="button"

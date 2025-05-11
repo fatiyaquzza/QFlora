@@ -159,18 +159,18 @@ const Register: React.FC = () => {
               </>
             ) : (
               <Text className="text-center text-white font-poppinsSemiBold">
-                Sign up
+                Daftar
               </Text>
             )}
           </TouchableOpacity>
 
           <View className="flex-row items-center">
             <Text className="text-gray-600 font-poppins">
-              Already have an account?
+              Sudah Memiliki Akun?
             </Text>
             <TouchableOpacity onPress={() => router.push("../auth")}>
               <Text className="text-[#0B2D12] font-poppinsSemiBold ml-1">
-                Sign in
+                Masuk!
               </Text>
             </TouchableOpacity>
           </View>

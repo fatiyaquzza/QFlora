@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       quran_verse: DataTypes.TEXT,
       translation: DataTypes.TEXT,
       audio_url: DataTypes.TEXT,
+      keyword_arab: DataTypes.TEXT,
     },
     {
       tableName: "specific_plant_verses",

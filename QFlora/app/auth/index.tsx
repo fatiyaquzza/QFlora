@@ -20,10 +20,10 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useAuth();
   const [errorModalVisible, setErrorModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [loadingLogin, setLoadingLogin] = useState(false);
+  const { login, loginWithGoogle } = useAuth();
 
   return (
     <KeyboardAvoidingView
@@ -119,18 +119,43 @@ const Login: React.FC = () => {
               </>
             ) : (
               <Text className="text-center text-white font-poppinsSemiBold">
-                Sign in
+                Masuk
               </Text>
             )}
           </TouchableOpacity>
 
+          <View className="flex flex-row items-center justify-center w-full mt-4 mb-6 space-x-4">
+            {/* Tombol Google */}
+            <TouchableOpacity
+              className="flex flex-row items-center justify-center flex-1 bg-white border border-gray-300 rounded-lg h-14"
+              onPress={async () => {
+                try {
+                  setLoadingLogin(true);
+                  await loginWithGoogle();
+                } catch (err: any) {
+                  setErrorMessage(err.message);
+                  setErrorModalVisible(true);
+                } finally {
+                  setLoadingLogin(false);
+                }
+              }}
+            >
+              <Image
+                source={require("../../assets/images/google-logo.png")}
+                style={{ width: 24, height: 24, marginRight: 8 }}
+              />
+              <Text className="text-sm text-gray-700 font-poppinsSemiBold">
+                Lanjutkan dengan Google
+              </Text>
+            </TouchableOpacity>
+          </View>
           <View className="flex-row items-center">
             <Text className="text-gray-600 font-poppins">
-              Don’t have an account?
+              Belum punya akun?
             </Text>
             <TouchableOpacity onPress={() => router.push("../auth/register")}>
               <Text className="text-[#0B2D12] font-poppinsSemiBold ml-1">
-                Sign up
+                Daftar!
               </Text>
             </TouchableOpacity>
           </View>

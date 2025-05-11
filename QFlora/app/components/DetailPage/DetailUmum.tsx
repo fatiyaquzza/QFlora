@@ -165,8 +165,22 @@ const DetailUmum = () => {
                   </TouchableOpacity>
                 </View>
                 <Text className="mb-3 text-2xl leading-10 text-right font-poppins">
-                  {verse.quran_verse}
+                  {verse.keyword_arab
+                    ? verse.quran_verse
+                        .split(verse.keyword_arab)
+                        .map((part: string, i: number, arr: string[]) => (
+                          <React.Fragment key={i}>
+                            <Text>{part}</Text>
+                            {i !== arr.length - 1 && (
+                              <Text className="bg-highlight text-black font-poppinsSemiBold">
+                                {verse.keyword_arab}
+                              </Text>
+                            )}
+                          </React.Fragment>
+                        ))
+                    : verse.quran_verse}
                 </Text>
+
                 <Text className="text-gray-700 font-poppins">
                   {verse.translation}
                 </Text>
