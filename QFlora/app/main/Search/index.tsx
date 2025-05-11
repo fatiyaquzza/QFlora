@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   SafeAreaView,
+  Keyboard,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
@@ -20,6 +21,7 @@ import { router } from "expo-router";
 import { useFavorite } from "../../../context/FavoriteContext";
 import { RefreshControl } from "react-native";
 import Fuse from "fuse.js";
+import { useTabVisibility } from "../_layout";
 
 const Search = (): JSX.Element => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -82,6 +84,23 @@ const Search = (): JSX.Element => {
   const handleToggleFavorite = (id: string) => {
     toggleFavorite(parseInt(id));
   };
+
+  const { setIsInputFocused } = useTabVisibility();
+
+useEffect(() => {
+  const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+    setIsInputFocused(true);
+  });
+  const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+    setIsInputFocused(false);
+  });
+
+  return () => {
+    showSubscription.remove();
+    hideSubscription.remove();
+  };
+}, []);
+
 
   useEffect(() => {
     if (!searchQuery || plants.length === 0) {
