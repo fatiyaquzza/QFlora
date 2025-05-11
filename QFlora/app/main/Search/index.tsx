@@ -107,7 +107,7 @@ const Search = (): JSX.Element => {
   
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-background">
       <StatusBar style="dark" />
       <View className="flex-row items-end px-4 pb-4 border-b mt-14 border-gray">
         <Image

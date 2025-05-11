@@ -175,7 +175,7 @@ function SpecificPlantsPage() {
 
   return (
     <AdminLayout>
-      <div className="mt-4 bg-white rounded-xl p-4 shadow overflow-x-auto max-w-[1200px] font-Poppins">
+      <div className="mt-4 bg-white rounded-xl p-4 shadow overflow-x-auto  font-Poppins">
         <div className="px-2 pt-2">
           <div className="flex items-center justify-between mb-4">
             <h1 className="mb-6 text-xl font-bold text-black">
@@ -190,7 +190,7 @@ function SpecificPlantsPage() {
           </div>
           <div className="border-t border-gray-300 mb-4"></div>
 
-          <div className="overflow-x-auto max-w-[1190px]">
+          <div className="overflow-x-auto ">
             <table className="w-full text-sm text-left border-separate border-spacing-y-4">
               <thead className="text-gray-700 border-b border-gray-300">
                 <tr>
