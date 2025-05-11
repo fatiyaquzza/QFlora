@@ -45,6 +45,8 @@ export interface SpecificPlant {
   chemical_comp: string;
   cultivation: string;
   source_ref: string;
+  eng_name:string;
+  arab_name:string;
   verses: SpecificVerse[];
   classifications: SpecificPlantClassification[];
 }

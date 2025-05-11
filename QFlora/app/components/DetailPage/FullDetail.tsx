@@ -55,6 +55,13 @@ const FullDetail = () => {
       .filter((item) => item.length > 0);
   };
 
+  const parseSourceRef = (text: string): string[] => {
+    return text
+      .split("#-")
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0);
+  };
+
   useEffect(() => {
     const fetchDetail = async () => {
       try {
@@ -144,23 +151,25 @@ const FullDetail = () => {
             </TouchableOpacity>
             {sections.deskripsi && (
               <View className="flex-row flex-wrap justify-between px-4 pb-4">
-                <Text className="font-poppins text-justify mb-3">{plant?.description}</Text>
-                  <View className="w-[48%] bg-softgreen rounded-lg p-3 mb-2">
-                    <Text className="text-center font-poppinsSemiBold">
-                      Bahasa Arab
-                    </Text>
-                    <Text className="text-center font-poppinsItalic">
-                      Al-Zanjabeel
-                    </Text>
-                  </View>
-                  <View className="w-[48%] bg-softgreen rounded-lg p-3 mb-2">
-                    <Text className="text-center font-poppinsSemiBold">
-                      Bahasa Inggris
-                    </Text>
-                    <Text className="text-center font-poppinsItalic">
-                      Ginger
-                    </Text>
-                  </View>
+                <Text className="font-poppins text-justify mb-3">
+                  {plant?.description}
+                </Text>
+                <View className="w-[48%] bg-softgreen rounded-lg p-3 mb-2">
+                  <Text className="text-center font-poppinsSemiBold">
+                    Bahasa Arab
+                  </Text>
+                  <Text className="text-center font-poppins text-2xl">
+                    {plant?.arab_name}
+                  </Text>
+                </View>
+                <View className="w-[48%] bg-softgreen rounded-lg p-3 mb-2">
+                  <Text className="text-center font-poppinsSemiBold">
+                    Bahasa Inggris
+                  </Text>
+                  <Text className="text-center text-md font-poppins">
+                    {plant?.eng_name}
+                  </Text>
+                </View>
               </View>
             )}
           </View>
@@ -370,7 +379,20 @@ const FullDetail = () => {
                   className="text-white font-poppins"
                   style={{ textAlign: "justify" }}
                 >
-                  {plant?.source_ref}
+                  {plant?.source_ref ? (
+                    parseSourceRef(plant.source_ref).map((item, idx) => (
+                      <View key={idx} className="flex-row items-start mb-1">
+                        <Text className="text-white font-poppins mr-2">•</Text>
+                        <Text className="text-white font-poppins flex-1 text-justify text-sm">
+                          {item}
+                        </Text>
+                      </View>
+                    ))
+                  ) : (
+                    <Text className="text-white font-poppins">
+                      Tidak tersedia
+                    </Text>
+                  )}
                 </Text>
               </View>
             )}

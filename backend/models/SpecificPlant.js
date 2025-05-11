@@ -8,6 +8,8 @@ module.exports = (sequelize, DataTypes) => {
       plant_type: DataTypes.ENUM("Buah", "Sayur", "Bunga"),
       overview: DataTypes.TEXT,
       description: DataTypes.TEXT,
+      eng_name:DataTypes.TEXT,
+      arab_name:DataTypes.TEXT,
       benefits: DataTypes.TEXT,
       characteristics: DataTypes.TEXT,
       origin: DataTypes.TEXT,

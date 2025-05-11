@@ -18,6 +18,8 @@ function SpecificPlantsPage() {
     chemical_comp: "",
     cultivation: "",
     source_ref: "",
+    eng_name:"",
+    arab_name:"",
   });
   const [editing, setEditing] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -75,6 +77,8 @@ function SpecificPlantsPage() {
         chemical_comp: "",
         cultivation: "",
         source_ref: "",
+        eng_name:"",
+        arab_name:"",
       });
       refreshData();
       setShowForm(false);
@@ -198,6 +202,8 @@ function SpecificPlantsPage() {
                 <tr>
                   <th className="px-4 py-2">Nama</th>
                   <th className="px-4 py-2">Latin</th>
+                  <th className="px-4 py-2">Inggris</th>
+                  <th className="px-4 py-2">Arab</th>
                   <th className="px-4 py-2">Gambar</th>
                   <th className="px-4 py-2">Jenis</th>
                   <th className="px-4 py-2">Ayat</th>
@@ -232,6 +238,22 @@ function SpecificPlantsPage() {
                         style={{ minHeight: "100px" }}
                       >
                         {plant.latin_name}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div
+                        className="min-h-40 overflow-y-auto pr-1"
+                        style={{ minHeight: "100px" }}
+                      >
+                        {plant.eng_name}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div
+                        className="min-h-40 overflow-y-auto pr-1"
+                        style={{ minHeight: "100px" }}
+                      >
+                        {plant.arab_name}
                       </div>
                     </td>
                     <td className="px-4 py-4 w-44 min-w-44">
