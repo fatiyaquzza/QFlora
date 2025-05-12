@@ -105,21 +105,52 @@ function GeneralCategoriesPage() {
     fetchCategories();
   };
 
+  const [excelFile, setExcelFile] = useState(null);
+
+  const handleExcelUpload = async () => {
+    if (!excelFile) return alert("Pilih file Excel terlebih dahulu.");
+    const formData = new FormData();
+    formData.append("file", excelFile);
+    try {
+      await axiosClient.post("/api/import-general-verses", formData);
+      alert("Import berhasil!");
+      fetchCategories();
+      setExcelFile(null);
+    } catch (err) {
+      alert("Gagal import. Pastikan format Excel sesuai.");
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="overflow-x-auto bg-white rounded-xl shadow p-4 font-Poppins">
         <div className="px-2 pt-2">
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="mb-6 text-xl font-bold text-black">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
+            <h1 className="text-xl font-bold text-black">
               Daftar Kategori Umum
             </h1>
-            <button
-              className="px-4 py-2 text-sm text-white bg-[#004E1D] rounded hover:bg-green-700"
-              onClick={() => setShowForm(true)}
-            >
-              Tambah
-            </button>
+            <div className="flex gap-2">
+              <input
+                type="file"
+                accept=".xlsx, .xls"
+                onChange={(e) => setExcelFile(e.target.files[0])}
+                className="text-sm"
+              />
+              <button
+                onClick={handleExcelUpload}
+                className="px-4 py-2 text-sm text-white bg-indigo-600 rounded hover:bg-indigo-800"
+              >
+                Upload Excel Ayat
+              </button>
+              <button
+                className="px-4 py-2 text-sm text-white bg-[#004E1D] rounded hover:bg-green-700"
+                onClick={() => setShowForm(true)}
+              >
+                Tambah
+              </button>
+            </div>
           </div>
+
           <div className="overflow-x-auto">
             <div className="border-t border-gray-300 mb-4"></div>
 
@@ -163,7 +194,9 @@ function GeneralCategoriesPage() {
                                   {v.surah} - {v.verse_number}
                                 </b>
                               </p>
-                              <p className="text-sm text-right">{v.quran_verse}</p>
+                              <p className="text-sm text-right">
+                                {v.quran_verse}
+                              </p>
                               <p className="text-sm text-gray-700">
                                 {v.translation}
                               </p>
@@ -171,13 +204,16 @@ function GeneralCategoriesPage() {
                                 <source src={v.audio_url} type="audio/mpeg" />
                               </audio>
                               {v.keyword_arab && (
-  <p className="text-sm text-amber-800 mt-1">
-    🔍 <span className="font-semibold">Kata kunci Arab:</span>{" "}
-    <span className="bg-yellow-100 px-1 py-0.5 rounded text-black">
-      {v.keyword_arab}
-    </span>
-  </p>
-)}
+                                <p className="text-sm text-amber-800 mt-1">
+                                  🔍{" "}
+                                  <span className="font-semibold">
+                                    Kata kunci Arab:
+                                  </span>{" "}
+                                  <span className="bg-yellow-100 px-1 py-0.5 rounded text-black">
+                                    {v.keyword_arab}
+                                  </span>
+                                </p>
+                              )}
 
                               <div className="flex gap-2 mt-2">
                                 <button
@@ -211,24 +247,6 @@ function GeneralCategoriesPage() {
                     </td>
                     <td className="px-2 py-4 min-w-40 w-40 text-center whitespace-nowrap">
                       <div className="flex flex-col items-center gap-2">
-                        <button
-                          onClick={() => {
-                            setSelectedCategoryId(cat.id);
-                            setEditingVerse(null);
-                            setNewVerse({
-                              surah: "",
-                              verse_number: "",
-                              quran_verse: "",
-                              translation: "",
-                              audio_url: "",
-                              keyword_arab: "",
-                            });
-                            setShowVerseForm(true);
-                          }}
-                          className="px-3 py-1 text-white bg-[#004E1D] rounded"
-                        >
-                          Tambah Ayat
-                        </button>
                         <button
                           onClick={() => setEditing(cat)}
                           className="px-3 py-1 text-white bg-blue-500 rounded"

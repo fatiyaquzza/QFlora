@@ -18,14 +18,16 @@ function SpecificPlantsPage() {
     chemical_comp: "",
     cultivation: "",
     source_ref: "",
-    eng_name:"",
-    arab_name:"",
+    eng_name: "",
+    arab_name: "",
   });
   const [editing, setEditing] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [selectedPlantId, setSelectedPlantId] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [plantToDelete, setPlantToDelete] = useState(null);
+
+  const [excelSpecific, setExcelSpecific] = useState(null);
 
   const [showVerseForm, setShowVerseForm] = useState(false);
   const [verseEditing, setVerseEditing] = useState(null);
@@ -77,8 +79,8 @@ function SpecificPlantsPage() {
         chemical_comp: "",
         cultivation: "",
         source_ref: "",
-        eng_name:"",
-        arab_name:"",
+        eng_name: "",
+        arab_name: "",
       });
       refreshData();
       setShowForm(false);
@@ -179,20 +181,49 @@ function SpecificPlantsPage() {
     refreshData();
   };
 
+  const handleUploadSpecificExcel = async () => {
+    if (!excelSpecific) return alert("Pilih file Excel terlebih dahulu.");
+    const formData = new FormData();
+    formData.append("file", excelSpecific);
+
+    try {
+      await axiosClient.post("/api/import-specific-verses", formData);
+      alert("Berhasil mengimport ayat spesifik!");
+      refreshData();
+      setExcelSpecific(null);
+    } catch (err) {
+      alert("Gagal import: " + (err.response?.data?.error || err.message));
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="mt-4 bg-white rounded-xl p-4 shadow overflow-x-auto  font-Poppins">
         <div className="px-2 pt-2">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="mb-6 text-xl font-bold text-black">
+            <h1 className="text-xl font-bold text-black">
               Daftar Kategori Spesifik
             </h1>
-            <button
-              className="px-4 py-2 text-sm text-white bg-[#004E1D] rounded hover:bg-green-700"
-              onClick={() => setShowForm(true)}
-            >
-              Tambah
-            </button>
+            <div className="flex gap-2">
+              <input
+                type="file"
+                accept=".xlsx, .xls"
+                onChange={(e) => setExcelSpecific(e.target.files[0])}
+                className="text-sm"
+              />
+              <button
+                onClick={handleUploadSpecificExcel}
+                className="px-4 py-2 text-sm text-white bg-indigo-600 rounded hover:bg-indigo-800"
+              >
+                Upload Excel Ayat
+              </button>
+              <button
+                className="px-4 py-2 text-sm text-white bg-[#004E1D] rounded hover:bg-green-700"
+                onClick={() => setShowForm(true)}
+              >
+                Tambah
+              </button>
+            </div>
           </div>
           <div className="border-t border-gray-300 mb-4"></div>
 
@@ -275,11 +306,11 @@ function SpecificPlantsPage() {
                             className="mb-3 border-b border-gray-200 pb-2 last:border-none"
                           >
                             <p>
-                                {" "}
-                                <b>
-                                  {v.surah} - {v.verse_number}
-                                </b>
-                              </p>
+                              {" "}
+                              <b>
+                                {v.surah} - {v.verse_number}
+                              </b>
+                            </p>
                             <p className="text-sm text-right">
                               {v.quran_verse}
                             </p>
@@ -395,15 +426,6 @@ function SpecificPlantsPage() {
                     </td>
                     <td className="px-4 py-4 text-center min-w-40 w-40">
                       <div className="flex flex-col gap-1">
-                        <button
-                          className="px-3 py-1 text-white bg-green-600 rounded hover:bg-green-700"
-                          onClick={() => {
-                            setSelectedPlantId(plant.id);
-                            setShowVerseForm(true);
-                          }}
-                        >
-                          Tambah Ayat
-                        </button>
                         <button
                           className="px-3 py-1 text-white bg-green-700 rounded hover:bg-green-800"
                           onClick={() => {

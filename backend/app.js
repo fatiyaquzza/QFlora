@@ -48,3 +48,6 @@ app.use("/plants", plantRoutes);
 
 const suggestionRoutes = require("./routes/suggestions");
 app.use("/suggestions", suggestionRoutes);
+
+const verseImportRoutes = require("./routes/verseImportRoutes");
+app.use("/api", verseImportRoutes);
