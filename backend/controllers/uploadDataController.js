@@ -121,7 +121,6 @@ const importSpecificPlantVerses = async (req, res) => {
           continue;
         }
 
-        // Cek apakah ayat sudah ada (berdasarkan surah & nomor ayat untuk tumbuhan yang sama)
         const existingVerse = await SpecificPlantVerse.findOne({
           where: {
             specific_plant_id: plant.id,
@@ -139,7 +138,6 @@ const importSpecificPlantVerses = async (req, res) => {
           continue;
         }
 
-        // Jika belum ada, simpan
         await SpecificPlantVerse.create({
           specific_plant_id: plant.id,
           surah: row["Surah"],
@@ -169,32 +167,30 @@ const importSpecificPlantVerses = async (req, res) => {
 
 const importGeneralVerses = async (req, res) => {
   try {
-    // Validasi file tersedia
     if (!req.file) {
       return res
         .status(400)
         .json({ message: "File tidak ditemukan dalam request." });
     }
 
-    // Baca file Excel
     const workbook = xlsx.readFile(req.file.path);
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const data = xlsx.utils.sheet_to_json(sheet);
 
-    // Validasi isi
     if (!data || data.length === 0) {
       return res
         .status(400)
         .json({ message: "File Excel kosong atau tidak terbaca." });
     }
 
-    // Loop setiap baris
     for (const [index, row] of data.entries()) {
       try {
         const categoryName = row["Nama Kategori Umum"]?.trim();
+        const surah = row["Surah"]?.trim();
+        const verse_number = row["Nomor Ayat"];
 
-        if (!categoryName) {
-          console.warn(`❗ Baris ${index + 2}: Nama Kategori kosong`);
+        if (!categoryName || !surah || !verse_number) {
+          console.warn(`❗ Baris ${index + 2}: Data tidak lengkap`);
           continue;
         }
 
@@ -204,18 +200,32 @@ const importGeneralVerses = async (req, res) => {
 
         if (!category) {
           console.warn(
-            `❗ Baris ${
-              index + 2
-            }: Kategori "${categoryName}" tidak ditemukan di database`
+            `❗ Baris ${index + 2}: Kategori "${categoryName}" tidak ditemukan`
+          );
+          continue;
+        }
+
+        // 🔍 Cek apakah kombinasi sudah ada
+        const existingVerse = await GeneralCategoryVerse.findOne({
+          where: {
+            general_category_id: category.id,
+            surah: surah,
+            verse_number: verse_number,
+          },
+        });
+
+        if (existingVerse) {
+          console.warn(
+            `⚠️ Baris ${index + 2}: Ayat "${surah} - ${verse_number}" untuk kategori "${categoryName}" sudah ada`
           );
           continue;
         }
 
         await GeneralCategoryVerse.create({
           general_category_id: category.id,
-          surah: row["Surah"],
-          verse_number: row["Nomor Ayat"],
-          quran_verse: row["Ayat Al-Qur'an"], // cocokkan dengan field model
+          surah,
+          verse_number,
+          quran_verse: row["Ayat Al-Qur'an"],
           translation: row["Terjemahan"],
           audio_url: row["Audio URL"],
           keyword_arab: row["Kata Kunci Arab"] || null,
@@ -225,7 +235,6 @@ const importGeneralVerses = async (req, res) => {
       }
     }
 
-    // Hapus file setelah diproses
     fs.unlinkSync(req.file.path);
 
     res.status(200).json({ message: "Import berhasil!" });
@@ -237,6 +246,7 @@ const importGeneralVerses = async (req, res) => {
     });
   }
 };
+
 
 const importSpecificPlants = async (req, res) => {
   try {
@@ -303,9 +313,58 @@ const importSpecificPlants = async (req, res) => {
   }
 };
 
+const importGeneralPlants = async (req, res) => {
+  try {
+    if (!req.file)
+      return res.status(400).json({ message: "File tidak ditemukan." });
+
+    const workbook = xlsx.readFile(req.file.path);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const data = xlsx.utils.sheet_to_json(sheet);
+
+    if (!data || data.length === 0) {
+      return res.status(400).json({ message: "File kosong atau tidak valid." });
+    }
+
+    for (const [index, row] of data.entries()) {
+      try {
+        const name = row["name"]?.trim();
+        if (!name) {
+          console.warn(`❗ Baris ${index + 2}: Nama kosong`);
+          continue;
+        }
+
+        const existing = await GeneralCategory.findOne({ where: { name } });
+        if (existing) {
+          console.warn(`❗ Baris ${index + 2}: "${name}" sudah ada`);
+          continue;
+        }
+
+        await GeneralCategory.create({
+          name,
+          latin_name: row["latin_name"] || "",
+          image_url: row["image_url"] || "",
+          overview: row["overview"] || "",
+        });
+      } catch (err) {
+        console.error(`❌ Baris ${index + 2} gagal:`, err);
+      }
+    }
+
+    fs.unlinkSync(req.file.path);
+    res.status(200).json({ message: "Berhasil import kategori umum!" });
+  } catch (err) {
+    console.error("❌ ERROR IMPORT:", err);
+    res
+      .status(500)
+      .json({ message: "Gagal import kategori umum", error: err.message });
+  }
+};
+
 module.exports = {
   importGeneralVerses,
   importSpecificPlantVerses,
   importSpecificPlants,
   importSpecificPlantClassifications,
+  importGeneralPlants,
 };

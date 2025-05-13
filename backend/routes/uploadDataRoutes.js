@@ -5,6 +5,7 @@ const {
   importSpecificPlantVerses,
   importSpecificPlants,
   importSpecificPlantClassifications,
+  importGeneralPlants
 } = require("../controllers/uploadDataController");
 
 const router = express.Router();
@@ -29,6 +30,11 @@ router.post(
   "/import-specific-classifications",
   upload.single("file"),
   importSpecificPlantClassifications
+);
+router.post(
+  "/import-general-plants",
+  upload.single("file"),
+  importGeneralPlants
 );
 
 module.exports = router;
