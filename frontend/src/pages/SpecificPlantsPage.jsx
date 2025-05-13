@@ -28,6 +28,7 @@ function SpecificPlantsPage() {
   const [plantToDelete, setPlantToDelete] = useState(null);
 
   const [excelSpecific, setExcelSpecific] = useState(null);
+  const [showDeleteAllModal, setShowDeleteAllModal] = useState(false);
 
   const [showVerseForm, setShowVerseForm] = useState(false);
   const [verseEditing, setVerseEditing] = useState(null);
@@ -181,6 +182,20 @@ function SpecificPlantsPage() {
     refreshData();
   };
 
+  const handleDeleteAllPlants = async () => {
+    try {
+      await axiosClient.delete("/specific-plants/all");
+      setShowDeleteAllModal(false);
+      refreshData();
+      alert("Semua tumbuhan berhasil dihapus.");
+    } catch (err) {
+      alert(
+        "Gagal menghapus semua tumbuhan: " +
+          (err.response?.data?.error || err.message)
+      );
+    }
+  };
+
   const handleUploadSpecificExcel = async () => {
     if (!excelSpecific) return alert("Pilih file Excel terlebih dahulu.");
     const formData = new FormData();
@@ -215,8 +230,15 @@ function SpecificPlantsPage() {
                 onClick={handleUploadSpecificExcel}
                 className="px-4 py-2 text-sm text-white bg-indigo-600 rounded hover:bg-indigo-800"
               >
-                Upload Excel Ayat
+                +
               </button>
+              <button
+                className="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-800"
+                onClick={() => setShowDeleteAllModal(true)}
+              >
+                Hapus Semua
+              </button>
+
               <button
                 className="px-4 py-2 text-sm text-white bg-[#004E1D] rounded hover:bg-green-700"
                 onClick={() => setShowForm(true)}
@@ -688,6 +710,36 @@ function SpecificPlantsPage() {
               onClick={confirmDeletePlant}
             >
               Hapus
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        show={showDeleteAllModal}
+        title="Konfirmasi Hapus Semua"
+        onClose={() => setShowDeleteAllModal(false)}
+      >
+        <div className="space-y-4">
+          <p className="text-black">
+            Apakah Anda yakin ingin menghapus{" "}
+            <span className="text-red-600  font-semibold">
+              semua tumbuhan spesifik
+            </span>
+            ?
+          </p>
+          <div className="flex justify-end gap-2">
+            <button
+              className="px-4 py-2 bg-gray-300 rounded"
+              onClick={() => setShowDeleteAllModal(false)}
+            >
+              Batal
+            </button>
+            <button
+              className="px-4 py-2 text-white bg-red-600 rounded"
+              onClick={handleDeleteAllPlants}
+            >
+              Hapus Semua
             </button>
           </div>
         </div>

@@ -150,3 +150,14 @@ exports.deleteClassification = async (req, res) => {
     res.status(500).json({ error: "Gagal menghapus klasifikasi" });
   }
 };
+
+exports.deleteAll = async (req, res) => {
+  try {
+    await SpecificPlant.destroy({ where: {}, cascade: true }); // tanpa truncate
+    res.json({ message: "Semua data berhasil dihapus." });
+  } catch (err) {
+    console.error("❌ Gagal deleteAll:", err);
+    res.status(500).json({ error: "Gagal menghapus semua tumbuhan: " + err.message });
+  }
+};
+

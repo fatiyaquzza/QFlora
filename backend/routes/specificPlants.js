@@ -3,6 +3,8 @@ const router = express.Router();
 const controller = require("../controllers/specificPlantController");
 
 router.get("/", controller.getAll);
+router.delete("/all", controller.deleteAll);
+
 router.get("/:id", controller.getById);
 router.post("/", controller.create);
 router.put("/:id", controller.update);
@@ -25,5 +27,6 @@ router.delete(
   "/:specific_plant_id/classifications/:classificationId",
   controller.deleteClassification
 );
+
 
 module.exports = router;
