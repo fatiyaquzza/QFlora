@@ -29,8 +29,13 @@ function SpecificPlantsPage() {
 
   const [excelSpecific, setExcelSpecific] = useState(null);
   const [showDeleteAllModal, setShowDeleteAllModal] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [excelTanaman, setExcelTanaman] = useState(null);
+  const [showUploadSelector, setShowUploadSelector] = useState(false);
+  const [uploadType, setUploadType] = useState("");
+  const [excelKlasifikasi, setExcelKlasifikasi] = useState(null);
+  const [classificationEditing, setClassificationEditing] = useState(null);
 
-  const [showVerseForm, setShowVerseForm] = useState(false);
   const [verseEditing, setVerseEditing] = useState(null);
   const [newVerse, setNewVerse] = useState({
     surah: "",
@@ -54,7 +59,21 @@ function SpecificPlantsPage() {
     genus: "",
     species: "",
   });
-  const [classificationEditing, setClassificationEditing] = useState(null);
+
+  const handleUploadPlantExcel = async () => {
+    if (!excelTanaman) return alert("Pilih file Excel terlebih dahulu.");
+    const formData = new FormData();
+    formData.append("file", excelTanaman);
+
+    try {
+      await axiosClient.post("/api/import-specific-plants", formData); // endpoint baru
+      alert("Berhasil mengimport data tumbuhan!");
+      refreshData();
+      setExcelTanaman(null);
+    } catch (err) {
+      alert("Gagal import: " + (err.response?.data?.error || err.message));
+    }
+  };
 
   useEffect(() => {
     axiosClient.get("/specific-plants").then((res) => setPlants(res.data));
@@ -108,24 +127,6 @@ function SpecificPlantsPage() {
       setPlantToDelete(null);
       refreshData();
     }
-  };
-
-  const handleAddVerse = async (e) => {
-    e.preventDefault();
-    await axiosClient.post(
-      `/specific-plants/${selectedPlantId}/verses`,
-      newVerse
-    );
-    refreshData();
-    setShowVerseForm(false);
-    setNewVerse({
-      surah: "",
-      verse_number: "",
-      quran_verse: "",
-      translation: "",
-      audio_url: "",
-      keyword_arab: "",
-    });
   };
 
   const handleUpdateVerse = async (e) => {
@@ -211,6 +212,21 @@ function SpecificPlantsPage() {
     }
   };
 
+  const handleUploadKlasifikasiExcel = async () => {
+    if (!excelKlasifikasi) return alert("Pilih file Excel terlebih dahulu.");
+    const formData = new FormData();
+    formData.append("file", excelKlasifikasi);
+
+    try {
+      await axiosClient.post("/api/import-specific-classifications", formData);
+      alert("Berhasil mengimport klasifikasi!");
+      refreshData();
+      setExcelKlasifikasi(null);
+    } catch (err) {
+      alert("Gagal import: " + (err.response?.data?.error || err.message));
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="mt-4 bg-white rounded-xl p-4 shadow overflow-x-auto  font-Poppins">
@@ -220,18 +236,13 @@ function SpecificPlantsPage() {
               Daftar Kategori Spesifik
             </h1>
             <div className="flex gap-2">
-              <input
-                type="file"
-                accept=".xlsx, .xls"
-                onChange={(e) => setExcelSpecific(e.target.files[0])}
-                className="text-sm"
-              />
               <button
-                onClick={handleUploadSpecificExcel}
-                className="px-4 py-2 text-sm text-white bg-indigo-600 rounded hover:bg-indigo-800"
+                className="px-4 py-2 text-sm text-white bg-blue-700 rounded hover:bg-green-700"
+                onClick={() => setShowUploadSelector(true)}
               >
                 +
               </button>
+
               <button
                 className="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-800"
                 onClick={() => setShowDeleteAllModal(true)}
@@ -449,15 +460,6 @@ function SpecificPlantsPage() {
                     <td className="px-4 py-4 text-center min-w-40 w-40">
                       <div className="flex flex-col gap-1">
                         <button
-                          className="px-3 py-1 text-white bg-green-700 rounded hover:bg-green-800"
-                          onClick={() => {
-                            setSelectedPlantId(plant.id);
-                            setShowClassificationForm(true);
-                          }}
-                        >
-                          Tambah Klasifikasi
-                        </button>
-                        <button
                           className="px-3 py-1 text-white bg-blue-600 rounded hover:bg-blue-700"
                           onClick={() => setEditing(plant)}
                         >
@@ -479,35 +481,6 @@ function SpecificPlantsPage() {
         </div>
       </div>
 
-      <Modal
-        show={showClassificationForm}
-        title="Tambah Klasifikasi"
-        onClose={() => setShowClassificationForm(false)}
-      >
-        <form onSubmit={handleAddClassification} className="space-y-3">
-          {Object.keys(newClassification).map((key) => (
-            <input
-              key={key}
-              type="text"
-              className="w-full p-2 border rounded"
-              placeholder={key.replace(/_/g, " ")}
-              value={newClassification[key]}
-              onChange={(e) =>
-                setNewClassification({
-                  ...newClassification,
-                  [key]: e.target.value,
-                })
-              }
-            />
-          ))}
-          <button
-            type="submit"
-            className="px-4 py-2 text-white bg-green-600 rounded"
-          >
-            Simpan
-          </button>
-        </form>
-      </Modal>
 
       <Modal
         show={!!classificationEditing}
@@ -626,33 +599,6 @@ function SpecificPlantsPage() {
       </Modal>
 
       <Modal
-        show={showVerseForm}
-        title="Tambah Ayat"
-        onClose={() => setShowVerseForm(false)}
-      >
-        <form onSubmit={handleAddVerse} className="space-y-3">
-          {Object.keys(newVerse).map((key) => (
-            <input
-              key={key}
-              type="text"
-              className="w-full p-2 border rounded"
-              value={newVerse[key]}
-              onChange={(e) =>
-                setNewVerse({ ...newVerse, [key]: e.target.value })
-              }
-              placeholder={key.replace(/_/g, " ")}
-            />
-          ))}
-          <button
-            type="submit"
-            className="px-4 py-2 text-white bg-green-600 rounded"
-          >
-            Simpan
-          </button>
-        </form>
-      </Modal>
-
-      <Modal
         show={!!verseEditing}
         title="Edit Ayat"
         onClose={() => setVerseEditing(null)}
@@ -742,6 +688,230 @@ function SpecificPlantsPage() {
               Hapus Semua
             </button>
           </div>
+        </div>
+      </Modal>
+
+      <Modal
+        show={showUploadModal && uploadType === "verse"}
+        title="Upload Ayat Al-Qur'an"
+        onClose={() => {
+          setShowUploadModal(false);
+          setExcelSpecific(null);
+        }}
+      >
+        <div className="space-y-4">
+          <div
+            className="border-2 border-dashed border-gray-300 p-6 rounded-lg text-center cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
+            onClick={() => document.getElementById("uploadExcelInput")?.click()}
+          >
+            <p className="text-sm font-medium text-gray-700">
+              Drag your file(s) to start uploading
+            </p>
+            <p className="text-xs text-gray-500">or</p>
+            <button
+              type="button"
+              className="mt-2 px-3 py-1 text-sm bg-blue-100 text-blue-600 rounded"
+            >
+              Browse files
+            </button>
+          </div>
+          <input
+            id="uploadExcelInput"
+            type="file"
+            accept=".xlsx, .xls"
+            className="hidden"
+            onChange={(e) => setExcelSpecific(e.target.files[0])}
+          />
+          {excelSpecific && (
+            <p className="text-sm text-green-700 font-semibold">
+              📄 {excelSpecific.name}
+            </p>
+          )}
+          <div className="flex justify-end gap-2">
+            <button
+              className="px-4 py-2 bg-gray-300 rounded"
+              onClick={() => {
+                setShowUploadModal(false);
+                setExcelSpecific(null);
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-800"
+              onClick={handleUploadSpecificExcel}
+            >
+              Selesai
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        show={showUploadModal && uploadType === "plant"}
+        title="Upload Data Tumbuhan"
+        onClose={() => {
+          setShowUploadModal(false);
+          setExcelTanaman(null);
+        }}
+      >
+        <div className="space-y-4">
+          <div
+            className="border-2 border-dashed border-gray-300 p-6 rounded-lg text-center cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
+            onClick={() =>
+              document.getElementById("uploadPlantExcelInput")?.click()
+            }
+          >
+            <p className="text-sm font-medium text-gray-700">
+              Drag your file(s) to start uploading
+            </p>
+            <p className="text-xs text-gray-500">or</p>
+            <button
+              type="button"
+              className="mt-2 px-3 py-1 text-sm bg-blue-100 text-blue-600 rounded"
+            >
+              Browse files
+            </button>
+          </div>
+          <input
+            id="uploadPlantExcelInput"
+            type="file"
+            accept=".xlsx, .xls"
+            className="hidden"
+            onChange={(e) => setExcelTanaman(e.target.files[0])}
+          />
+          {excelTanaman && (
+            <p className="text-sm text-green-700 font-semibold">
+              📄 {excelTanaman.name}
+            </p>
+          )}
+          <div className="flex justify-end gap-2">
+            <button
+              className="px-4 py-2 bg-gray-300 rounded"
+              onClick={() => {
+                setShowUploadModal(false);
+                setExcelTanaman(null);
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-800"
+              onClick={handleUploadPlantExcel}
+            >
+              Selesai
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        show={showUploadModal && uploadType === "classification"}
+        title="Upload Klasifikasi Tumbuhan"
+        onClose={() => {
+          setShowUploadModal(false);
+          setExcelKlasifikasi(null);
+        }}
+      >
+        <div className="space-y-4">
+          <div
+            className="border-2 border-dashed border-gray-300 p-6 rounded-lg text-center cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
+            onClick={() =>
+              document.getElementById("uploadKlasifikasiExcelInput")?.click()
+            }
+          >
+            <p className="text-sm font-medium text-gray-700">
+              Drag your file(s) to start uploading
+            </p>
+            <p className="text-xs text-gray-500">or</p>
+            <button
+              type="button"
+              className="mt-2 px-3 py-1 text-sm bg-blue-100 text-blue-600 rounded"
+            >
+              Browse files
+            </button>
+          </div>
+          <input
+            id="uploadKlasifikasiExcelInput"
+            type="file"
+            accept=".xlsx, .xls"
+            className="hidden"
+            onChange={(e) => setExcelKlasifikasi(e.target.files[0])}
+          />
+          {excelKlasifikasi && (
+            <p className="text-sm text-green-700 font-semibold">
+              📄 {excelKlasifikasi.name}
+            </p>
+          )}
+          <div className="flex justify-end gap-2">
+            <button
+              className="px-4 py-2 bg-gray-300 rounded"
+              onClick={() => {
+                setShowUploadModal(false);
+                setExcelKlasifikasi(null);
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-800"
+              onClick={handleUploadKlasifikasiExcel}
+            >
+              Selesai
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        show={showUploadSelector}
+        title="Tambah Data"
+        onClose={() => setShowUploadSelector(false)}
+      >
+        <p className="mb-4 text-sm text-gray-600">
+          Pilih salah satu data yang ingin kamu tambahkan
+        </p>
+        <div className="space-y-3">
+          <button
+            onClick={() => {
+              setUploadType("plant");
+              setShowUploadSelector(false);
+              setShowUploadModal(true); // ✅ GANTI INI
+            }}
+            className="w-full py-2 bg-lime-300 rounded hover:bg-lime-400 font-semibold"
+          >
+            Tambah Data Tumbuhan
+          </button>
+
+          <button
+            onClick={() => {
+              setUploadType("verse");
+              setShowUploadSelector(false);
+              setShowUploadModal(true);
+            }}
+            className="w-full py-2 bg-lime-300 rounded hover:bg-lime-400 font-semibold"
+          >
+            Tambah Data Ayat Alquran
+          </button>
+          <button
+            onClick={() => {
+              setUploadType("classification");
+              setShowUploadSelector(false);
+              setShowUploadModal(true);
+            }}
+            className="w-full py-2 bg-lime-300 rounded hover:bg-lime-400 font-semibold"
+          >
+            Tambah Data Klasifikasi
+          </button>
+        </div>
+
+        <div className="flex justify-end gap-2 mt-6">
+          <button
+            className="px-4 py-2 bg-gray-200 rounded"
+            onClick={() => setShowUploadSelector(false)}
+          >
+            Cancel
+          </button>
         </div>
       </Modal>
     </AdminLayout>
