@@ -6,8 +6,6 @@ import { StatusBar } from "expo-status-bar";
 import axiosClient from "../../../api/axioxClient";
 import { useAuth } from "../../../context/authContext";
 import { useFavorite } from "../../../context/FavoriteContext";
-import { useLocalSearchParams } from "expo-router";
-
 
 // Define the Plant interface
 export interface Plant {
@@ -25,22 +23,21 @@ const Home: React.FC = () => {
   const { favorites, generalFavorites, toggleFavorite, toggleGeneralFavorite } = useFavorite();
   const [refreshing, setRefreshing] = useState(false);
 
-
   const handleToggleFavorite = async (id: string, type: "general" | "specific") => {
     const numericId = Number(id);
-  
+
     if (type === "general") {
       await toggleGeneralFavorite(numericId);
     } else {
       await toggleFavorite(numericId);
     }
-  
+
+    // Update UI state
     setAllPlants((prev) =>
       prev.map((plant) =>
         plant.id === id ? { ...plant, liked: !plant.liked } : plant
       )
     );
-  
     setPopularPlants((prev) =>
       prev.map((plant) =>
         plant.id === id ? { ...plant, liked: !plant.liked } : plant
@@ -48,11 +45,18 @@ const Home: React.FC = () => {
     );
   };
 
+  // Remove duplicate plants
+  const removeDuplicatePlants = (plants: Plant[]): Plant[] => {
+    return Array.from(new Set(plants.map((p) => p.id)))
+      .map((id) => plants.find((p) => p.id === id))
+      .filter((plant): plant is Plant => plant !== undefined);
+  };
+
   const fetchData = async () => {
     try {
       const resAll = await axiosClient.get("/plants/all");
       const resPop = await axiosClient.get("/plants/popular");
-  
+
       const format = (items: any[]): Plant[] =>
         items.map((p) => {
           const id = p.id.toString();
@@ -61,7 +65,7 @@ const Home: React.FC = () => {
             p.type === "general"
               ? generalFavorites.includes(numericId)
               : favorites.includes(numericId);
-  
+
           return {
             id,
             name: p.name,
@@ -70,31 +74,32 @@ const Home: React.FC = () => {
             image: { uri: p.image_url },
           };
         });
-  
-      setAllPlants(format(resAll.data));
-      setPopularPlants(format(resPop.data));
+
+      setAllPlants(removeDuplicatePlants(format(resAll.data)));
+      setPopularPlants(removeDuplicatePlants(format(resPop.data)));
     } catch (err) {
       console.error("❌ Gagal ambil data home:", err);
     }
   };
-  
 
   useEffect(() => {
     fetchData();
   }, [generalFavorites]);
-  
+
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchData(); 
+    await fetchData();
     setRefreshing(false);
   };
-  
 
+  // 🔁 Mendapatkan plant dari dua list agar toggle tidak gagal
+  const getPlantById = (id: string): Plant | undefined => {
+    return allPlants.find((p) => p.id === id) || popularPlants.find((p) => p.id === id);
+  };
 
   return (
     <>
       <StatusBar style="dark" />
-
       <View className="flex-row items-end p-4 pt-10 border-b border-gray bg-background">
         <Image
           source={require("../../../assets/images/logo.png")}
@@ -107,41 +112,47 @@ const Home: React.FC = () => {
       </View>
 
       <ScrollView
-  contentContainerStyle={{ flexGrow: 1 }}
-  refreshControl={
-    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-  }
->
+        contentContainerStyle={{ flexGrow: 1 }}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      >
         <View className="flex-1 px-3 pt-6 bg-background">
           <TimeCard />
 
+          {/* === ALL PLANTS === */}
           <View className="flex-row items-center justify-between mx-5 mt-10">
             <Text className="text-lg font-poppinsSemiBold text-primary">
               Jelajahi Tumbuhan di Alquran
             </Text>
           </View>
-
           <PlantsCard
             plants={allPlants}
             showFavoriteIcon={true}
             onToggleFavorite={(id) => {
-              const plant = popularPlants.find((p) => p.id === id);
-              if (plant) handleToggleFavorite(id, plant.type);
+              const plant = getPlantById(id);
+              if (plant) {
+                handleToggleFavorite(id, plant.type);
+              } else {
+                console.warn("Plant not found for toggle:", id);
+              }
             }}
           />
 
+          {/* === POPULAR === */}
           <View className="flex-row items-center justify-between mx-5 mt-5">
             <Text className="text-lg font-poppinsSemiBold text-primary">
               Tumbuhan Terpopuler
             </Text>
           </View>
-
           <PlantsCard
             plants={popularPlants}
             showFavoriteIcon={true}
             onToggleFavorite={(id) => {
-              const plant = allPlants.find((p) => p.id === id);
-              if (plant) handleToggleFavorite(id, plant.type);
+              const plant = getPlantById(id);
+              if (plant) {
+                handleToggleFavorite(id, plant.type);
+              } else {
+                console.warn("Plant not found for toggle:", id);
+              }
             }}
           />
         </View>

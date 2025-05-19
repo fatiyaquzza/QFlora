@@ -97,7 +97,6 @@ const Detail = () => {
     };
   }, []);
 
-  // ✅ Blok perlindungan awal render
   if (loading || !plant) {
     return (
       <View className="items-center justify-center flex-1">

@@ -57,7 +57,7 @@ const FullDetail = () => {
 
   const parseSourceRef = (text: string): string[] => {
     return text
-      .split("#-")
+      .split("#*")
       .map((item) => item.trim())
       .filter((item) => item.length > 0);
   };
