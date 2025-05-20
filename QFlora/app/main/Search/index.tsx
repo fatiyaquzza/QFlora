@@ -36,10 +36,8 @@ const Search = (): JSX.Element => {
   const [fuseResults, setFuseResults] = useState<SearchPlant[]>([]);
 
   const filteredPlants = fuseResults.filter(
-    (plant) =>
-      selectedFilter === "Semua" || plant.category === selectedFilter
+    (plant) => selectedFilter === "Semua" || plant.category === selectedFilter
   );
-  
 
   const handleCardPress = (id: string) => {
     router.push(`../components/DetailPage/Detail/${id}`);
@@ -87,43 +85,37 @@ const Search = (): JSX.Element => {
 
   const { setIsInputFocused } = useTabVisibility();
 
-useEffect(() => {
-  const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
-    setIsInputFocused(true);
-  });
-  const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
-    setIsInputFocused(false);
-  });
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+      setIsInputFocused(true);
+    });
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+      setIsInputFocused(false);
+    });
 
-  return () => {
-    showSubscription.remove();
-    hideSubscription.remove();
-  };
-}, []);
-
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
 
   useEffect(() => {
     if (!searchQuery || plants.length === 0) {
       setFuseResults(plants); // tampilkan semua kalau belum ada input
       return;
     }
-  
+
     const fuse = new Fuse(plants, {
-      keys: [
-        'name',
-        'verses.surah', 
-        'verses.ayat',   
-      ],
+      keys: ["name", "verses.surah", "verses.ayat"],
       includeScore: true,
       threshold: 0.4,
-      minMatchCharLength: 2,
+      minMatchCharLength: 4,
       ignoreLocation: true,
     });
-  
+
     const results = fuse.search(searchQuery).map((res) => res.item);
     setFuseResults(results);
   }, [searchQuery, plants]);
-  
 
   return (
     <SafeAreaView className="flex-1 bg-background">

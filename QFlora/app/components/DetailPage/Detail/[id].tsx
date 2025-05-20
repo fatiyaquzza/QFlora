@@ -175,12 +175,11 @@ const Detail = () => {
             <Text className="text-gray-800 font-poppins text-justify">{plant.overview}</Text>
           </View>
 
-          {/* ✅ Ayat dengan audio */}
           {(plant.verses || []).map((verse, index) => (
             <View className="px-4 mb-4" key={index}>
               <View className="p-4 bg-white border border-gray-200 shadow-sm rounded-xl">
                 <View className="flex-row items-center justify-between mb-4">
-                  <Text className="text-lg font-poppinsBold">
+                  <Text className="text-lg font-poppinsBold capitalize">
                     Surah {verse.surah} : {verse.verse_number}
                   </Text>
                   <TouchableOpacity
@@ -214,7 +213,7 @@ const Detail = () => {
         
     : verse.quran_verse}
 </Text>
-                <Text className="text-gray-700 font-poppins">
+                <Text className="text-gray-700 font-poppins text-justify">
                   {verse.translation}
                 </Text>
               </View>
