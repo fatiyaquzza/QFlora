@@ -1,16 +1,9 @@
-const {
-  SpecificPlant,
-  SpecificPlantVerse,
-  SpecificPlantClassification,
-} = require("../models");
+const { SpecificPlant, SpecificPlantVerse } = require("../models");
 
 exports.getAll = async (req, res) => {
   try {
     const data = await SpecificPlant.findAll({
-      include: [
-        { model: SpecificPlantVerse, as: "verses" },
-        { model: SpecificPlantClassification, as: "classifications" },
-      ],
+      include: [{ model: SpecificPlantVerse, as: "verses" }],
     });
     res.json(data);
   } catch (err) {
@@ -24,7 +17,6 @@ exports.getById = async (req, res) => {
     const data = await SpecificPlant.findByPk(req.params.id, {
       include: [
         { model: SpecificPlantVerse, as: "verses" },
-        { model: SpecificPlantClassification, as: "classifications" },
       ],
     });
 
@@ -113,43 +105,43 @@ exports.updateVerse = async (req, res) => {
   }
 };
 
-exports.addClassification = async (req, res) => {
-  try {
-    const { specific_plant_id } = req.params;
-    const newData = await SpecificPlantClassification.create({
-      ...req.body,
-      specific_plant_id,
-    });
-    res.status(201).json(newData);
-  } catch (err) {
-    res.status(500).json({ error: "Gagal menambahkan klasifikasi" });
-  }
-};
+// exports.addClassification = async (req, res) => {
+//   try {
+//     const { specific_plant_id } = req.params;
+//     const newData = await SpecificPlantClassification.create({
+//       ...req.body,
+//       specific_plant_id,
+//     });
+//     res.status(201).json(newData);
+//   } catch (err) {
+//     res.status(500).json({ error: "Gagal menambahkan klasifikasi" });
+//   }
+// };
 
-exports.updateClassification = async (req, res) => {
-  try {
-    const { specific_plant_id, classificationId } = req.params;
-    const updated = await SpecificPlantClassification.update(req.body, {
-      where: { id: classificationId, specific_plant_id },
-    });
-    res.json({ message: "Klasifikasi diperbarui", updated });
-  } catch (err) {
-    res.status(500).json({ error: "Gagal memperbarui klasifikasi" });
-  }
-};
+// exports.updateClassification = async (req, res) => {
+//   try {
+//     const { specific_plant_id, classificationId } = req.params;
+//     const updated = await SpecificPlantClassification.update(req.body, {
+//       where: { id: classificationId, specific_plant_id },
+//     });
+//     res.json({ message: "Klasifikasi diperbarui", updated });
+//   } catch (err) {
+//     res.status(500).json({ error: "Gagal memperbarui klasifikasi" });
+//   }
+// };
 
-exports.deleteClassification = async (req, res) => {
-  try {
-    const { specific_plant_id, classificationId } = req.params;
-    const deleted = await SpecificPlantClassification.destroy({
-      where: { id: classificationId, specific_plant_id },
-    });
-    if (!deleted) return res.status(404).json({ error: "Tidak ditemukan" });
-    res.json({ message: "Klasifikasi dihapus" });
-  } catch (err) {
-    res.status(500).json({ error: "Gagal menghapus klasifikasi" });
-  }
-};
+// exports.deleteClassification = async (req, res) => {
+//   try {
+//     const { specific_plant_id, classificationId } = req.params;
+//     const deleted = await SpecificPlantClassification.destroy({
+//       where: { id: classificationId, specific_plant_id },
+//     });
+//     if (!deleted) return res.status(404).json({ error: "Tidak ditemukan" });
+//     res.json({ message: "Klasifikasi dihapus" });
+//   } catch (err) {
+//     res.status(500).json({ error: "Gagal menghapus klasifikasi" });
+//   }
+// };
 
 exports.deleteAll = async (req, res) => {
   try {
@@ -157,7 +149,8 @@ exports.deleteAll = async (req, res) => {
     res.json({ message: "Semua data berhasil dihapus." });
   } catch (err) {
     console.error("❌ Gagal deleteAll:", err);
-    res.status(500).json({ error: "Gagal menghapus semua tumbuhan: " + err.message });
+    res
+      .status(500)
+      .json({ error: "Gagal menghapus semua tumbuhan: " + err.message });
   }
 };
-

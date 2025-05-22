@@ -2,6 +2,10 @@ module.exports = (sequelize, DataTypes) => {
   const SpecificPlant = sequelize.define(
     "SpecificPlant",
     {
+      species_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
       name: DataTypes.STRING,
       latin_name: DataTypes.STRING,
       image_url: DataTypes.TEXT,

@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const sequelize = require("./config/db");
+const db = require("./models");
 
 dotenv.config();
 
@@ -18,10 +19,36 @@ app.get("/", (req, res) => {
 });
 
 // Test DB
-sequelize
-  .authenticate()
-  .then(() => console.log("✅ Database connected."))
-  .catch((err) => console.error("❌ DB Connection Error:", err));
+(async () => {
+  try {
+    await db.sequelize.authenticate();
+    console.log("✅ Database connected.");
+
+    // Sync model secara berurutan berdasarkan foreign key
+    await db.Subkingdom.sync();
+    await db.Superdivision.sync();
+    await db.Division.sync();
+    await db.Class.sync();
+    await db.Subclass.sync();
+    await db.Order.sync();
+    await db.Family.sync();
+    await db.Genus.sync();
+    await db.Species.sync();
+
+    await db.SpecificPlant.sync({ alter: true });
+    await db.SpecificPlantVerse.sync();
+    await db.GeneralCategory.sync();
+    await db.GeneralCategoryVerse.sync();
+    await db.GeneralFavorite.sync();
+    await db.Favorite.sync();
+    await db.Suggestion.sync();
+    await db.User.sync();
+
+    console.log("✅ Semua model berhasil disinkronkan secara berurutan.");
+  } catch (error) {
+    console.error("❌ Gagal sync model ke DB:", error);
+  }
+})();
 
 // Start Server
 app.listen(PORT, () => {
@@ -51,3 +78,6 @@ app.use("/suggestions", suggestionRoutes);
 
 const verseImportRoutes = require("./routes/uploadDataRoutes");
 app.use("/api", verseImportRoutes);
+
+const taxonomyRoutes = require("./routes/taxonomy");
+app.use("/api", taxonomyRoutes);

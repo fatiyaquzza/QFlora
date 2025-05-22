@@ -144,44 +144,44 @@ function SpecificPlantsPage() {
     refreshData();
   };
 
-  const handleAddClassification = async (e) => {
-    e.preventDefault();
-    await axiosClient.post(
-      `/specific-plants/${selectedPlantId}/classifications`,
-      newClassification
-    );
-    refreshData();
-    setShowClassificationForm(false);
-    setNewClassification({
-      kingdom: "",
-      subkingdom: "",
-      superdivision: "",
-      division: "",
-      class: "",
-      subclass: "",
-      order: "",
-      family: "",
-      genus: "",
-      species: "",
-    });
-  };
+  // const handleAddClassification = async (e) => {
+  //   e.preventDefault();
+  //   await axiosClient.post(
+  //     `/specific-plants/${selectedPlantId}/classifications`,
+  //     newClassification
+  //   );
+  //   refreshData();
+  //   setShowClassificationForm(false);
+  //   setNewClassification({
+  //     kingdom: "",
+  //     subkingdom: "",
+  //     superdivision: "",
+  //     division: "",
+  //     class: "",
+  //     subclass: "",
+  //     order: "",
+  //     family: "",
+  //     genus: "",
+  //     species: "",
+  //   });
+  // };
 
-  const handleUpdateClassification = async (e) => {
-    e.preventDefault();
-    await axiosClient.put(
-      `/specific-plants/${selectedPlantId}/classifications/${classificationEditing.id}`,
-      classificationEditing
-    );
-    refreshData();
-    setClassificationEditing(null);
-  };
+  // const handleUpdateClassification = async (e) => {
+  //   e.preventDefault();
+  //   await axiosClient.put(
+  //     `/specific-plants/${selectedPlantId}/classifications/${classificationEditing.id}`,
+  //     classificationEditing
+  //   );
+  //   refreshData();
+  //   setClassificationEditing(null);
+  // };
 
-  const handleDeleteClassification = async (plantId, id) => {
-    await axiosClient.delete(
-      `/specific-plants/${plantId}/classifications/${id}`
-    );
-    refreshData();
-  };
+  // const handleDeleteClassification = async (plantId, id) => {
+  //   await axiosClient.delete(
+  //     `/specific-plants/${plantId}/classifications/${id}`
+  //   );
+  //   refreshData();
+  // };
 
   const handleDeleteAllPlants = async () => {
     try {
@@ -389,7 +389,7 @@ function SpecificPlantsPage() {
                     </td>
 
                     <td className="px-4 py-4 min-w-80 w-80">
-                      <div className="max-h-64 overflow-y-auto pr-2">
+                      {/* <div className="max-h-64 overflow-y-auto pr-2">
                         {plant.classifications?.map((cls) => (
                           <div
                             key={cls.id}
@@ -420,7 +420,7 @@ function SpecificPlantsPage() {
                             </div>
                           </div>
                         ))}
-                      </div>
+                      </div> */}
                     </td>
                     <td className="px-4 py-4 min-w-80 w-80">
                       <div className="max-h-40 overflow-y-auto pr-1">
@@ -482,7 +482,7 @@ function SpecificPlantsPage() {
       </div>
 
 
-      <Modal
+      {/* <Modal
         show={!!classificationEditing}
         title="Edit Klasifikasi"
         onClose={() => setClassificationEditing(null)}
@@ -510,7 +510,7 @@ function SpecificPlantsPage() {
             Update
           </button>
         </form>
-      </Modal>
+      </Modal> */}
 
       <Modal
         show={showForm}
@@ -805,7 +805,7 @@ function SpecificPlantsPage() {
         </div>
       </Modal>
 
-      <Modal
+      {/* <Modal
         show={showUploadModal && uploadType === "classification"}
         title="Upload Klasifikasi Tumbuhan"
         onClose={() => {
@@ -861,7 +861,7 @@ function SpecificPlantsPage() {
             </button>
           </div>
         </div>
-      </Modal>
+      </Modal> */}
 
       <Modal
         show={showUploadSelector}
@@ -893,7 +893,7 @@ function SpecificPlantsPage() {
           >
             Tambah Data Ayat Alquran
           </button>
-          <button
+          {/* <button
             onClick={() => {
               setUploadType("classification");
               setShowUploadSelector(false);
@@ -902,7 +902,7 @@ function SpecificPlantsPage() {
             className="w-full py-2 bg-lime-300 rounded hover:bg-lime-400 font-semibold"
           >
             Tambah Data Klasifikasi
-          </button>
+          </button> */}
         </div>
 
         <div className="flex justify-end gap-2 mt-6">

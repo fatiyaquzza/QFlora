@@ -19,7 +19,7 @@ const FullDetail = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [sections, setSections] = useState({
     deskripsi: false,
-    klasifikasi: false,
+    // klasifikasi: false,
     manfaat: false,
     karakteristik: false,
     asalUsul: false,
@@ -175,7 +175,7 @@ const FullDetail = () => {
           </View>
 
           {/* Klasifikasi */}
-          <View className="mx-4 mb-3 overflow-hidden bg-white shadow-md rounded-xl">
+          {/* <View className="mx-4 mb-3 overflow-hidden bg-white shadow-md rounded-xl">
             <TouchableOpacity
               onPress={() => toggleSection("klasifikasi")}
               className="flex-row items-center justify-between px-4 py-4"
@@ -224,7 +224,7 @@ const FullDetail = () => {
                 </View>
               </View>
             )}
-          </View>
+          </View> */}
 
           {/* Manfaat */}
           <View className="mx-4 mb-3 overflow-hidden bg-white shadow-md rounded-xl">

@@ -6,6 +6,7 @@ import {
   MdInventory2,
   MdDescription,
   MdPerson,
+  MdCategory,
 } from "react-icons/md";
 
 const navItems = [
@@ -19,6 +20,11 @@ const navItems = [
     path: "/specific-plants",
     label: "Kategori Spesifik",
     icon: <MdDescription size={20} />,
+  },
+  {
+    path: "/add-taxonomy",
+    label: "Tambah Klasifikasi",
+    icon: <MdCategory size={20} />,
   },
   { path: "/users", label: "Pengguna", icon: <MdPerson size={20} /> },
   {

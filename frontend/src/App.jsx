@@ -7,6 +7,8 @@ import SpecificPlantsPage from "./pages/SpecificPlantsPage";
 import UserListPage from "./pages/UserListPage";
 import DashboardPage from "./pages/DashboardPage";
 import SuggestionsPage from "./pages/SuggestionPage";
+import TaxonomyFormPage from "./pages/TaxonomyFormPage";
+
 function App() {
   return (
     <AuthProvider>
@@ -45,6 +47,15 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/add-taxonomy"
+            element={
+              <PrivateRoute>
+                <TaxonomyFormPage />
+              </PrivateRoute>
+            }
+          />
+
           <Route
             path="/suggestions"
             element={
