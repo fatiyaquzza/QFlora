@@ -57,30 +57,58 @@ function AddGeneralPlantPage() {
               Kembali
             </button>
           </div>
-          <form onSubmit={handleAdd} className="space-y-3">
+          <form onSubmit={handleAdd} className="space-y-4">
             {Object.keys(form).map((key) => (
               <div key={key}>
-                <input
-                  ref={inputRefs[key]}
-                  type="text"
-                  className={`w-full p-2 border rounded capitalize ${
-                    touched[key] && !form[key].trim() ? "border-red-500" : ""
-                  }`}
-                  value={form[key]}
-                  onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-                  onBlur={() =>
-                    setTouched((prev) => ({ ...prev, [key]: true }))
-                  }
-                  placeholder={key.replace(/_/g, " ")}
-                />
+                <label
+                  htmlFor={key}
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {key.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
+                </label>
+                {key === 'overview' ? (
+                  <textarea
+                    ref={inputRefs[key]}
+                    id={key}
+                    rows="4"
+                    className={`w-full p-2 border rounded transition-colors ${
+                      touched[key] && !form[key].trim()
+                        ? "border-red-500"
+                        : "border-gray-300 hover:border-gray-400 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                    }`}
+                    value={form[key]}
+                    onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                    onBlur={() =>
+                      setTouched((prev) => ({ ...prev, [key]: true }))
+                    }
+                    placeholder={`Masukkan ${key.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}`}
+                  />
+                ) : (
+                  <input
+                    ref={inputRefs[key]}
+                    id={key}
+                    type="text"
+                    className={`w-full p-2 border rounded transition-colors ${
+                      touched[key] && !form[key].trim()
+                        ? "border-red-500"
+                        : "border-gray-300 hover:border-gray-400 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                    }`}
+                    value={form[key]}
+                    onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                    onBlur={() =>
+                      setTouched((prev) => ({ ...prev, [key]: true }))
+                    }
+                    placeholder={`Masukkan ${key.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}`}
+                  />
+                )}
                 {touched[key] && !form[key].trim() && (
                   <p className="text-sm text-red-500 mt-1">
-                    {key.replace(/_/g, " ")} wajib diisi.
+                    {key.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())} wajib diisi.
                   </p>
                 )}
               </div>
             ))}
-            <div className="flex justify-end gap-2">
+            <div className="flex justify-end gap-2 pt-2">
               <button
                 type="submit"
                 className="px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700 disabled:bg-green-400"
