@@ -23,6 +23,24 @@ function AddSpecificPlantPage() {
     arab_name: "",
   });
 
+  // Add touched state
+  const [touched, setTouched] = useState({
+    name: false,
+    latin_name: false,
+    image_url: false,
+    plant_type_id: false,
+    overview: false,
+    description: false,
+    benefits: false,
+    characteristics: false,
+    origin: false,
+    chemical_comp: false,
+    cultivation: false,
+    source_ref: false,
+    eng_name: false,
+    arab_name: false,
+  });
+
   // Store only the selected species ID for the final classification
   const [selectedSpeciesId, setSelectedSpeciesId] = useState(null);
 
@@ -267,16 +285,63 @@ function AddSpecificPlantPage() {
       ...prev,
       [name]: value,
     }));
+    // Mark field as touched when changed
+    setTouched((prev) => ({
+      ...prev,
+      [name]: true,
+    }));
   };
 
   const handleSubmitPlantDetails = async (e) => {
     e.preventDefault();
     setError("");
 
-    if (!form.name) {
-      setError("Nama tumbuhan harus diisi");
-      return;
+    const requiredFields = [
+      "name",
+      "latin_name",
+      "image_url",
+      "plant_type_id",
+      "overview",
+      "description",
+      "benefits",
+      "characteristics",
+      "origin",
+      "chemical_comp",
+      "cultivation",
+      "source_ref",
+      "eng_name",
+      "arab_name",
+    ];
+
+    const fieldNames = {
+      name: "Nama tumbuhan",
+      latin_name: "Nama latin",
+      image_url: "URL gambar",
+      plant_type_id: "Jenis tanaman",
+      overview: "Ringkasan",
+      description: "Deskripsi",
+      benefits: "Manfaat",
+      characteristics: "Ciri-ciri",
+      origin: "Asal",
+      chemical_comp: "Kandungan kimia",
+      cultivation: "Budidaya",
+      source_ref: "Sumber referensi",
+      eng_name: "Nama inggris",
+      arab_name: "Nama arab",
+    };
+
+    for (const field of requiredFields) {
+      if (!form[field] || form[field].toString().trim() === "") {
+        setTouched((prev) => ({ ...prev, [field]: true }));
+
+        document
+          .querySelector(`[name="${field}"]`)
+          ?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+        return;
+      }
     }
+
     setCurrentStep(2);
   };
 
@@ -311,10 +376,7 @@ function AddSpecificPlantPage() {
 
   const renderStepOne = () => {
     return (
-      <form
-        onSubmit={handleSubmitPlantDetails}
-        className="space-y-4 max-w-4xl mx-auto"
-      >
+      <form onSubmit={handleSubmitPlantDetails} className="space-y-4 mx-auto">
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
             {error}
@@ -331,10 +393,19 @@ function AddSpecificPlantPage() {
               name="name"
               value={form.name}
               onChange={handleChange}
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+              className={`w-full p-2 border rounded transition-colors ${
+                touched.name && !form.name
+                  ? "border-red-500"
+                  : "border-gray-300 hover:border-gray-400"
+              }`}
               placeholder="Masukkan nama tumbuhan"
               required
             />
+            {touched.name && !form.name && (
+              <p className="text-sm text-red-500 mt-1">
+                Nama tumbuhan wajib diisi
+              </p>
+            )}
           </div>
 
           <div>
@@ -346,9 +417,19 @@ function AddSpecificPlantPage() {
               name="latin_name"
               value={form.latin_name}
               onChange={handleChange}
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+              className={`w-full p-2 border rounded transition-colors ${
+                touched.latin_name && !form.latin_name
+                  ? "border-red-500"
+                  : "border-gray-300 hover:border-gray-400"
+              }`}
               placeholder="Masukkan nama latin"
+              required
             />
+            {touched.latin_name && !form.latin_name && (
+              <p className="text-sm text-red-500 mt-1">
+                Nama latin wajib diisi
+              </p>
+            )}
           </div>
 
           <div>
@@ -360,9 +441,19 @@ function AddSpecificPlantPage() {
               name="eng_name"
               value={form.eng_name}
               onChange={handleChange}
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+              className={`w-full p-2 border rounded transition-colors ${
+                touched.eng_name && !form.eng_name
+                  ? "border-red-500"
+                  : "border-gray-300 hover:border-gray-400"
+              }`}
               placeholder="Masukkan nama inggris"
+              required
             />
+            {touched.eng_name && !form.eng_name && (
+              <p className="text-sm text-red-500 mt-1">
+                Nama inggris wajib diisi
+              </p>
+            )}
           </div>
 
           <div>
@@ -374,9 +465,17 @@ function AddSpecificPlantPage() {
               name="arab_name"
               value={form.arab_name}
               onChange={handleChange}
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+              className={`w-full p-2 border rounded transition-colors ${
+                touched.arab_name && !form.arab_name
+                  ? "border-red-500"
+                  : "border-gray-300 hover:border-gray-400"
+              }`}
               placeholder="Masukkan nama arab"
+              required
             />
+            {touched.arab_name && !form.arab_name && (
+              <p className="text-sm text-red-500 mt-1">Nama arab wajib diisi</p>
+            )}
           </div>
 
           <div>
@@ -388,9 +487,19 @@ function AddSpecificPlantPage() {
               name="image_url"
               value={form.image_url}
               onChange={handleChange}
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+              className={`w-full p-2 border rounded transition-colors ${
+                touched.image_url && !form.image_url
+                  ? "border-red-500"
+                  : "border-gray-300 hover:border-gray-400"
+              }`}
               placeholder="Masukkan URL gambar"
+              required
             />
+            {touched.image_url && !form.image_url && (
+              <p className="text-sm text-red-500 mt-1">
+                URL gambar wajib diisi
+              </p>
+            )}
           </div>
 
           <div>
@@ -401,14 +510,25 @@ function AddSpecificPlantPage() {
               name="plant_type_id"
               value={form.plant_type_id}
               onChange={handleChange}
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+              className={`w-full p-2 border rounded transition-colors ${
+                touched.plant_type_id && !form.plant_type_id
+                  ? "border-red-500"
+                  : "border-gray-300 hover:border-gray-400"
+              }`}
+              required
             >
+              <option value="">Pilih jenis tanaman</option>
               {plantTypes.map((type) => (
                 <option key={type.id} value={type.id}>
                   {type.name}
                 </option>
               ))}
             </select>
+            {touched.plant_type_id && !form.plant_type_id && (
+              <p className="text-sm text-red-500 mt-1">
+                Jenis tanaman wajib dipilih
+              </p>
+            )}
           </div>
         </div>
 
@@ -420,9 +540,17 @@ function AddSpecificPlantPage() {
             name="overview"
             value={form.overview}
             onChange={handleChange}
-            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 h-24"
+            className={`w-full p-2 border rounded transition-colors ${
+              touched.overview && !form.overview
+                ? "border-red-500"
+                : "border-gray-300 hover:border-gray-400"
+            }`}
             placeholder="Masukkan ringkasan tumbuhan"
+            required
           ></textarea>
+          {touched.overview && !form.overview && (
+            <p className="text-sm text-red-500 mt-1">Ringkasan wajib diisi</p>
+          )}
         </div>
 
         <div>
@@ -433,9 +561,17 @@ function AddSpecificPlantPage() {
             name="description"
             value={form.description}
             onChange={handleChange}
-            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 h-24"
+            className={`w-full p-2 border rounded transition-colors ${
+              touched.description && !form.description
+                ? "border-red-500"
+                : "border-gray-300 hover:border-gray-400"
+            }`}
             placeholder="Masukkan deskripsi tumbuhan"
+            required
           ></textarea>
+          {touched.description && !form.description && (
+            <p className="text-sm text-red-500 mt-1">Deskripsi wajib diisi</p>
+          )}
         </div>
 
         <div>
@@ -446,9 +582,17 @@ function AddSpecificPlantPage() {
             name="benefits"
             value={form.benefits}
             onChange={handleChange}
-            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 h-24"
+            className={`w-full p-2 border rounded transition-colors ${
+              touched.benefits && !form.benefits
+                ? "border-red-500"
+                : "border-gray-300 hover:border-gray-400"
+            }`}
             placeholder="Masukkan manfaat tumbuhan"
+            required
           ></textarea>
+          {touched.benefits && !form.benefits && (
+            <p className="text-sm text-red-500 mt-1">Manfaat wajib diisi</p>
+          )}
         </div>
 
         <div>
@@ -459,9 +603,17 @@ function AddSpecificPlantPage() {
             name="characteristics"
             value={form.characteristics}
             onChange={handleChange}
-            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 h-24"
+            className={`w-full p-2 border rounded transition-colors ${
+              touched.characteristics && !form.characteristics
+                ? "border-red-500"
+                : "border-gray-300 hover:border-gray-400"
+            }`}
             placeholder="Masukkan ciri-ciri tumbuhan"
+            required
           ></textarea>
+          {touched.characteristics && !form.characteristics && (
+            <p className="text-sm text-red-500 mt-1">Ciri-ciri wajib diisi</p>
+          )}
         </div>
 
         <div>
@@ -472,9 +624,17 @@ function AddSpecificPlantPage() {
             name="origin"
             value={form.origin}
             onChange={handleChange}
-            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 h-24"
+            className={`w-full p-2 border rounded transition-colors ${
+              touched.origin && !form.origin
+                ? "border-red-500"
+                : "border-gray-300 hover:border-gray-400"
+            }`}
             placeholder="Masukkan asal tumbuhan"
+            required
           ></textarea>
+          {touched.origin && !form.origin && (
+            <p className="text-sm text-red-500 mt-1">Asal wajib diisi</p>
+          )}
         </div>
 
         <div>
@@ -485,9 +645,19 @@ function AddSpecificPlantPage() {
             name="chemical_comp"
             value={form.chemical_comp}
             onChange={handleChange}
-            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 h-24"
+            className={`w-full p-2 border rounded transition-colors ${
+              touched.chemical_comp && !form.chemical_comp
+                ? "border-red-500"
+                : "border-gray-300 hover:border-gray-400"
+            }`}
             placeholder="Masukkan kandungan kimia tumbuhan"
+            required
           ></textarea>
+          {touched.chemical_comp && !form.chemical_comp && (
+            <p className="text-sm text-red-500 mt-1">
+              Kandungan kimia wajib diisi
+            </p>
+          )}
         </div>
 
         <div>
@@ -498,9 +668,17 @@ function AddSpecificPlantPage() {
             name="cultivation"
             value={form.cultivation}
             onChange={handleChange}
-            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 h-24"
+            className={`w-full p-2 border rounded transition-colors ${
+              touched.cultivation && !form.cultivation
+                ? "border-red-500"
+                : "border-gray-300 hover:border-gray-400"
+            }`}
             placeholder="Masukkan cara budidaya tumbuhan"
+            required
           ></textarea>
+          {touched.cultivation && !form.cultivation && (
+            <p className="text-sm text-red-500 mt-1">Budidaya wajib diisi</p>
+          )}
         </div>
 
         <div>
@@ -511,9 +689,19 @@ function AddSpecificPlantPage() {
             name="source_ref"
             value={form.source_ref}
             onChange={handleChange}
-            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 h-24"
+            className={`w-full p-2 border rounded transition-colors ${
+              touched.source_ref && !form.source_ref
+                ? "border-red-500"
+                : "border-gray-300 hover:border-gray-400"
+            }`}
             placeholder="Masukkan sumber referensi"
+            required
           ></textarea>
+          {touched.source_ref && !form.source_ref && (
+            <p className="text-sm text-red-500 mt-1">
+              Sumber referensi wajib diisi
+            </p>
+          )}
         </div>
 
         <div className="pt-4 flex justify-end gap-3">
@@ -538,10 +726,7 @@ function AddSpecificPlantPage() {
 
   const renderStepTwo = () => {
     return (
-      <form
-        onSubmit={handleSubmitClassification}
-        className="space-y-4 max-w-4xl mx-auto"
-      >
+      <form onSubmit={handleSubmitClassification} className="space-y-4 mx-auto">
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
             {error}
