@@ -133,15 +133,14 @@ function TaxonomyFormPage() {
             </div>
           )}
 
-          <div className="space-y-6 max-w-4xl mx-auto">
+          <div className="space-y-6 mx-auto">
             <div className="bg-green-50 p-4 rounded-lg mb-4 border border-green-200">
               <h3 className="text-green-800 font-medium">
                 Petunjuk Penambahan Klasifikasi
               </h3>
               <p className="text-green-700 text-sm mt-1">
                 Anda dapat memilih dari klasifikasi yang sudah ada, atau
-                menambahkan entri baru. Pastikan memulai dari Subkingdom hingga
-                Spesies secara berurutan.
+                menambahkan entri baru.
               </p>
             </div>
 
@@ -152,7 +151,6 @@ function TaxonomyFormPage() {
                     {label}
                   </label>
 
-                  {/* Dropdown jika data tersedia */}
                   {(taxonomyData[plural] || []).length > 0 && (
                     <select
                       className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 mb-2"

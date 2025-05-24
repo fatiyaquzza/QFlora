@@ -34,7 +34,7 @@ function App() {
             }
           />
           <Route
-            path="/specific-plant/add"
+            path="/specific-plants/add"
             element={
               <PrivateRoute>
                 <AddSpecificPlantPage />

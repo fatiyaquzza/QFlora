@@ -38,6 +38,13 @@ function AdminLayout({ children }) {
   const { logout, user } = useAuth();
   const location = useLocation();
 
+  const isPathActive = (path) => {
+    if (path === "/") {
+      return location.pathname === "/";
+    }
+    return location.pathname.startsWith(path);
+  };
+
   return (
     <div className="min-h-screen font-Poppins">
       {/* Sidebar */}
@@ -51,7 +58,7 @@ function AdminLayout({ children }) {
               key={item.path}
               to={item.path}
               className={`flex items-center gap-3 px-3 py-4 rounded-md transition-all ${
-                location.pathname === item.path
+                isPathActive(item.path)
                   ? "bg-green-900 text-white"
                   : "text-black hover:bg-gray-100"
               }`}

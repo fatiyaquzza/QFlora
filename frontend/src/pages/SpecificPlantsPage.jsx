@@ -242,7 +242,7 @@ function SpecificPlantsPage() {
 
               <button
                 className="px-4 py-2 text-sm text-white bg-[#004E1D] rounded hover:bg-green-700"
-                onClick={() => navigate("/specific-plant/add")}
+                onClick={() => navigate("/specific-plants/add")}
               >
                 Tambah
               </button>
