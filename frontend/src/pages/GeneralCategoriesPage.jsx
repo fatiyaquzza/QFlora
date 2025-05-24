@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import axiosClient from "../api/axiosClient";
 import Modal from "../components/Modal";
 import AdminLayout from "../components/AdminLayout";
+import { useNavigate } from "react-router-dom";
 
 function GeneralCategoriesPage() {
   const [categories, setCategories] = useState([]);
+  const navigate = useNavigate();
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({
     name: "",
@@ -155,7 +157,7 @@ function GeneralCategoriesPage() {
 
               <button
                 className="px-4 py-2 text-sm text-white bg-[#004E1D] rounded hover:bg-green-700"
-                onClick={() => setShowForm(true)}
+                onClick={() => navigate("/general-categories/add")}
               >
                 Tambah
               </button>

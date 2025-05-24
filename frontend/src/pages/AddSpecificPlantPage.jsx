@@ -74,7 +74,7 @@ function AddSpecificPlantPage() {
         setPlantTypes(response.data);
         // Set default plant type if available
         if (response.data.length > 0) {
-          setForm(prev => ({ ...prev, plant_type_id: response.data[0].id }));
+          setForm((prev) => ({ ...prev, plant_type_id: response.data[0].id }));
         }
       } catch (err) {
         console.error("Error fetching plant types:", err);
@@ -89,7 +89,7 @@ function AddSpecificPlantPage() {
       try {
         const response = await axiosClient.get("/api/taxonomy/full");
         setTaxonomyData(response.data);
-        
+
         // Set subkingdoms directly since they're the top level
         setSubkingdoms(response.data.subkingdoms);
       } catch (err) {
@@ -105,10 +105,10 @@ function AddSpecificPlantPage() {
   useEffect(() => {
     if (selectedSubkingdom) {
       const filtered = taxonomyData.superdivisions.filter(
-        item => item.subkingdom_id.toString() === selectedSubkingdom
+        (item) => item.subkingdom_id.toString() === selectedSubkingdom
       );
       setSuperdivisions(filtered);
-      
+
       // Reset lower levels
       setSelectedSuperdivision("");
       setSelectedDivision("");
@@ -132,10 +132,10 @@ function AddSpecificPlantPage() {
   useEffect(() => {
     if (selectedSuperdivision) {
       const filtered = taxonomyData.divisions.filter(
-        item => item.superdivision_id.toString() === selectedSuperdivision
+        (item) => item.superdivision_id.toString() === selectedSuperdivision
       );
       setDivisions(filtered);
-      
+
       // Reset lower levels
       setSelectedDivision("");
       setSelectedClass("");
@@ -157,10 +157,10 @@ function AddSpecificPlantPage() {
   useEffect(() => {
     if (selectedDivision) {
       const filtered = taxonomyData.classes.filter(
-        item => item.division_id.toString() === selectedDivision
+        (item) => item.division_id.toString() === selectedDivision
       );
       setClasses(filtered);
-      
+
       // Reset lower levels
       setSelectedClass("");
       setSelectedSubclass("");
@@ -180,10 +180,10 @@ function AddSpecificPlantPage() {
   useEffect(() => {
     if (selectedClass) {
       const filtered = taxonomyData.subclasses.filter(
-        item => item.class_id.toString() === selectedClass
+        (item) => item.class_id.toString() === selectedClass
       );
       setSubclasses(filtered);
-      
+
       // Reset lower levels
       setSelectedSubclass("");
       setSelectedOrder("");
@@ -201,10 +201,10 @@ function AddSpecificPlantPage() {
   useEffect(() => {
     if (selectedSubclass) {
       const filtered = taxonomyData.orders.filter(
-        item => item.subclass_id.toString() === selectedSubclass
+        (item) => item.subclass_id.toString() === selectedSubclass
       );
       setOrders(filtered);
-      
+
       // Reset lower levels
       setSelectedOrder("");
       setSelectedFamily("");
@@ -220,10 +220,10 @@ function AddSpecificPlantPage() {
   useEffect(() => {
     if (selectedOrder) {
       const filtered = taxonomyData.families.filter(
-        item => item.order_id.toString() === selectedOrder
+        (item) => item.order_id.toString() === selectedOrder
       );
       setFamilies(filtered);
-      
+
       // Reset lower levels
       setSelectedFamily("");
       setSelectedGenus("");
@@ -237,10 +237,10 @@ function AddSpecificPlantPage() {
   useEffect(() => {
     if (selectedFamily) {
       const filtered = taxonomyData.genuses.filter(
-        item => item.family_id.toString() === selectedFamily
+        (item) => item.family_id.toString() === selectedFamily
       );
       setGenera(filtered);
-      
+
       // Reset lower levels
       setSelectedGenus("");
       setSelectedSpeciesId(null);
@@ -252,10 +252,10 @@ function AddSpecificPlantPage() {
   useEffect(() => {
     if (selectedGenus) {
       const filtered = taxonomyData.species.filter(
-        item => item.genus_id.toString() === selectedGenus
+        (item) => item.genus_id.toString() === selectedGenus
       );
       setSpecies(filtered);
-      
+
       // Reset species
       setSelectedSpeciesId(null);
     }
@@ -272,14 +272,11 @@ function AddSpecificPlantPage() {
   const handleSubmitPlantDetails = async (e) => {
     e.preventDefault();
     setError("");
-    
-    // Basic form validation only, no saving to backend yet
+
     if (!form.name) {
       setError("Nama tumbuhan harus diisi");
       return;
     }
-    
-    // Just move to the next step without saving
     setCurrentStep(2);
   };
 
@@ -295,16 +292,12 @@ function AddSpecificPlantPage() {
     }
 
     try {
-      // First, create the plant data with the species ID
       const plantData = {
         ...form,
-        species_id: selectedSpeciesId
+        species_id: selectedSpeciesId,
       };
-      
-      // Save the plant with its species classification
+
       await axiosClient.post("/specific-plants", plantData);
-      
-      // Navigate back to the plants list with the correct route
       navigate("/specific-plants");
     } catch (err) {
       console.error("Error saving plant data:", err);
@@ -318,7 +311,10 @@ function AddSpecificPlantPage() {
 
   const renderStepOne = () => {
     return (
-      <form onSubmit={handleSubmitPlantDetails} className="space-y-4 max-w-4xl mx-auto">
+      <form
+        onSubmit={handleSubmitPlantDetails}
+        className="space-y-4 max-w-4xl mx-auto"
+      >
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
             {error}
@@ -407,7 +403,7 @@ function AddSpecificPlantPage() {
               onChange={handleChange}
               className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
             >
-              {plantTypes.map(type => (
+              {plantTypes.map((type) => (
                 <option key={type.id} value={type.id}>
                   {type.name}
                 </option>
@@ -542,7 +538,10 @@ function AddSpecificPlantPage() {
 
   const renderStepTwo = () => {
     return (
-      <form onSubmit={handleSubmitClassification} className="space-y-4 max-w-4xl mx-auto">
+      <form
+        onSubmit={handleSubmitClassification}
+        className="space-y-4 max-w-4xl mx-auto"
+      >
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
             {error}
@@ -550,7 +549,9 @@ function AddSpecificPlantPage() {
         )}
 
         <div className="bg-green-50 p-4 rounded-lg mb-4 border border-green-200">
-          <h3 className="text-green-800 font-medium">Data tumbuhan berhasil disimpan!</h3>
+          <h3 className="text-green-800 font-medium">
+            Data tumbuhan berhasil disimpan!
+          </h3>
           <p className="text-green-700 text-sm">
             Silahkan lengkapi klasifikasi taksonomi untuk tumbuhan {form.name}.
           </p>
@@ -580,7 +581,7 @@ function AddSpecificPlantPage() {
               required
             >
               <option value="">Pilih Subkingdom</option>
-              {subkingdoms.map(item => (
+              {subkingdoms.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.name}
                 </option>
@@ -600,7 +601,7 @@ function AddSpecificPlantPage() {
               required
             >
               <option value="">Pilih Superdivision</option>
-              {superdivisions.map(item => (
+              {superdivisions.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.name}
                 </option>
@@ -620,7 +621,7 @@ function AddSpecificPlantPage() {
               required
             >
               <option value="">Pilih Division</option>
-              {divisions.map(item => (
+              {divisions.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.name}
                 </option>
@@ -640,7 +641,7 @@ function AddSpecificPlantPage() {
               required
             >
               <option value="">Pilih Class</option>
-              {classes.map(item => (
+              {classes.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.name}
                 </option>
@@ -660,7 +661,7 @@ function AddSpecificPlantPage() {
               required
             >
               <option value="">Pilih Subclass</option>
-              {subclasses.map(item => (
+              {subclasses.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.name}
                 </option>
@@ -680,7 +681,7 @@ function AddSpecificPlantPage() {
               required
             >
               <option value="">Pilih Order</option>
-              {orders.map(item => (
+              {orders.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.name}
                 </option>
@@ -700,7 +701,7 @@ function AddSpecificPlantPage() {
               required
             >
               <option value="">Pilih Family</option>
-              {families.map(item => (
+              {families.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.name}
                 </option>
@@ -720,7 +721,7 @@ function AddSpecificPlantPage() {
               required
             >
               <option value="">Pilih Genus</option>
-              {genera.map(item => (
+              {genera.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.name}
                 </option>
@@ -740,7 +741,7 @@ function AddSpecificPlantPage() {
               required
             >
               <option value="">Pilih Species</option>
-              {species.map(item => (
+              {species.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.name}
                 </option>
@@ -784,24 +785,52 @@ function AddSpecificPlantPage() {
               Kembali
             </button>
           </div>
-          
+
           <div className="w-full mb-8">
             <div className="flex items-center">
-              <div className={`flex-1 border-t-2 ${currentStep >= 1 ? 'border-green-500' : 'border-gray-300'}`}></div>
-              <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${currentStep >= 1 ? 'bg-green-500' : 'bg-gray-300'}`}>
+              <div
+                className={`flex-1 border-t-2 ${
+                  currentStep >= 1 ? "border-green-500" : "border-gray-300"
+                }`}
+              ></div>
+              <div
+                className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${
+                  currentStep >= 1 ? "bg-green-500" : "bg-gray-300"
+                }`}
+              >
                 1
               </div>
-              <div className={`flex-1 border-t-2 ${currentStep >= 2 ? 'border-green-500' : 'border-gray-300'}`}></div>
-              <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${currentStep >= 2 ? 'bg-green-500' : 'bg-gray-300'}`}>
+              <div
+                className={`flex-1 border-t-2 ${
+                  currentStep >= 2 ? "border-green-500" : "border-gray-300"
+                }`}
+              ></div>
+              <div
+                className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-white ${
+                  currentStep >= 2 ? "bg-green-500" : "bg-gray-300"
+                }`}
+              >
                 2
               </div>
               <div className="flex-1 border-t-2 border-gray-300"></div>
             </div>
-            <div className="flex text-xs md:text-sm justify-between px-5 mt-2">
-              <div className={`${currentStep >= 1 ? 'text-green-500 font-semibold' : 'text-gray-500'}`}>
+            <div className="flex text-xs md:text-sm justify-between px-5 mt-2 ">
+              <div
+                className={`${
+                  currentStep >= 1
+                    ? "text-green-500 font-semibold"
+                    : "text-gray-500"
+                }`}
+              >
                 Detail Tumbuhan
               </div>
-              <div className={`${currentStep >= 2 ? 'text-green-500 font-semibold' : 'text-gray-500'}`}>
+              <div
+                className={`${
+                  currentStep >= 2
+                    ? "text-green-500 font-semibold"
+                    : "text-gray-500"
+                }`}
+              >
                 Klasifikasi
               </div>
             </div>
@@ -817,4 +846,4 @@ function AddSpecificPlantPage() {
   );
 }
 
-export default AddSpecificPlantPage; 
+export default AddSpecificPlantPage;

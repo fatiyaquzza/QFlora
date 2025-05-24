@@ -9,6 +9,7 @@ import DashboardPage from "./pages/DashboardPage";
 import SuggestionsPage from "./pages/SuggestionPage";
 import TaxonomyFormPage from "./pages/TaxonomyFormPage";
 import AddSpecificPlantPage from "./pages/AddSpecificPlantPage";
+import AddGeneralPlantPage from "./pages/AddGeneralPlantPage";
 
 function App() {
   return (
@@ -33,7 +34,7 @@ function App() {
             }
           />
           <Route
-            path="/add-specific-plant"
+            path="/specific-plant/add"
             element={
               <PrivateRoute>
                 <AddSpecificPlantPage />
@@ -69,6 +70,14 @@ function App() {
             element={
               <PrivateRoute>
                 <UserListPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/general-categories/add"
+            element={
+              <PrivateRoute>
+                <AddGeneralPlantPage/>
               </PrivateRoute>
             }
           />

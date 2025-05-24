@@ -69,7 +69,7 @@ function SpecificPlantsPage() {
       try {
         const [plantsRes, typesRes] = await Promise.all([
           axiosClient.get("/specific-plants"),
-          axiosClient.get("/api/plant-types")
+          axiosClient.get("/api/plant-types"),
         ]);
         setPlants(plantsRes.data);
         setPlantTypes(typesRes.data);
@@ -78,53 +78,68 @@ function SpecificPlantsPage() {
       }
     };
     fetchData();
-    
-    axiosClient.get("/api/taxonomy/full").then((res) => {
-      const taxonomyMap = {};
-      
-      res.data.species.forEach(species => {
-        const genus = res.data.genuses.find(g => g.id === species.genus_id);
-        if (!genus) return;
-        
-        const family = res.data.families.find(f => f.id === genus.family_id);
-        if (!family) return;
-        
-        const order = res.data.orders.find(o => o.id === family.order_id);
-        if (!order) return;
-        
-        const subclass = res.data.subclasses.find(sc => sc.id === order.subclass_id);
-        if (!subclass) return;
-        
-        const classData = res.data.classes.find(c => c.id === subclass.class_id);
-        if (!classData) return;
-        
-        const division = res.data.divisions.find(d => d.id === classData.division_id);
-        if (!division) return;
-        
-        const superdivision = res.data.superdivisions.find(sd => sd.id === division.superdivision_id);
-        if (!superdivision) return;
-        
-        const subkingdom = res.data.subkingdoms.find(sk => sk.id === superdivision.subkingdom_id);
-        if (!subkingdom) return;
-        
-        taxonomyMap[species.id] = {
-          kingdom: "Plantae",
-          subkingdom: subkingdom.name,
-          superdivision: superdivision.name,
-          division: division.name,
-          class: classData.name,
-          subclass: subclass.name,
-          order: order.name,
-          family: family.name,
-          genus: genus.name,
-          species: species.name
-        };
+
+    axiosClient
+      .get("/api/taxonomy/full")
+      .then((res) => {
+        const taxonomyMap = {};
+
+        res.data.species.forEach((species) => {
+          const genus = res.data.genuses.find((g) => g.id === species.genus_id);
+          if (!genus) return;
+
+          const family = res.data.families.find(
+            (f) => f.id === genus.family_id
+          );
+          if (!family) return;
+
+          const order = res.data.orders.find((o) => o.id === family.order_id);
+          if (!order) return;
+
+          const subclass = res.data.subclasses.find(
+            (sc) => sc.id === order.subclass_id
+          );
+          if (!subclass) return;
+
+          const classData = res.data.classes.find(
+            (c) => c.id === subclass.class_id
+          );
+          if (!classData) return;
+
+          const division = res.data.divisions.find(
+            (d) => d.id === classData.division_id
+          );
+          if (!division) return;
+
+          const superdivision = res.data.superdivisions.find(
+            (sd) => sd.id === division.superdivision_id
+          );
+          if (!superdivision) return;
+
+          const subkingdom = res.data.subkingdoms.find(
+            (sk) => sk.id === superdivision.subkingdom_id
+          );
+          if (!subkingdom) return;
+
+          taxonomyMap[species.id] = {
+            kingdom: "Plantae",
+            subkingdom: subkingdom.name,
+            superdivision: superdivision.name,
+            division: division.name,
+            class: classData.name,
+            subclass: subclass.name,
+            order: order.name,
+            family: family.name,
+            genus: genus.name,
+            species: species.name,
+          };
+        });
+
+        setTaxonomyData(taxonomyMap);
+      })
+      .catch((err) => {
+        console.error("Error loading taxonomy data:", err);
       });
-      
-      setTaxonomyData(taxonomyMap);
-    }).catch(err => {
-      console.error("Error loading taxonomy data:", err);
-    });
   }, []);
 
   const refreshData = () => {
@@ -198,8 +213,8 @@ function SpecificPlantsPage() {
   };
 
   const getPlantTypeName = (typeId) => {
-    const plantType = plantTypes.find(type => type.id === typeId);
-    return plantType ? plantType.name : '';
+    const plantType = plantTypes.find((type) => type.id === typeId);
+    return plantType ? plantType.name : "";
   };
 
   return (
@@ -227,7 +242,7 @@ function SpecificPlantsPage() {
 
               <button
                 className="px-4 py-2 text-sm text-white bg-[#004E1D] rounded hover:bg-green-700"
-                onClick={() => navigate("/add-specific-plant")}
+                onClick={() => navigate("/specific-plant/add")}
               >
                 Tambah
               </button>
@@ -302,7 +317,9 @@ function SpecificPlantsPage() {
                         alt="img"
                       />
                     </td>
-                    <td className="px-4 py-4 w-28">{getPlantTypeName(plant.plant_type_id)}</td>
+                    <td className="px-4 py-4 w-28">
+                      {getPlantTypeName(plant.plant_type_id)}
+                    </td>
                     <td className="px-4 py-4 max-w-xs">
                       <div
                         className="max-h-64 overflow-y-auto pr-2 w-80"
@@ -367,20 +384,56 @@ function SpecificPlantsPage() {
                       <div className="max-h-64 overflow-y-auto pr-2">
                         {plant.species_id && taxonomyData[plant.species_id] ? (
                           <div className="mb-2 text-sm">
-                            <p className="font-semibold text-green-700 mb-1">Klasifikasi Taksonomi:</p>
-                            <p><span className="font-medium">Kingdom:</span> {taxonomyData[plant.species_id].kingdom}</p>
-                            <p><span className="font-medium">Subkingdom:</span> {taxonomyData[plant.species_id].subkingdom}</p>
-                            <p><span className="font-medium">Superdivision:</span> {taxonomyData[plant.species_id].superdivision}</p>
-                            <p><span className="font-medium">Division:</span> {taxonomyData[plant.species_id].division}</p>
-                            <p><span className="font-medium">Class:</span> {taxonomyData[plant.species_id].class}</p>
-                            <p><span className="font-medium">Subclass:</span> {taxonomyData[plant.species_id].subclass}</p>
-                            <p><span className="font-medium">Order:</span> {taxonomyData[plant.species_id].order}</p>
-                            <p><span className="font-medium">Family:</span> {taxonomyData[plant.species_id].family}</p>
-                            <p><span className="font-medium">Genus:</span> {taxonomyData[plant.species_id].genus}</p>
-                            <p><span className="font-medium">Species:</span> {taxonomyData[plant.species_id].species}</p>
+                            <p className="font-semibold text-green-700 mb-1">
+                              Klasifikasi Taksonomi:
+                            </p>
+                            <p>
+                              <span className="font-medium">Kingdom:</span>{" "}
+                              {taxonomyData[plant.species_id].kingdom}
+                            </p>
+                            <p>
+                              <span className="font-medium">Subkingdom:</span>{" "}
+                              {taxonomyData[plant.species_id].subkingdom}
+                            </p>
+                            <p>
+                              <span className="font-medium">
+                                Superdivision:
+                              </span>{" "}
+                              {taxonomyData[plant.species_id].superdivision}
+                            </p>
+                            <p>
+                              <span className="font-medium">Division:</span>{" "}
+                              {taxonomyData[plant.species_id].division}
+                            </p>
+                            <p>
+                              <span className="font-medium">Class:</span>{" "}
+                              {taxonomyData[plant.species_id].class}
+                            </p>
+                            <p>
+                              <span className="font-medium">Subclass:</span>{" "}
+                              {taxonomyData[plant.species_id].subclass}
+                            </p>
+                            <p>
+                              <span className="font-medium">Order:</span>{" "}
+                              {taxonomyData[plant.species_id].order}
+                            </p>
+                            <p>
+                              <span className="font-medium">Family:</span>{" "}
+                              {taxonomyData[plant.species_id].family}
+                            </p>
+                            <p>
+                              <span className="font-medium">Genus:</span>{" "}
+                              {taxonomyData[plant.species_id].genus}
+                            </p>
+                            <p>
+                              <span className="font-medium">Species:</span>{" "}
+                              {taxonomyData[plant.species_id].species}
+                            </p>
                           </div>
                         ) : (
-                          <p className="text-gray-500 italic">Tidak ada data klasifikasi</p>
+                          <p className="text-gray-500 italic">
+                            Tidak ada data klasifikasi
+                          </p>
                         )}
                       </div>
                     </td>
@@ -694,10 +747,12 @@ function SpecificPlantsPage() {
                 <select
                   name="plant_type_id"
                   value={editing?.plant_type_id || ""}
-                  onChange={(e) => setEditing({ ...editing, plant_type_id: e.target.value })}
+                  onChange={(e) =>
+                    setEditing({ ...editing, plant_type_id: e.target.value })
+                  }
                   className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
-                  {plantTypes.map(type => (
+                  {plantTypes.map((type) => (
                     <option key={type.id} value={type.id}>
                       {type.name}
                     </option>
