@@ -18,13 +18,13 @@ app.get("/", (req, res) => {
   res.send("QFLORA API is running...");
 });
 
-// Test DB
+// Test DB and Migrations
 (async () => {
   try {
     await db.sequelize.authenticate();
     console.log("✅ Database connected.");
 
-    // Sync model secara berurutan berdasarkan foreign key
+    // Sync taxonomy tables
     await db.Subkingdom.sync();
     await db.Superdivision.sync();
     await db.Division.sync();
@@ -34,8 +34,10 @@ app.get("/", (req, res) => {
     await db.Family.sync();
     await db.Genus.sync();
     await db.Species.sync();
-
-    await db.SpecificPlant.sync({ alter: true });
+    
+    // Sync remaining tables
+    await db.PlantType.sync();
+    await db.SpecificPlant.sync();
     await db.SpecificPlantVerse.sync();
     await db.GeneralCategory.sync();
     await db.GeneralCategoryVerse.sync();
@@ -47,6 +49,7 @@ app.get("/", (req, res) => {
     console.log("✅ Semua model berhasil disinkronkan secara berurutan.");
   } catch (error) {
     console.error("❌ Gagal sync model ke DB:", error);
+    console.error("Detail error:", error.original || error);
   }
 })();
 
@@ -65,7 +68,7 @@ const favoriteRoutes = require("./routes/favorite");
 app.use("/favorites", favoriteRoutes);
 
 const userRoutes = require("./routes/users");
-app.use("/users", require("./routes/users"));
+app.use("/users", userRoutes);
 
 const generalFavoriteRoutes = require("./routes/generalFavorites");
 app.use("/general-favorites", generalFavoriteRoutes);
@@ -81,3 +84,7 @@ app.use("/api", verseImportRoutes);
 
 const taxonomyRoutes = require("./routes/taxonomy");
 app.use("/api", taxonomyRoutes);
+
+// Add plant types routes
+const plantTypeRoutes = require("./routes/plantTypes");
+app.use("/api/plant-types", plantTypeRoutes);

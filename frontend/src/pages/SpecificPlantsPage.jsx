@@ -11,7 +11,7 @@ function SpecificPlantsPage() {
     name: "",
     latin_name: "",
     image_url: "",
-    plant_type: "Buah",
+    plant_type_id: "",
     overview: "",
     description: "",
     benefits: "",
@@ -47,6 +47,8 @@ function SpecificPlantsPage() {
 
   const [taxonomyData, setTaxonomyData] = useState({});
 
+  const [plantTypes, setPlantTypes] = useState([]);
+
   const handleUploadPlantExcel = async () => {
     if (!excelTanaman) return alert("Pilih file Excel terlebih dahulu.");
     const formData = new FormData();
@@ -63,7 +65,19 @@ function SpecificPlantsPage() {
   };
 
   useEffect(() => {
-    axiosClient.get("/specific-plants").then((res) => setPlants(res.data));
+    const fetchData = async () => {
+      try {
+        const [plantsRes, typesRes] = await Promise.all([
+          axiosClient.get("/specific-plants"),
+          axiosClient.get("/api/plant-types")
+        ]);
+        setPlants(plantsRes.data);
+        setPlantTypes(typesRes.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    };
+    fetchData();
     
     axiosClient.get("/api/taxonomy/full").then((res) => {
       const taxonomyMap = {};
@@ -183,6 +197,11 @@ function SpecificPlantsPage() {
     }
   };
 
+  const getPlantTypeName = (typeId) => {
+    const plantType = plantTypes.find(type => type.id === typeId);
+    return plantType ? plantType.name : '';
+  };
+
   return (
     <AdminLayout>
       <div className="mt-4 bg-white border-2 rounded-xl p-4 shadow overflow-x-auto  font-Poppins">
@@ -283,7 +302,7 @@ function SpecificPlantsPage() {
                         alt="img"
                       />
                     </td>
-                    <td className="px-4 py-4 w-28">{plant.plant_type}</td>
+                    <td className="px-4 py-4 w-28">{getPlantTypeName(plant.plant_type_id)}</td>
                     <td className="px-4 py-4 max-w-xs">
                       <div
                         className="max-h-64 overflow-y-auto pr-2 w-80"
@@ -656,7 +675,7 @@ function SpecificPlantsPage() {
           className="space-y-3 max-h-[70vh] overflow-y-auto pr-1"
         >
           {Object.keys(form).map((key) =>
-            key !== "plant_type" ? (
+            key !== "plant_type_id" ? (
               <input
                 key={key}
                 type="text"
@@ -668,18 +687,23 @@ function SpecificPlantsPage() {
                 placeholder={key.replace(/_/g, " ")}
               />
             ) : (
-              <select
-                key={key}
-                className="w-full p-2 border rounded"
-                value={editing?.[key] || "Buah"}
-                onChange={(e) =>
-                  setEditing({ ...editing, [key]: e.target.value })
-                }
-              >
-                <option value="Buah">Buah</option>
-                <option value="Sayur">Sayur</option>
-                <option value="Bunga">Bunga</option>
-              </select>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Jenis Tanaman
+                </label>
+                <select
+                  name="plant_type_id"
+                  value={editing?.plant_type_id || ""}
+                  onChange={(e) => setEditing({ ...editing, plant_type_id: e.target.value })}
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  {plantTypes.map(type => (
+                    <option key={type.id} value={type.id}>
+                      {type.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             )
           )}
           <button

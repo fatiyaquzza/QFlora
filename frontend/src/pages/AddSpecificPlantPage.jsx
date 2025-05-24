@@ -10,7 +10,7 @@ function AddSpecificPlantPage() {
     name: "",
     latin_name: "",
     image_url: "",
-    plant_type: "Buah",
+    plant_type_id: "",
     overview: "",
     description: "",
     benefits: "",
@@ -62,6 +62,26 @@ function AddSpecificPlantPage() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Add state for plant types
+  const [plantTypes, setPlantTypes] = useState([]);
+
+  // Fetch plant types on component mount
+  useEffect(() => {
+    const fetchPlantTypes = async () => {
+      try {
+        const response = await axiosClient.get("/api/plant-types");
+        setPlantTypes(response.data);
+        // Set default plant type if available
+        if (response.data.length > 0) {
+          setForm(prev => ({ ...prev, plant_type_id: response.data[0].id }));
+        }
+      } catch (err) {
+        console.error("Error fetching plant types:", err);
+      }
+    };
+    fetchPlantTypes();
+  }, []);
 
   // Initial data loading - fetch all taxonomy data at once
   useEffect(() => {
@@ -382,14 +402,16 @@ function AddSpecificPlantPage() {
               Jenis Tanaman
             </label>
             <select
-              name="plant_type"
-              value={form.plant_type}
+              name="plant_type_id"
+              value={form.plant_type_id}
               onChange={handleChange}
               className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
             >
-              <option value="Buah">Buah</option>
-              <option value="Sayur">Sayur</option>
-              <option value="Bunga">Bunga</option>
+              {plantTypes.map(type => (
+                <option key={type.id} value={type.id}>
+                  {type.name}
+                </option>
+              ))}
             </select>
           </div>
         </div>

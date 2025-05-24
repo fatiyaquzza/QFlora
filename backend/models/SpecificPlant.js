@@ -6,10 +6,13 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      plant_type_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
       name: DataTypes.STRING,
       latin_name: DataTypes.STRING,
       image_url: DataTypes.TEXT,
-      plant_type: DataTypes.ENUM("Buah", "Sayur", "Bunga"),
       overview: DataTypes.TEXT,
       description: DataTypes.TEXT,
       eng_name:DataTypes.TEXT,
@@ -26,6 +29,13 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: true,
     }
   );
+
+  SpecificPlant.associate = (models) => {
+    SpecificPlant.belongsTo(models.PlantType, {
+      foreignKey: 'plant_type_id',
+      as: 'plant_type'
+    });
+  };
 
   return SpecificPlant;
 };

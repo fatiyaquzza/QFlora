@@ -8,10 +8,9 @@ import {
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 
-export enum PlantCategory {
-  Buah = "Buah",
-  Sayur = "Sayur",
-  Bunga = "Bunga",
+export interface PlantType {
+  id: number;
+  name: string;
 }
 
 export interface SearchPlant {
@@ -19,7 +18,7 @@ export interface SearchPlant {
   name: string;
   image: ImageSourcePropType;
   liked: boolean;
-  category: PlantCategory;
+  plant_type: PlantType;
   verses?: {
     surah: string;
     ayat: string;

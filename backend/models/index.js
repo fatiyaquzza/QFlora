@@ -3,45 +3,17 @@ const Sequelize = require("sequelize");
 const sequelize = require("../config/db");
 
 const User = require("./User")(sequelize, Sequelize.DataTypes);
-
-const SpecificPlant = require("./SpecificPlant")(
-  sequelize,
-  Sequelize.DataTypes
-);
+const PlantType = require("./PlantType")(sequelize, Sequelize.DataTypes);
+const SpecificPlant = require("./SpecificPlant")(sequelize, Sequelize.DataTypes);
 const Favorite = require("./Favorite")(sequelize, Sequelize.DataTypes);
-
-const GeneralCategory = require("./GeneralCategory")(
-  sequelize,
-  Sequelize.DataTypes
-);
-
-const GeneralCategoryVerse = require("./GeneralCategoryVerse")(
-  sequelize,
-  Sequelize.DataTypes
-);
-
-const SpecificPlantVerse = require("./SpecificPlantVerse")(
-  sequelize,
-  Sequelize.DataTypes
-);
-
-const SpecificPlantClassification = require("./SpecificPlantClassification")(
-  sequelize,
-  Sequelize.DataTypes
-);
-
-const GeneralFavorite = require("./GeneralFavorite")(
-  sequelize,
-  Sequelize.DataTypes
-);
-
+const GeneralCategory = require("./GeneralCategory")(sequelize, Sequelize.DataTypes);
+const GeneralCategoryVerse = require("./GeneralCategoryVerse")(sequelize, Sequelize.DataTypes);
+const SpecificPlantVerse = require("./SpecificPlantVerse")(sequelize, Sequelize.DataTypes);
+const SpecificPlantClassification = require("./SpecificPlantClassification")(sequelize, Sequelize.DataTypes);
+const GeneralFavorite = require("./GeneralFavorite")(sequelize, Sequelize.DataTypes);
 const Suggestion = require("./Suggestion")(sequelize, Sequelize.DataTypes);
-
 const Subkingdom = require("./Subkingdom")(sequelize, Sequelize.DataTypes);
-const Superdivision = require("./Superdivision")(
-  sequelize,
-  Sequelize.DataTypes
-);
+const Superdivision = require("./Superdivision")(sequelize, Sequelize.DataTypes);
 const Division = require("./Division")(sequelize, Sequelize.DataTypes);
 const Class = require("./Class")(sequelize, Sequelize.DataTypes);
 const Subclass = require("./Subclass")(sequelize, Sequelize.DataTypes);
@@ -49,6 +21,17 @@ const Order = require("./Order")(sequelize, Sequelize.DataTypes);
 const Family = require("./Family")(sequelize, Sequelize.DataTypes);
 const Genus = require("./Genus")(sequelize, Sequelize.DataTypes);
 const Species = require("./Species")(sequelize, Sequelize.DataTypes);
+
+// Relasi PlantType dengan SpecificPlant
+PlantType.hasMany(SpecificPlant, {
+  foreignKey: "plant_type_id",
+  as: "plants"
+});
+
+SpecificPlant.belongsTo(PlantType, {
+  foreignKey: "plant_type_id",
+  as: "plant_type"
+});
 
 // Relasi
 GeneralCategory.hasMany(GeneralCategoryVerse, {
@@ -193,6 +176,7 @@ Species.hasMany(SpecificPlant, {
 module.exports = {
   sequelize,
   User,
+  PlantType,
   SpecificPlant,
   SpecificPlantVerse,
   SpecificPlantClassification,

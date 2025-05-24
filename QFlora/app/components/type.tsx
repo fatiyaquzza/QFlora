@@ -36,7 +36,7 @@ export interface SpecificPlant {
   name: string;
   latin_name: string;
   image_url: string;
-  plant_type: "Buah" | "Sayur" | "Bunga";
+  plant_type_id: number;
   overview: string;
   description: string;
   benefits: string;
