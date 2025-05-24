@@ -8,6 +8,7 @@ import UserListPage from "./pages/UserListPage";
 import DashboardPage from "./pages/DashboardPage";
 import SuggestionsPage from "./pages/SuggestionPage";
 import TaxonomyFormPage from "./pages/TaxonomyFormPage";
+import AddSpecificPlantPage from "./pages/AddSpecificPlantPage";
 
 function App() {
   return (
@@ -32,6 +33,22 @@ function App() {
             }
           />
           <Route
+            path="/add-specific-plant"
+            element={
+              <PrivateRoute>
+                <AddSpecificPlantPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/taxonomy"
+            element={
+              <PrivateRoute>
+                <TaxonomyFormPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
             path="/general-categories"
             element={
               <PrivateRoute>
@@ -40,27 +57,18 @@ function App() {
             }
           />
           <Route
-            path="/users"
-            element={
-              <PrivateRoute>
-                <UserListPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/add-taxonomy"
-            element={
-              <PrivateRoute>
-                <TaxonomyFormPage />
-              </PrivateRoute>
-            }
-          />
-
-          <Route
             path="/suggestions"
             element={
               <PrivateRoute>
                 <SuggestionsPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/users"
+            element={
+              <PrivateRoute>
+                <UserListPage />
               </PrivateRoute>
             }
           />

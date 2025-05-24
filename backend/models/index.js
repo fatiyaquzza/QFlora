@@ -69,7 +69,7 @@ SpecificPlantVerse.belongsTo(SpecificPlant, {
   foreignKey: "specific_plant_id",
 });
 
-//NI NANTI HAPUSSS
+// Relasi SpecificPlant dan SpecificPlantClassification
 SpecificPlant.hasMany(SpecificPlantClassification, {
   foreignKey: "specific_plant_id",
   as: "classifications",

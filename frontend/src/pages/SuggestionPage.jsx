@@ -38,11 +38,12 @@ function SuggestionsPage() {
   return (
     <>
       <AdminLayout>
-        <div className="p-6 bg-gray-100 min-h-screen font-Poppins">
-          <div className="bg-white rounded-xl shadow p-6">
+        <div className="mt-4 bg-white border-2 rounded-xl p-4 shadow overflow-x-auto font-Poppins">
+          <div className="px-2 pt-2">
             <h1 className="mb-6 text-xl font-bold text-black">
               Masukan Pengguna
             </h1>
+            <div className="border-t border-gray-300 mb-4"></div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left border-separate border-spacing-y-4">
                 <thead className="text-gray-600">

@@ -22,7 +22,7 @@ const navItems = [
     icon: <MdDescription size={20} />,
   },
   {
-    path: "/add-taxonomy",
+    path: "/taxonomy",
     label: "Tambah Klasifikasi",
     icon: <MdCategory size={20} />,
   },
@@ -40,13 +40,12 @@ function AdminLayout({ children }) {
 
   return (
     <div className="min-h-screen font-Poppins">
-      {/* Sidebar - Fixed */}
-      <aside className="fixed top-0 left-0 h-screen w-64 bg-white drop-shadow-sm shadow-black py-6 z-10">
+      {/* Sidebar */}
+      <aside className="fixed top-0 left-0 h-screen w-64 bg-green-200 bg-opacity-35 drop-shadow-sm shadow-black py-6 z-10">
         <h1 className="mb-10 text-2xl font-bold text-center text-black">
           QFlora
         </h1>
         <nav className="flex flex-col gap-2 px-4 pb-20">
-          {/* Tambahkan padding bawah agar tidak tertutup logout */}
           {navItems.map((item) => (
             <Link
               key={item.path}
@@ -77,7 +76,7 @@ function AdminLayout({ children }) {
       {/* Content - offset to right of fixed sidebar */}
       <div className="pl-64 flex flex-col min-h-screen">
         {/* Header */}
-        <header className="flex items-center justify-end px-6 py-5 bg-white drop-shadow-sm">
+        <header className="flex items-center justify-end px-6 py-5 bg-white border-b-2 drop-shadow-sm">
           <div className="relative flex items-center gap-3">
             <p className="text-sm font-semibold text-black">
               Halo,{" "}
@@ -89,9 +88,7 @@ function AdminLayout({ children }) {
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 p-6 overflow-y-auto bg-gray-100">
-          {children}
-        </main>
+        <main className="flex-1 p-6 overflow-y-auto bg-white">{children}</main>
       </div>
     </div>
   );

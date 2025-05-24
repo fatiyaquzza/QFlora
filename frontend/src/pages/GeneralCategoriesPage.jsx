@@ -139,7 +139,7 @@ function GeneralCategoriesPage() {
 
   return (
     <AdminLayout>
-      <div className="overflow-x-auto bg-white rounded-xl shadow p-4 font-Poppins">
+      <div className="mt-4 bg-white border-2 rounded-xl p-4 shadow overflow-x-auto font-Poppins">
         <div className="px-2 pt-2">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
             <h1 className="text-xl font-bold text-black">
@@ -474,7 +474,6 @@ function GeneralCategoriesPage() {
           </div>
         </Modal>
 
-
         <Modal
           show={showUploadModal && uploadType === "plant"}
           title="Upload Kategori Umum dari Excel"
@@ -534,63 +533,62 @@ function GeneralCategoriesPage() {
         </Modal>
 
         <Modal
-  show={showUploadModal && uploadType === "verse"}
-  title="Upload Ayat Al-Qur’an dari Excel"
-  onClose={() => {
-    setShowUploadModal(false);
-    setExcelFile(null);
-  }}
->
-  <div className="space-y-4">
-    <div
-      className="border-2 border-dashed border-gray-300 p-6 rounded-lg text-center cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
-      onClick={() =>
-        document.getElementById("uploadExcelAyatInput")?.click()
-      }
-    >
-      <p className="text-sm font-medium text-gray-700">
-        Tarik file Excel ke sini
-      </p>
-      <p className="text-xs text-gray-500">atau klik tombol bawah</p>
-      <button
-        type="button"
-        className="mt-2 px-3 py-1 text-sm bg-blue-100 text-blue-600 rounded"
-      >
-        Pilih File
-      </button>
-    </div>
-    <input
-      id="uploadExcelAyatInput"
-      type="file"
-      accept=".xlsx, .xls"
-      className="hidden"
-      onChange={(e) => setExcelFile(e.target.files[0])}
-    />
-    {excelFile && (
-      <p className="text-sm text-green-700 font-semibold">
-        📄 {excelFile.name}
-      </p>
-    )}
-    <div className="flex justify-end gap-2">
-      <button
-        className="px-4 py-2 bg-gray-300 rounded"
-        onClick={() => {
-          setShowUploadModal(false);
-          setExcelFile(null);
-        }}
-      >
-        Batal
-      </button>
-      <button
-        className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-800"
-        onClick={handleExcelUpload}
-      >
-        Selesai
-      </button>
-    </div>
-  </div>
-</Modal>
-
+          show={showUploadModal && uploadType === "verse"}
+          title="Upload Ayat Al-Qur'an dari Excel"
+          onClose={() => {
+            setShowUploadModal(false);
+            setExcelFile(null);
+          }}
+        >
+          <div className="space-y-4">
+            <div
+              className="border-2 border-dashed border-gray-300 p-6 rounded-lg text-center cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
+              onClick={() =>
+                document.getElementById("uploadExcelAyatInput")?.click()
+              }
+            >
+              <p className="text-sm font-medium text-gray-700">
+                Tarik file Excel ke sini
+              </p>
+              <p className="text-xs text-gray-500">atau klik tombol bawah</p>
+              <button
+                type="button"
+                className="mt-2 px-3 py-1 text-sm bg-blue-100 text-blue-600 rounded"
+              >
+                Pilih File
+              </button>
+            </div>
+            <input
+              id="uploadExcelAyatInput"
+              type="file"
+              accept=".xlsx, .xls"
+              className="hidden"
+              onChange={(e) => setExcelFile(e.target.files[0])}
+            />
+            {excelFile && (
+              <p className="text-sm text-green-700 font-semibold">
+                📄 {excelFile.name}
+              </p>
+            )}
+            <div className="flex justify-end gap-2">
+              <button
+                className="px-4 py-2 bg-gray-300 rounded"
+                onClick={() => {
+                  setShowUploadModal(false);
+                  setExcelFile(null);
+                }}
+              >
+                Batal
+              </button>
+              <button
+                className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-800"
+                onClick={handleExcelUpload}
+              >
+                Selesai
+              </button>
+            </div>
+          </div>
+        </Modal>
 
         <Modal
           show={showUploadSelector}

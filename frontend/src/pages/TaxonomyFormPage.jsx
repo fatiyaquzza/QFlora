@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from "react";
 import axiosClient from "../api/axiosClient";
 import AdminLayout from "../components/AdminLayout";
+import { useNavigate } from "react-router-dom";
 
 const TAXONOMY_LEVELS = [
-    { key: "species", label: "Species", plural: "species", parent: "genus" },
-    { key: "genus", label: "Genus", plural: "genuses", parent: "family" },
-    { key: "family", label: "Family", plural: "families", parent: "order" },
-    { key: "order", label: "Order", plural: "orders", parent: "subclass" },
-    { key: "subclass", label: "Subclass", plural: "subclasses", parent: "class_" },
-    { key: "class_", label: "Class", plural: "classes", parent: "division" },   
+  { key: "species", label: "Species", plural: "species", parent: "genus" },
+  { key: "genus", label: "Genus", plural: "genuses", parent: "family" },
+  { key: "family", label: "Family", plural: "families", parent: "order" },
+  { key: "order", label: "Order", plural: "orders", parent: "subclass" },
+  {
+    key: "subclass",
+    label: "Subclass",
+    plural: "subclasses",
+    parent: "class_",
+  },
+  { key: "class_", label: "Class", plural: "classes", parent: "division" },
   {
     key: "division",
     label: "Division",
@@ -30,9 +36,12 @@ const TAXONOMY_LEVELS = [
 ];
 
 function TaxonomyFormPage() {
+  const navigate = useNavigate();
   const [taxonomyData, setTaxonomyData] = useState({});
   const [selected, setSelected] = useState({});
   const [newEntries, setNewEntries] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchTaxonomy = async () => {
@@ -41,12 +50,16 @@ function TaxonomyFormPage() {
         setTaxonomyData(res.data);
       } catch (err) {
         console.error("Gagal ambil taxonomy:", err);
+        setError("Gagal memuat data taksonomi. Silakan coba lagi.");
       }
     };
     fetchTaxonomy();
   }, []);
 
   const handleSave = async () => {
+    setIsLoading(true);
+    setError("");
+
     const payload = {};
     let hasSpecies = false;
 
@@ -70,7 +83,8 @@ function TaxonomyFormPage() {
       });
 
     if (!hasSpecies) {
-      alert("Spesies harus diisi (dipilih atau ditambah)");
+      setError("Spesies harus diisi (dipilih atau ditambah)");
+      setIsLoading(false);
       return;
     }
 
@@ -80,81 +94,120 @@ function TaxonomyFormPage() {
       setSelected({});
       setNewEntries({});
     } catch (err) {
-      alert(
-        "❌ Gagal menyimpan: " + (err.response?.data?.error || err.message)
+      setError(
+        err.response?.data?.error || "Terjadi kesalahan saat menyimpan data"
       );
       console.error(err);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleReset = () => {
+    setSelected({});
+    setNewEntries({});
+    setError("");
   };
 
   return (
     <AdminLayout>
-      <div className="p-6 max-w-5xl mx-auto bg-white rounded-xl shadow space-y-6 font-Poppins">
-        <h1 className="text-2xl font-bold">Tambah Klasifikasi Tumbuhan</h1>
+      <div className="mt-4 bg-white border-2 rounded-xl p-4 shadow overflow-x-auto font-Poppins">
+        <div className="px-2 pt-2">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-xl font-bold text-black">
+              Tambah Klasifikasi Taksonomi
+            </h1>
+            <button
+              className="px-4 py-2 text-sm text-white bg-gray-600 rounded hover:bg-gray-700"
+              onClick={() => navigate(-1)}
+            >
+              Kembali
+            </button>
+          </div>
 
-        <div className="space-y-6">
-          {TAXONOMY_LEVELS.map(({ key, label, plural }) => (
-            <div key={key}>
-              <p className="text-lg font-semibold">{label}</p>
+          <div className="border-t border-gray-300 mb-4"></div>
 
-              {/* Dropdown jika data tersedia */}
-              {(taxonomyData[plural] || []).length > 0 && (
-                <div className="mt-2">
-                  <select
-                    className="border px-3 py-2 rounded w-full"
-                    value={selected[key] || ""}
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+              {error}
+            </div>
+          )}
+
+          <div className="space-y-6 max-w-4xl mx-auto">
+            <div className="bg-green-50 p-4 rounded-lg mb-4 border border-green-200">
+              <h3 className="text-green-800 font-medium">
+                Petunjuk Penambahan Klasifikasi
+              </h3>
+              <p className="text-green-700 text-sm mt-1">
+                Anda dapat memilih dari klasifikasi yang sudah ada, atau
+                menambahkan entri baru. Pastikan memulai dari Subkingdom hingga
+                Spesies secara berurutan.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {TAXONOMY_LEVELS.map(({ key, label, plural }) => (
+                <div key={key} className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {label}
+                  </label>
+
+                  {/* Dropdown jika data tersedia */}
+                  {(taxonomyData[plural] || []).length > 0 && (
+                    <select
+                      className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 mb-2"
+                      value={selected[key] || ""}
+                      onChange={(e) =>
+                        setSelected((prev) => ({
+                          ...prev,
+                          [key]: parseInt(e.target.value),
+                        }))
+                      }
+                    >
+                      <option value="">-- Pilih {label} --</option>
+                      {taxonomyData[plural].map((item) => (
+                        <option key={item.id} value={item.id}>
+                          {item.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+
+                  {/* Tambah entri baru */}
+                  <input
+                    type="text"
+                    value={newEntries[key] || ""}
                     onChange={(e) =>
-                      setSelected((prev) => ({
+                      setNewEntries((prev) => ({
                         ...prev,
-                        [key]: parseInt(e.target.value),
+                        [key]: e.target.value,
                       }))
                     }
-                  >
-                    <option value="">-- Pilih {label} --</option>
-                    {taxonomyData[plural].map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.name}
-                      </option>
-                    ))}
-                  </select>
+                    placeholder={`Atau tambahkan ${label} baru`}
+                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
                 </div>
-              )}
-
-              {/* Tambah entri baru */}
-              <div className="mt-3">
-                <input
-                  type="text"
-                  value={newEntries[key] || ""}
-                  onChange={(e) =>
-                    setNewEntries((prev) => ({
-                      ...prev,
-                      [key]: e.target.value,
-                    }))
-                  }
-                  placeholder={`Atau tambahkan ${label} baru`}
-                  className="border px-3 py-2 rounded w-full"
-                />
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        <div className="pt-6 flex justify-end gap-2">
-          <button
-            className="px-4 py-2 bg-gray-300 rounded"
-            onClick={() => {
-              setSelected({});
-              setNewEntries({});
-            }}
-          >
-            Reset
-          </button>
-          <button
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-            onClick={handleSave}
-          >
-            Simpan Tumbuhan
-          </button>
+            <div className="pt-4 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={handleReset}
+                className="px-4 py-2 text-white bg-gray-600 rounded hover:bg-gray-700"
+              >
+                Reset
+              </button>
+              <button
+                type="button"
+                onClick={handleSave}
+                className="px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700 disabled:bg-green-400"
+                disabled={isLoading}
+              >
+                {isLoading ? "Menyimpan..." : "Simpan Klasifikasi"}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </AdminLayout>

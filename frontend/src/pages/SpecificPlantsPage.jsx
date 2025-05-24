@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import axiosClient from "../api/axiosClient";
 import Modal from "../components/Modal";
 import AdminLayout from "../components/AdminLayout";
+import { useNavigate } from "react-router-dom";
 
 function SpecificPlantsPage() {
+  const navigate = useNavigate();
   const [plants, setPlants] = useState([]);
-  const [form, setForm] = useState({
+  const [form] = useState({
     name: "",
     latin_name: "",
     image_url: "",
@@ -22,7 +24,6 @@ function SpecificPlantsPage() {
     arab_name: "",
   });
   const [editing, setEditing] = useState(null);
-  const [showForm, setShowForm] = useState(false);
   const [selectedPlantId, setSelectedPlantId] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [plantToDelete, setPlantToDelete] = useState(null);
@@ -33,11 +34,9 @@ function SpecificPlantsPage() {
   const [excelTanaman, setExcelTanaman] = useState(null);
   const [showUploadSelector, setShowUploadSelector] = useState(false);
   const [uploadType, setUploadType] = useState("");
-  const [excelKlasifikasi, setExcelKlasifikasi] = useState(null);
-  const [classificationEditing, setClassificationEditing] = useState(null);
 
   const [verseEditing, setVerseEditing] = useState(null);
-  const [newVerse, setNewVerse] = useState({
+  const [newVerse] = useState({
     surah: "",
     verse_number: "",
     quran_verse: "",
@@ -46,19 +45,7 @@ function SpecificPlantsPage() {
     keyword_arab: "",
   });
 
-  const [showClassificationForm, setShowClassificationForm] = useState(false);
-  const [newClassification, setNewClassification] = useState({
-    kingdom: "",
-    subkingdom: "",
-    superdivision: "",
-    division: "",
-    class: "",
-    subclass: "",
-    order: "",
-    family: "",
-    genus: "",
-    species: "",
-  });
+  const [taxonomyData, setTaxonomyData] = useState({});
 
   const handleUploadPlantExcel = async () => {
     if (!excelTanaman) return alert("Pilih file Excel terlebih dahulu.");
@@ -77,34 +64,57 @@ function SpecificPlantsPage() {
 
   useEffect(() => {
     axiosClient.get("/specific-plants").then((res) => setPlants(res.data));
+    
+    axiosClient.get("/api/taxonomy/full").then((res) => {
+      const taxonomyMap = {};
+      
+      res.data.species.forEach(species => {
+        const genus = res.data.genuses.find(g => g.id === species.genus_id);
+        if (!genus) return;
+        
+        const family = res.data.families.find(f => f.id === genus.family_id);
+        if (!family) return;
+        
+        const order = res.data.orders.find(o => o.id === family.order_id);
+        if (!order) return;
+        
+        const subclass = res.data.subclasses.find(sc => sc.id === order.subclass_id);
+        if (!subclass) return;
+        
+        const classData = res.data.classes.find(c => c.id === subclass.class_id);
+        if (!classData) return;
+        
+        const division = res.data.divisions.find(d => d.id === classData.division_id);
+        if (!division) return;
+        
+        const superdivision = res.data.superdivisions.find(sd => sd.id === division.superdivision_id);
+        if (!superdivision) return;
+        
+        const subkingdom = res.data.subkingdoms.find(sk => sk.id === superdivision.subkingdom_id);
+        if (!subkingdom) return;
+        
+        taxonomyMap[species.id] = {
+          kingdom: "Plantae",
+          subkingdom: subkingdom.name,
+          superdivision: superdivision.name,
+          division: division.name,
+          class: classData.name,
+          subclass: subclass.name,
+          order: order.name,
+          family: family.name,
+          genus: genus.name,
+          species: species.name
+        };
+      });
+      
+      setTaxonomyData(taxonomyMap);
+    }).catch(err => {
+      console.error("Error loading taxonomy data:", err);
+    });
   }, []);
 
   const refreshData = () => {
     axiosClient.get("/specific-plants").then((res) => setPlants(res.data));
-  };
-
-  const handleAdd = (e) => {
-    e.preventDefault();
-    axiosClient.post("/specific-plants", form).then(() => {
-      setForm({
-        name: "",
-        latin_name: "",
-        image_url: "",
-        plant_type: "Buah",
-        overview: "",
-        description: "",
-        benefits: "",
-        characteristics: "",
-        origin: "",
-        chemical_comp: "",
-        cultivation: "",
-        source_ref: "",
-        eng_name: "",
-        arab_name: "",
-      });
-      refreshData();
-      setShowForm(false);
-    });
   };
 
   const handleUpdate = (e) => {
@@ -144,45 +154,6 @@ function SpecificPlantsPage() {
     refreshData();
   };
 
-  // const handleAddClassification = async (e) => {
-  //   e.preventDefault();
-  //   await axiosClient.post(
-  //     `/specific-plants/${selectedPlantId}/classifications`,
-  //     newClassification
-  //   );
-  //   refreshData();
-  //   setShowClassificationForm(false);
-  //   setNewClassification({
-  //     kingdom: "",
-  //     subkingdom: "",
-  //     superdivision: "",
-  //     division: "",
-  //     class: "",
-  //     subclass: "",
-  //     order: "",
-  //     family: "",
-  //     genus: "",
-  //     species: "",
-  //   });
-  // };
-
-  // const handleUpdateClassification = async (e) => {
-  //   e.preventDefault();
-  //   await axiosClient.put(
-  //     `/specific-plants/${selectedPlantId}/classifications/${classificationEditing.id}`,
-  //     classificationEditing
-  //   );
-  //   refreshData();
-  //   setClassificationEditing(null);
-  // };
-
-  // const handleDeleteClassification = async (plantId, id) => {
-  //   await axiosClient.delete(
-  //     `/specific-plants/${plantId}/classifications/${id}`
-  //   );
-  //   refreshData();
-  // };
-
   const handleDeleteAllPlants = async () => {
     try {
       await axiosClient.delete("/specific-plants/all");
@@ -212,24 +183,9 @@ function SpecificPlantsPage() {
     }
   };
 
-  const handleUploadKlasifikasiExcel = async () => {
-    if (!excelKlasifikasi) return alert("Pilih file Excel terlebih dahulu.");
-    const formData = new FormData();
-    formData.append("file", excelKlasifikasi);
-
-    try {
-      await axiosClient.post("/api/import-specific-classifications", formData);
-      alert("Berhasil mengimport klasifikasi!");
-      refreshData();
-      setExcelKlasifikasi(null);
-    } catch (err) {
-      alert("Gagal import: " + (err.response?.data?.error || err.message));
-    }
-  };
-
   return (
     <AdminLayout>
-      <div className="mt-4 bg-white rounded-xl p-4 shadow overflow-x-auto  font-Poppins">
+      <div className="mt-4 bg-white border-2 rounded-xl p-4 shadow overflow-x-auto  font-Poppins">
         <div className="px-2 pt-2">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-xl font-bold text-black">
@@ -252,7 +208,7 @@ function SpecificPlantsPage() {
 
               <button
                 className="px-4 py-2 text-sm text-white bg-[#004E1D] rounded hover:bg-green-700"
-                onClick={() => setShowForm(true)}
+                onClick={() => navigate("/add-specific-plant")}
               >
                 Tambah
               </button>
@@ -389,38 +345,25 @@ function SpecificPlantsPage() {
                     </td>
 
                     <td className="px-4 py-4 min-w-80 w-80">
-                      {/* <div className="max-h-64 overflow-y-auto pr-2">
-                        {plant.classifications?.map((cls) => (
-                          <div
-                            key={cls.id}
-                            className="mb-2 border-b border-gray-200 pb-2 last:border-none"
-                          >
-                            <p className="text-sm italic">
-                              🔬 {cls.kingdom}, {cls.family}, {cls.genus},{" "}
-                              {cls.species}
-                            </p>
-                            <div className="flex gap-2 mt-1">
-                              <button
-                                className="px-2 py-1 text-xs text-white bg-blue-600 rounded hover:bg-blue-700"
-                                onClick={() => {
-                                  setSelectedPlantId(plant.id);
-                                  setClassificationEditing(cls);
-                                }}
-                              >
-                                Edit
-                              </button>
-                              <button
-                                className="px-2 py-1 text-xs text-white bg-red-600 rounded hover:bg-red-700"
-                                onClick={() =>
-                                  handleDeleteClassification(plant.id, cls.id)
-                                }
-                              >
-                                Hapus
-                              </button>
-                            </div>
+                      <div className="max-h-64 overflow-y-auto pr-2">
+                        {plant.species_id && taxonomyData[plant.species_id] ? (
+                          <div className="mb-2 text-sm">
+                            <p className="font-semibold text-green-700 mb-1">Klasifikasi Taksonomi:</p>
+                            <p><span className="font-medium">Kingdom:</span> {taxonomyData[plant.species_id].kingdom}</p>
+                            <p><span className="font-medium">Subkingdom:</span> {taxonomyData[plant.species_id].subkingdom}</p>
+                            <p><span className="font-medium">Superdivision:</span> {taxonomyData[plant.species_id].superdivision}</p>
+                            <p><span className="font-medium">Division:</span> {taxonomyData[plant.species_id].division}</p>
+                            <p><span className="font-medium">Class:</span> {taxonomyData[plant.species_id].class}</p>
+                            <p><span className="font-medium">Subclass:</span> {taxonomyData[plant.species_id].subclass}</p>
+                            <p><span className="font-medium">Order:</span> {taxonomyData[plant.species_id].order}</p>
+                            <p><span className="font-medium">Family:</span> {taxonomyData[plant.species_id].family}</p>
+                            <p><span className="font-medium">Genus:</span> {taxonomyData[plant.species_id].genus}</p>
+                            <p><span className="font-medium">Species:</span> {taxonomyData[plant.species_id].species}</p>
                           </div>
-                        ))}
-                      </div> */}
+                        ) : (
+                          <p className="text-gray-500 italic">Tidak ada data klasifikasi</p>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-4 min-w-80 w-80">
                       <div className="max-h-40 overflow-y-auto pr-1">
@@ -480,150 +423,6 @@ function SpecificPlantsPage() {
           </div>
         </div>
       </div>
-
-
-      {/* <Modal
-        show={!!classificationEditing}
-        title="Edit Klasifikasi"
-        onClose={() => setClassificationEditing(null)}
-      >
-        <form onSubmit={handleUpdateClassification} className="space-y-3">
-          {Object.keys(newClassification).map((key) => (
-            <input
-              key={key}
-              type="text"
-              className="w-full p-2 border rounded"
-              placeholder={key.replace(/_/g, " ")}
-              value={classificationEditing?.[key] || ""}
-              onChange={(e) =>
-                setClassificationEditing({
-                  ...classificationEditing,
-                  [key]: e.target.value,
-                })
-              }
-            />
-          ))}
-          <button
-            type="submit"
-            className="px-4 py-2 text-white bg-blue-600 rounded"
-          >
-            Update
-          </button>
-        </form>
-      </Modal> */}
-
-      <Modal
-        show={showForm}
-        title="Tambah Tumbuhan"
-        onClose={() => setShowForm(false)}
-      >
-        <form
-          onSubmit={handleAdd}
-          className="space-y-3 max-h-[70vh] overflow-y-auto pr-1"
-        >
-          {Object.keys(form).map((key) =>
-            key !== "plant_type" ? (
-              <input
-                key={key}
-                type="text"
-                className="w-full p-2 border rounded"
-                value={form[key]}
-                onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-                placeholder={key.replace(/_/g, " ")}
-              />
-            ) : (
-              <select
-                key={key}
-                className="w-full p-2 border rounded"
-                value={form[key]}
-                onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-              >
-                <option value="Buah">Buah</option>
-                <option value="Sayur">Sayur</option>
-                <option value="Bunga">Bunga</option>
-              </select>
-            )
-          )}
-          <button
-            type="submit"
-            className="px-4 py-2 text-white bg-green-600 rounded"
-          >
-            Simpan
-          </button>
-        </form>
-      </Modal>
-
-      <Modal
-        show={!!editing}
-        title="Edit Tumbuhan"
-        onClose={() => setEditing(null)}
-      >
-        <form
-          onSubmit={handleUpdate}
-          className="space-y-3 max-h-[70vh] overflow-y-auto pr-1"
-        >
-          {Object.keys(form).map((key) =>
-            key !== "plant_type" ? (
-              <input
-                key={key}
-                type="text"
-                className="w-full p-2 border rounded"
-                value={editing?.[key] || ""}
-                onChange={(e) =>
-                  setEditing({ ...editing, [key]: e.target.value })
-                }
-                placeholder={key.replace(/_/g, " ")}
-              />
-            ) : (
-              <select
-                key={key}
-                className="w-full p-2 border rounded"
-                value={editing?.[key] || "Buah"}
-                onChange={(e) =>
-                  setEditing({ ...editing, [key]: e.target.value })
-                }
-              >
-                <option value="Buah">Buah</option>
-                <option value="Sayur">Sayur</option>
-                <option value="Bunga">Bunga</option>
-              </select>
-            )
-          )}
-          <button
-            type="submit"
-            className="px-4 py-2 text-white bg-blue-600 rounded"
-          >
-            Update
-          </button>
-        </form>
-      </Modal>
-
-      <Modal
-        show={!!verseEditing}
-        title="Edit Ayat"
-        onClose={() => setVerseEditing(null)}
-      >
-        <form onSubmit={handleUpdateVerse} className="space-y-3">
-          {Object.keys(newVerse).map((key) => (
-            <input
-              key={key}
-              type="text"
-              className="w-full p-2 border rounded"
-              value={verseEditing?.[key] || ""}
-              onChange={(e) =>
-                setVerseEditing({ ...verseEditing, [key]: e.target.value })
-              }
-              placeholder={key.replace(/_/g, " ")}
-            />
-          ))}
-          <button
-            type="submit"
-            className="px-4 py-2 text-white bg-blue-600 rounded"
-          >
-            Update
-          </button>
-        </form>
-      </Modal>
 
       <Modal
         show={showDeleteModal}
@@ -805,64 +604,6 @@ function SpecificPlantsPage() {
         </div>
       </Modal>
 
-      {/* <Modal
-        show={showUploadModal && uploadType === "classification"}
-        title="Upload Klasifikasi Tumbuhan"
-        onClose={() => {
-          setShowUploadModal(false);
-          setExcelKlasifikasi(null);
-        }}
-      >
-        <div className="space-y-4">
-          <div
-            className="border-2 border-dashed border-gray-300 p-6 rounded-lg text-center cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
-            onClick={() =>
-              document.getElementById("uploadKlasifikasiExcelInput")?.click()
-            }
-          >
-            <p className="text-sm font-medium text-gray-700">
-              Drag your file(s) to start uploading
-            </p>
-            <p className="text-xs text-gray-500">or</p>
-            <button
-              type="button"
-              className="mt-2 px-3 py-1 text-sm bg-blue-100 text-blue-600 rounded"
-            >
-              Browse files
-            </button>
-          </div>
-          <input
-            id="uploadKlasifikasiExcelInput"
-            type="file"
-            accept=".xlsx, .xls"
-            className="hidden"
-            onChange={(e) => setExcelKlasifikasi(e.target.files[0])}
-          />
-          {excelKlasifikasi && (
-            <p className="text-sm text-green-700 font-semibold">
-              📄 {excelKlasifikasi.name}
-            </p>
-          )}
-          <div className="flex justify-end gap-2">
-            <button
-              className="px-4 py-2 bg-gray-300 rounded"
-              onClick={() => {
-                setShowUploadModal(false);
-                setExcelKlasifikasi(null);
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-800"
-              onClick={handleUploadKlasifikasiExcel}
-            >
-              Selesai
-            </button>
-          </div>
-        </div>
-      </Modal> */}
-
       <Modal
         show={showUploadSelector}
         title="Tambah Data"
@@ -876,7 +617,7 @@ function SpecificPlantsPage() {
             onClick={() => {
               setUploadType("plant");
               setShowUploadSelector(false);
-              setShowUploadModal(true); // ✅ GANTI INI
+              setShowUploadModal(true);
             }}
             className="w-full py-2 bg-lime-300 rounded hover:bg-lime-400 font-semibold"
           >
@@ -893,16 +634,6 @@ function SpecificPlantsPage() {
           >
             Tambah Data Ayat Alquran
           </button>
-          {/* <button
-            onClick={() => {
-              setUploadType("classification");
-              setShowUploadSelector(false);
-              setShowUploadModal(true);
-            }}
-            className="w-full py-2 bg-lime-300 rounded hover:bg-lime-400 font-semibold"
-          >
-            Tambah Data Klasifikasi
-          </button> */}
         </div>
 
         <div className="flex justify-end gap-2 mt-6">
@@ -913,6 +644,78 @@ function SpecificPlantsPage() {
             Cancel
           </button>
         </div>
+      </Modal>
+
+      <Modal
+        show={!!editing}
+        title="Edit Tumbuhan"
+        onClose={() => setEditing(null)}
+      >
+        <form
+          onSubmit={handleUpdate}
+          className="space-y-3 max-h-[70vh] overflow-y-auto pr-1"
+        >
+          {Object.keys(form).map((key) =>
+            key !== "plant_type" ? (
+              <input
+                key={key}
+                type="text"
+                className="w-full p-2 border rounded"
+                value={editing?.[key] || ""}
+                onChange={(e) =>
+                  setEditing({ ...editing, [key]: e.target.value })
+                }
+                placeholder={key.replace(/_/g, " ")}
+              />
+            ) : (
+              <select
+                key={key}
+                className="w-full p-2 border rounded"
+                value={editing?.[key] || "Buah"}
+                onChange={(e) =>
+                  setEditing({ ...editing, [key]: e.target.value })
+                }
+              >
+                <option value="Buah">Buah</option>
+                <option value="Sayur">Sayur</option>
+                <option value="Bunga">Bunga</option>
+              </select>
+            )
+          )}
+          <button
+            type="submit"
+            className="px-4 py-2 text-white bg-blue-600 rounded"
+          >
+            Update
+          </button>
+        </form>
+      </Modal>
+
+      <Modal
+        show={!!verseEditing}
+        title="Edit Ayat"
+        onClose={() => setVerseEditing(null)}
+      >
+        <form onSubmit={handleUpdateVerse} className="space-y-3">
+          {Object.keys(newVerse).map((key) => (
+            <input
+              key={key}
+              type="text"
+              className="w-full p-2 border rounded"
+              value={verseEditing?.[key] || ""}
+              onChange={(e) =>
+                setVerseEditing({ ...verseEditing, [key]: e.target.value })
+              }
+              placeholder={key.replace(/_/g, " ")}
+            />
+          ))}
+          <button
+            type="submit"
+            className="px-4 py-2 text-white bg-blue-600 rounded"
+          >
+            Update
+          </button>
+        </form>
       </Modal>
     </AdminLayout>
   );

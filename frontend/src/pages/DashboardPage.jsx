@@ -61,7 +61,7 @@ function DashboardPage() {
           <Link
             key={idx}
             to={card.to}
-            className="flex items-center p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition min-w-[120px]"
+            className="flex items-center p-6 bg-white border-2 rounded-xl shadow-md hover:shadow-lg transition min-w-[120px]"
           >
             {/* Icon box */}
             <div
