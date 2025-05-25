@@ -19,6 +19,10 @@ export interface SearchPlant {
   image: ImageSourcePropType;
   liked: boolean;
   plant_type: PlantType;
+  chemical_components?: {
+    id: number;
+    name: string;
+  }[];
   verses?: {
     surah: string;
     ayat: string;

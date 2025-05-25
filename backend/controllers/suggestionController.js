@@ -23,7 +23,16 @@ exports.createSuggestion = async (req, res) => {
       description,
     });
 
-    res.status(201).json(suggestion);
+    // Fetch the created suggestion with user data
+    const suggestionWithUser = await Suggestion.findByPk(suggestion.id, {
+      include: {
+        model: User,
+        as: 'user',
+        attributes: ["name", "email"],
+      },
+    });
+
+    res.status(201).json(suggestionWithUser);
   } catch (err) {
     console.error("❌ Gagal membuat saran:", err);
     res.status(500).json({ error: "Gagal menyimpan saran" });
@@ -35,6 +44,7 @@ exports.getAllSuggestions = async (req, res) => {
     const suggestions = await Suggestion.findAll({
       include: {
         model: User,
+        as: 'user',
         attributes: ["name", "email"],
       },
       order: [["createdAt", "DESC"]],
@@ -51,7 +61,14 @@ exports.updateSuggestionNote = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    const suggestion = await Suggestion.findByPk(id);
+    const suggestion = await Suggestion.findByPk(id, {
+      include: {
+        model: User,
+        as: 'user',
+        attributes: ["name", "email"],
+      },
+    });
+    
     if (!suggestion) {
       return res.status(404).json({ error: "Saran tidak ditemukan" });
     }

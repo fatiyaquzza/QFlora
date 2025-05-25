@@ -1,3 +1,8 @@
+export interface ChemicalComponent {
+  id: number;
+  name: string;
+}
+
 export interface FavoritePlant {
   id: number;
   specific_plant_id: number;
@@ -42,11 +47,14 @@ export interface SpecificPlant {
   benefits: string;
   characteristics: string;
   origin: string;
-  chemical_comp: string;
   cultivation: string;
   source_ref: string;
-  eng_name:string;
-  arab_name:string;
+  eng_name: string;
+  arab_name: string;
   verses: SpecificVerse[];
-  classifications: SpecificPlantClassification[];
+  classification: SpecificPlantClassification;
+  chemical_components: ChemicalComponent[];
 }
+
+// Default empty export since this is just a type definition file
+export default {};

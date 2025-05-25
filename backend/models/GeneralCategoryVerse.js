@@ -1,11 +1,15 @@
 // models/GeneralCategoryVerse.js
 module.exports = (sequelize, DataTypes) => {
-  return sequelize.define(
+  const GeneralCategoryVerse = sequelize.define(
     "GeneralCategoryVerse",
     {
       general_category_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: 'general_categories',
+          key: 'id'
+        }
       },
       surah: DataTypes.STRING,
       verse_number: DataTypes.INTEGER,
@@ -19,4 +23,12 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: true,
     }
   );
+
+  GeneralCategoryVerse.associate = (models) => {
+    GeneralCategoryVerse.belongsTo(models.GeneralCategory, {
+      foreignKey: "general_category_id",
+    });
+  };
+
+  return GeneralCategoryVerse;
 };

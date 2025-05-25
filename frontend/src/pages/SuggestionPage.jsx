@@ -59,8 +59,8 @@ function SuggestionsPage() {
                 <tbody>
                   {suggestions.map((s) => (
                     <tr key={s.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-4">{s.User?.name || "-"}</td>
-                      <td className="px-4 py-4">{s.User?.email || "-"}</td>
+                      <td className="px-4 py-4">{s.user?.name || "-"}</td>
+                      <td className="px-4 py-4">{s.user?.email || "-"}</td>
                       <td className="px-4 py-4">{s.type}</td>
                       <td className="px-4 py-4">{s.description}</td>
                       <td className="px-4 py-4">

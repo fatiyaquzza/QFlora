@@ -20,7 +20,6 @@ module.exports = (sequelize, DataTypes) => {
       benefits: DataTypes.TEXT,
       characteristics: DataTypes.TEXT,
       origin: DataTypes.TEXT,
-      chemical_comp: DataTypes.TEXT,
       cultivation: DataTypes.TEXT,
       source_ref: DataTypes.TEXT,
     },
@@ -34,6 +33,26 @@ module.exports = (sequelize, DataTypes) => {
     SpecificPlant.belongsTo(models.PlantType, {
       foreignKey: 'plant_type_id',
       as: 'plant_type'
+    });
+    SpecificPlant.belongsToMany(models.ChemicalComponent, {
+      through: models.SpecificPlantChemicalComponent,
+      foreignKey: "specific_plant_id",
+      otherKey: "chemical_component_id",
+      as: "chemical_components",
+    });
+    SpecificPlant.hasMany(models.SpecificPlantVerse, {
+      foreignKey: 'specific_plant_id',
+      as: 'verses',
+      onDelete: 'CASCADE',
+      hooks: true
+    });
+    SpecificPlant.belongsTo(models.Species, {
+      foreignKey: "species_id",
+      as: "species_detail"
+    });
+    SpecificPlant.hasOne(models.SpecificPlantClassification, {
+      foreignKey: 'specific_plant_id',
+      as: 'classification'
     });
   };
 

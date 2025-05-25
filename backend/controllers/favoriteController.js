@@ -1,4 +1,4 @@
-const { Favorite, User, SpecificPlant } = require("../models");
+const { Favorite, User, SpecificPlant, ChemicalComponent, SpecificPlantVerse } = require("../models");
 
 exports.getFavorites = async (req, res) => {
   try {
@@ -12,8 +12,11 @@ exports.getFavorites = async (req, res) => {
       include: [
         {
           model: SpecificPlant,
-          as: "SpecificPlant", // ✅ Tambahkan alias sesuai model
-          include: ["verses"], // Jika verses pakai alias juga, harus pakai as: "verses"
+          as: "SpecificPlant",
+          include: [
+            { model: SpecificPlantVerse, as: "verses" },
+            { model: ChemicalComponent, as: "chemical_components", through: { attributes: [] } }
+          ],
         },
       ],
     });

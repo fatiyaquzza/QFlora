@@ -1,11 +1,13 @@
-const { SpecificPlant, SpecificPlantVerse, SpecificPlantClassification } = require("../models");
+const { SpecificPlant, SpecificPlantVerse, SpecificPlantClassification, ChemicalComponent, SpecificPlantChemicalComponent } = require("../models");
+const db = require("../models");
 
 exports.getAll = async (req, res) => {
   try {
     const data = await SpecificPlant.findAll({
       include: [
         { model: SpecificPlantVerse, as: "verses" },
-        { model: SpecificPlantClassification, as: "classifications" }
+        { model: SpecificPlantClassification, as: "classification" },
+        { model: db.ChemicalComponent, as: "chemical_components", through: { attributes: [] } }
       ],
     });
     res.json(data);
@@ -20,7 +22,8 @@ exports.getById = async (req, res) => {
     const data = await SpecificPlant.findByPk(req.params.id, {
       include: [
         { model: SpecificPlantVerse, as: "verses" },
-        { model: SpecificPlantClassification, as: "classifications" }
+        { model: SpecificPlantClassification, as: "classification" },
+        { model: db.ChemicalComponent, as: "chemical_components", through: { attributes: [] } }
       ],
     });
 
@@ -35,20 +38,56 @@ exports.getById = async (req, res) => {
 
 exports.create = async (req, res) => {
   try {
-    const data = await SpecificPlant.create(req.body);
-    res.status(201).json(data);
+    const { chemical_component_ids, ...plantData } = req.body;
+    const data = await SpecificPlant.create(plantData);
+
+    if (chemical_component_ids && chemical_component_ids.length > 0) {
+      await data.setChemical_components(chemical_component_ids);
+    }
+
+    // To return the created plant with its associations
+    const result = await SpecificPlant.findByPk(data.id, {
+      include: [
+        { model: SpecificPlantVerse, as: "verses" },
+        { model: SpecificPlantClassification, as: "classification" },
+        { model: db.ChemicalComponent, as: "chemical_components", through: { attributes: [] } }
+      ],
+    });
+
+    res.status(201).json(result);
   } catch (err) {
+    console.error("Error create specific plant:", err);
     res.status(500).json({ error: "Gagal menambah tanaman spesifik" });
   }
 };
 
 exports.update = async (req, res) => {
   try {
-    const updated = await SpecificPlant.update(req.body, {
-      where: { id: req.params.id },
+    const { chemical_component_ids, ...plantData } = req.body;
+    const plant = await SpecificPlant.findByPk(req.params.id);
+
+    if (!plant) {
+      return res.status(404).json({ error: "Tumbuhan tidak ditemukan" });
+    }
+
+    await plant.update(plantData);
+
+    if (chemical_component_ids) { // Allows sending empty array to remove all
+      await plant.setChemical_components(chemical_component_ids);
+    }
+
+    // To return the updated plant with its associations
+    const result = await SpecificPlant.findByPk(req.params.id, {
+      include: [
+        { model: SpecificPlantVerse, as: "verses" },
+        { model: SpecificPlantClassification, as: "classification" },
+        { model: db.ChemicalComponent, as: "chemical_components", through: { attributes: [] } }
+      ],
     });
-    res.json({ message: "Data diperbarui", updated });
+
+    res.json({ message: "Data diperbarui", data: result });
   } catch (err) {
+    console.error("Error update specific plant:", err);
     res.status(500).json({ error: "Gagal mengupdate data" });
   }
 };

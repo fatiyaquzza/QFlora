@@ -13,5 +13,16 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
+  Favorite.associate = (models) => {
+    Favorite.belongsTo(models.SpecificPlant, {
+      foreignKey: "specific_plant_id",
+      as: "SpecificPlant"
+    });
+    Favorite.belongsTo(models.User, {
+      foreignKey: "user_id",
+      as: "user"
+    });
+  };
+
   return Favorite;
 };

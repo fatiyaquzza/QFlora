@@ -16,12 +16,15 @@ function AddSpecificPlantPage() {
     benefits: "",
     characteristics: "",
     origin: "",
-    chemical_comp: "",
     cultivation: "",
     source_ref: "",
     eng_name: "",
     arab_name: "",
   });
+
+  // Add state for chemical components
+  const [chemicalComponents, setChemicalComponents] = useState([]);
+  const [selectedChemicalComponents, setSelectedChemicalComponents] = useState([]);
 
   // Add touched state
   const [touched, setTouched] = useState({
@@ -34,11 +37,11 @@ function AddSpecificPlantPage() {
     benefits: false,
     characteristics: false,
     origin: false,
-    chemical_comp: false,
     cultivation: false,
     source_ref: false,
     eng_name: false,
     arab_name: false,
+    chemical_components: false,
   });
 
   // Store only the selected species ID for the final classification
@@ -279,6 +282,19 @@ function AddSpecificPlantPage() {
     }
   }, [selectedGenus, taxonomyData.species]);
 
+  // Add useEffect to fetch chemical components
+  useEffect(() => {
+    const fetchChemicalComponents = async () => {
+      try {
+        const response = await axiosClient.get("/api/chemical-components");
+        setChemicalComponents(response.data);
+      } catch (err) {
+        console.error("Error fetching chemical components:", err);
+      }
+    };
+    fetchChemicalComponents();
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({
@@ -306,11 +322,10 @@ function AddSpecificPlantPage() {
       "benefits",
       "characteristics",
       "origin",
-      "chemical_comp",
       "cultivation",
       "source_ref",
       "eng_name",
-      "arab_name",
+      "arab_name"
     ];
 
     const fieldNames = {
@@ -323,12 +338,18 @@ function AddSpecificPlantPage() {
       benefits: "Manfaat",
       characteristics: "Ciri-ciri",
       origin: "Asal",
-      chemical_comp: "Kandungan kimia",
       cultivation: "Budidaya",
       source_ref: "Sumber referensi",
       eng_name: "Nama inggris",
       arab_name: "Nama arab",
     };
+
+    // Validate chemical components
+    if (selectedChemicalComponents.length === 0) {
+      setTouched(prev => ({ ...prev, chemical_components: true }));
+      setError("Pilih minimal satu komponen kimia");
+      return;
+    }
 
     for (const field of requiredFields) {
       if (!form[field] || form[field].toString().trim() === "") {
@@ -360,6 +381,7 @@ function AddSpecificPlantPage() {
       const plantData = {
         ...form,
         species_id: selectedSpeciesId,
+        chemical_component_ids: selectedChemicalComponents
       };
 
       await axiosClient.post("/specific-plants", plantData);
@@ -373,6 +395,46 @@ function AddSpecificPlantPage() {
       setIsLoading(false);
     }
   };
+
+  // Replace the chemical_comp textarea with this new component
+  const renderChemicalComponentsSelect = () => (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Kandungan Kimia
+      </label>
+      <div className="relative">
+        <select
+          multiple
+          value={selectedChemicalComponents}
+          onChange={(e) => {
+            const values = Array.from(e.target.selectedOptions, option => option.value);
+            setSelectedChemicalComponents(values);
+            setTouched(prev => ({ ...prev, chemical_components: true }));
+          }}
+          className={`w-full p-2 border rounded transition-colors ${
+            touched.chemical_components && selectedChemicalComponents.length === 0
+              ? "border-red-500"
+              : "border-gray-300 hover:border-gray-400"
+          }`}
+          size="5"
+        >
+          {chemicalComponents.map((component) => (
+            <option key={component.id} value={component.id}>
+              {component.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      {touched.chemical_components && selectedChemicalComponents.length === 0 && (
+        <p className="text-sm text-red-500 mt-1">
+          Pilih minimal satu komponen kimia
+        </p>
+      )}
+      <p className="text-xs text-gray-500 mt-1">
+        Tekan Ctrl (Windows) atau Command (Mac) untuk memilih beberapa komponen
+      </p>
+    </div>
+  );
 
   const renderStepOne = () => {
     return (
@@ -637,28 +699,7 @@ function AddSpecificPlantPage() {
           )}
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Kandungan Kimia
-          </label>
-          <textarea
-            name="chemical_comp"
-            value={form.chemical_comp}
-            onChange={handleChange}
-            className={`w-full p-2 border rounded transition-colors ${
-              touched.chemical_comp && !form.chemical_comp
-                ? "border-red-500"
-                : "border-gray-300 hover:border-gray-400"
-            }`}
-            placeholder="Masukkan kandungan kimia tumbuhan"
-            required
-          ></textarea>
-          {touched.chemical_comp && !form.chemical_comp && (
-            <p className="text-sm text-red-500 mt-1">
-              Kandungan kimia wajib diisi
-            </p>
-          )}
-        </div>
+        {renderChemicalComponentsSelect()}
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">

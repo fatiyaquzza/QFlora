@@ -17,5 +17,16 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
+  GeneralFavorite.associate = (models) => {
+    GeneralFavorite.belongsTo(models.GeneralCategory, {
+      foreignKey: "general_category_id",
+      as: "GeneralCategory"
+    });
+    GeneralFavorite.belongsTo(models.User, {
+      foreignKey: "user_id",
+      as: "user"
+    });
+  };
+
   return GeneralFavorite;
 };

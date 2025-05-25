@@ -48,6 +48,8 @@ function SpecificPlantsPage() {
   const [taxonomyData, setTaxonomyData] = useState({});
 
   const [plantTypes, setPlantTypes] = useState([]);
+  const [chemicalComponents, setChemicalComponents] = useState([]);
+  const [selectedChemicalComponents, setSelectedChemicalComponents] = useState([]);
 
   const handleUploadPlantExcel = async () => {
     if (!excelTanaman) return alert("Pilih file Excel terlebih dahulu.");
@@ -67,12 +69,14 @@ function SpecificPlantsPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [plantsRes, typesRes] = await Promise.all([
+        const [plantsRes, typesRes, chemicalsRes] = await Promise.all([
           axiosClient.get("/specific-plants"),
           axiosClient.get("/api/plant-types"),
+          axiosClient.get("/api/chemical-components"),
         ]);
         setPlants(plantsRes.data);
         setPlantTypes(typesRes.data);
+        setChemicalComponents(chemicalsRes.data);
       } catch (err) {
         console.error("Error fetching data:", err);
       }
@@ -148,9 +152,13 @@ function SpecificPlantsPage() {
 
   const handleUpdate = (e) => {
     e.preventDefault();
-    axiosClient.put(`/specific-plants/${editing.id}`, editing).then(() => {
+    const { chemical_comp, ...editingData } = editing;
+    editingData.chemical_component_ids = selectedChemicalComponents;
+    
+    axiosClient.put(`/specific-plants/${editing.id}`, editingData).then(() => {
       refreshData();
       setEditing(null);
+      setSelectedChemicalComponents([]);
     });
   };
 
@@ -459,7 +467,12 @@ function SpecificPlantsPage() {
                     </td>
                     <td className="px-4 py-4 min-w-80 w-80">
                       <div className="max-h-40 overflow-y-auto pr-1">
-                        {plant.chemical_comp}
+                        {plant.chemical_components?.map((comp, index) => (
+                          <span key={comp.id}>
+                            {comp.name}
+                            {index < plant.chemical_components.length - 1 ? ', ' : ''}
+                          </span>
+                        ))}
                       </div>
                     </td>
                     <td className="px-4 py-4 min-w-80 w-80">
@@ -476,7 +489,10 @@ function SpecificPlantsPage() {
                       <div className="flex flex-col gap-1">
                         <button
                           className="px-3 py-1 text-white bg-blue-600 rounded hover:bg-blue-700"
-                          onClick={() => setEditing(plant)}
+                          onClick={() => {
+                            setEditing(plant);
+                            setSelectedChemicalComponents(plant.chemical_components?.map(comp => comp.id) || []);
+                          }}
                         >
                           Edit
                         </button>
@@ -727,40 +743,74 @@ function SpecificPlantsPage() {
           onSubmit={handleUpdate}
           className="space-y-3 max-h-[70vh] overflow-y-auto pr-1"
         >
-          {Object.keys(form).map((key) =>
-            key !== "plant_type_id" ? (
-              <input
-                key={key}
-                type="text"
-                className="w-full p-2 border rounded"
-                value={editing?.[key] || ""}
-                onChange={(e) =>
-                  setEditing({ ...editing, [key]: e.target.value })
-                }
-                placeholder={key.replace(/_/g, " ")}
-              />
-            ) : (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Jenis Tanaman
-                </label>
-                <select
-                  name="plant_type_id"
-                  value={editing?.plant_type_id || ""}
+          {Object.keys(form).map((key) => {
+            if (key === "plant_type_id") {
+              return (
+                <div key={key}>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Jenis Tanaman
+                  </label>
+                  <select
+                    name="plant_type_id"
+                    value={editing?.plant_type_id || ""}
+                    onChange={(e) =>
+                      setEditing({ ...editing, plant_type_id: e.target.value })
+                    }
+                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    {plantTypes.map((type) => (
+                      <option key={type.id} value={type.id}>
+                        {type.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              );
+            } else if (key === "chemical_comp") {
+              return (
+                <div key={key}>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Kandungan Kimia
+                  </label>
+                  <select
+                    multiple
+                    value={selectedChemicalComponents}
+                    onChange={(e) => {
+                      const selected = Array.from(e.target.selectedOptions, option => parseInt(option.value));
+                      setSelectedChemicalComponents(selected);
+                      setEditing({
+                        ...editing,
+                        chemical_components: chemicalComponents.filter(comp => selected.includes(comp.id))
+                      });
+                    }}
+                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 min-h-[100px]"
+                  >
+                    {chemicalComponents.map((comp) => (
+                      <option key={comp.id} value={comp.id}>
+                        {comp.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Tekan Ctrl (Windows) atau Command (Mac) untuk memilih beberapa kandungan kimia
+                  </p>
+                </div>
+              );
+            } else {
+              return (
+                <input
+                  key={key}
+                  type="text"
+                  className="w-full p-2 border rounded"
+                  value={editing?.[key] || ""}
                   onChange={(e) =>
-                    setEditing({ ...editing, plant_type_id: e.target.value })
+                    setEditing({ ...editing, [key]: e.target.value })
                   }
-                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-                >
-                  {plantTypes.map((type) => (
-                    <option key={type.id} value={type.id}>
-                      {type.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )
-          )}
+                  placeholder={key.replace(/_/g, " ")}
+                />
+              );
+            }
+          })}
           <button
             type="submit"
             className="px-4 py-2 text-white bg-blue-600 rounded"

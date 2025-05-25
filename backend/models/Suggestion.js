@@ -27,5 +27,12 @@ module.exports = (sequelize, DataTypes) => {
     },
   });
 
+  Suggestion.associate = (models) => {
+    Suggestion.belongsTo(models.User, {
+      foreignKey: 'user_id',
+      as: 'user'
+    });
+  };
+
   return Suggestion;
 };

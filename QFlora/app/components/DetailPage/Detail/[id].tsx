@@ -172,7 +172,9 @@ const Detail = () => {
         <ScrollView className="mx-4">
           <View className="p-5">
             <Text className="mb-2 text-2xl font-poppinsBold">Overview</Text>
-            <Text className="text-gray-800 font-poppins text-justify">{plant.overview}</Text>
+            <Text className="text-gray-800 font-poppins text-justify">
+              {plant.overview}
+            </Text>
           </View>
 
           {(plant.verses || []).map((verse, index) => (
@@ -197,22 +199,21 @@ const Detail = () => {
                   </TouchableOpacity>
                 </View>
                 <Text className="mb-3 text-2xl leading-10 text-right font-poppins">
-  {verse.keyword_arab
-    ? verse.quran_verse
-        .split(verse.keyword_arab)
-        .map((part: string, i: number, arr: string[]) => (
-          <React.Fragment key={i}>
-            <Text>{part}</Text>
-            {i !== arr.length - 1 && (
-              <Text className="bg-highlight text-black font-poppinsSemiBold">
-                {verse.keyword_arab}
-              </Text>
-            )}
-          </React.Fragment>
-        ))
-        
-    : verse.quran_verse}
-</Text>
+                  {verse.keyword_arab
+                    ? verse.quran_verse
+                        .split(verse.keyword_arab)
+                        .map((part: string, i: number, arr: string[]) => (
+                          <React.Fragment key={i}>
+                            <Text>{part}</Text>
+                            {i !== arr.length - 1 && (
+                              <Text className="bg-highlight text-black font-poppinsSemiBold">
+                                {verse.keyword_arab}
+                              </Text>
+                            )}
+                          </React.Fragment>
+                        ))
+                    : verse.quran_verse}
+                </Text>
                 <Text className="text-gray-700 font-poppins text-justify">
                   {verse.translation}
                 </Text>

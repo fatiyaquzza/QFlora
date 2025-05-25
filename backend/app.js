@@ -24,7 +24,15 @@ app.get("/", (req, res) => {
     await db.sequelize.authenticate();
     console.log("✅ Database connected.");
 
-    // Sync taxonomy tables
+    // Sync new tables first without forcing, so they exist for foreign keys
+    await db.PlantType.sync();
+    await db.ChemicalComponent.sync(); 
+    await db.SpecificPlantChemicalComponent.sync();
+
+    // Sync SpecificPlant with alter:true to handle schema changes like column drops
+    await db.SpecificPlant.sync({ alter: true }); 
+
+    // Sync other taxonomy tables (assuming they don't need forced changes for this task)
     await db.Subkingdom.sync();
     await db.Superdivision.sync();
     await db.Division.sync();
@@ -36,8 +44,6 @@ app.get("/", (req, res) => {
     await db.Species.sync();
     
     // Sync remaining tables
-    await db.PlantType.sync();
-    await db.SpecificPlant.sync();
     await db.SpecificPlantVerse.sync();
     await db.GeneralCategory.sync();
     await db.GeneralCategoryVerse.sync();
@@ -46,7 +52,8 @@ app.get("/", (req, res) => {
     await db.Suggestion.sync();
     await db.User.sync();
 
-    console.log("✅ Semua model berhasil disinkronkan secara berurutan.");
+    console.log("✅ All models synced.");
+
   } catch (error) {
     console.error("❌ Gagal sync model ke DB:", error);
     console.error("Detail error:", error.original || error);
@@ -88,3 +95,7 @@ app.use("/api", taxonomyRoutes);
 // Add plant types routes
 const plantTypeRoutes = require("./routes/plantTypes");
 app.use("/api/plant-types", plantTypeRoutes);
+
+// Add chemical components routes
+const chemicalComponentRoutes = require("./routes/chemicalComponents");
+app.use("/api/chemical-components", chemicalComponentRoutes);

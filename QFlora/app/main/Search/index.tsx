@@ -58,6 +58,7 @@ const Search = (): JSX.Element => {
           image: { uri: item.image_url },
           liked: favorites.includes(item.id),
           plant_type: typesRes.data.find(type => type.id === item.plant_type_id) || typesRes.data[0],
+          chemical_components: item.chemical_components,
           verses: item.verses.map((v) => ({
             surah: v.surah,
             ayat: v.id.toString(),

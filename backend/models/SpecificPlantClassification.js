@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  return sequelize.define(
+  const SpecificPlantClassification = sequelize.define(
     "SpecificPlantClassification",
     {
       specific_plant_id: {
@@ -25,4 +25,13 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: true,
     }
   );
+
+  SpecificPlantClassification.associate = (models) => {
+    SpecificPlantClassification.belongsTo(models.SpecificPlant, {
+      foreignKey: 'specific_plant_id',
+      as: 'specific_plant'
+    });
+  };
+
+  return SpecificPlantClassification;
 };

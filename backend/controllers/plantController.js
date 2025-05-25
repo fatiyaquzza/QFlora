@@ -4,13 +4,18 @@ const {
   Favorite,
   GeneralFavorite,
   sequelize,
+  ChemicalComponent
 } = require("../models");
 
 const isValidUrl = (url) => typeof url === "string" && url.startsWith("http");
 
 exports.getAllPlants = async (req, res) => {
   try {
-    const specifics = await SpecificPlant.findAll();
+    const specifics = await SpecificPlant.findAll({
+      include: [
+        { model: ChemicalComponent, as: "chemical_components", through: { attributes: [] } }
+      ]
+    });
     const generals = await GeneralCategory.findAll();
 
     const specificPlants = specifics
@@ -40,8 +45,11 @@ exports.getPopularPlants = async (req, res) => {
       include: [
         {
           model: SpecificPlant,
-          as: "SpecificPlant", // ⬅️ sesuai dengan alias di relasi model
+          as: "SpecificPlant",
           required: true,
+          include: [
+            { model: ChemicalComponent, as: "chemical_components", through: { attributes: [] } }
+          ]
         },
       ],
       group: ["specific_plant_id", "SpecificPlant.id"],
@@ -57,7 +65,7 @@ exports.getPopularPlants = async (req, res) => {
       include: [
         {
           model: GeneralCategory,
-          as: "GeneralCategory", // ⬅️ sesuai dengan alias di relasi model
+          as: "GeneralCategory",
           required: true,
         },
       ],

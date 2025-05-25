@@ -1,11 +1,15 @@
 // models/SpecificPlantVerse.js
 module.exports = (sequelize, DataTypes) => {
-  return sequelize.define(
+  const SpecificPlantVerse = sequelize.define(
     "SpecificPlantVerse",
     {
       specific_plant_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: 'specific_plants',
+          key: 'id'
+        }
       },
       surah: DataTypes.STRING,
       verse_number: DataTypes.INTEGER,
@@ -19,4 +23,12 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: true,
     }
   );
+
+  SpecificPlantVerse.associate = (models) => {
+    SpecificPlantVerse.belongsTo(models.SpecificPlant, {
+      foreignKey: "specific_plant_id",
+    });
+  };
+
+  return SpecificPlantVerse;
 };
