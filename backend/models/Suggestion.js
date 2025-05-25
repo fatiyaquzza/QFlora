@@ -12,10 +12,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    admin_note: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
     status: {
       type: DataTypes.STRING,
       defaultValue: "Belum",

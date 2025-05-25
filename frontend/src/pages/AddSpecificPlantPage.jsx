@@ -104,14 +104,12 @@ function AddSpecificPlantPage() {
     fetchPlantTypes();
   }, []);
 
-  // Initial data loading - fetch all taxonomy data at once
   useEffect(() => {
     const fetchAllTaxonomyData = async () => {
       try {
         const response = await axiosClient.get("/api/taxonomy/full");
         setTaxonomyData(response.data);
 
-        // Set subkingdoms directly since they're the top level
         setSubkingdoms(response.data.subkingdoms);
       } catch (err) {
         console.error("Error fetching taxonomy data:", err);
@@ -122,7 +120,6 @@ function AddSpecificPlantPage() {
     fetchAllTaxonomyData();
   }, []);
 
-  // Filter superdivisions when subkingdom changes
   useEffect(() => {
     if (selectedSubkingdom) {
       const filtered = taxonomyData.superdivisions.filter(
@@ -130,7 +127,6 @@ function AddSpecificPlantPage() {
       );
       setSuperdivisions(filtered);
 
-      // Reset lower levels
       setSelectedSuperdivision("");
       setSelectedDivision("");
       setSelectedClass("");
@@ -149,7 +145,6 @@ function AddSpecificPlantPage() {
     }
   }, [selectedSubkingdom, taxonomyData.superdivisions]);
 
-  // Filter divisions when superdivision changes
   useEffect(() => {
     if (selectedSuperdivision) {
       const filtered = taxonomyData.divisions.filter(
@@ -174,7 +169,6 @@ function AddSpecificPlantPage() {
     }
   }, [selectedSuperdivision, taxonomyData.divisions]);
 
-  // Filter classes when division changes
   useEffect(() => {
     if (selectedDivision) {
       const filtered = taxonomyData.classes.filter(
@@ -282,7 +276,6 @@ function AddSpecificPlantPage() {
     }
   }, [selectedGenus, taxonomyData.species]);
 
-  // Add useEffect to fetch chemical components
   useEffect(() => {
     const fetchChemicalComponents = async () => {
       try {
@@ -301,7 +294,6 @@ function AddSpecificPlantPage() {
       ...prev,
       [name]: value,
     }));
-    // Mark field as touched when changed
     setTouched((prev) => ({
       ...prev,
       [name]: true,
@@ -328,23 +320,6 @@ function AddSpecificPlantPage() {
       "arab_name"
     ];
 
-    const fieldNames = {
-      name: "Nama tumbuhan",
-      latin_name: "Nama latin",
-      image_url: "URL gambar",
-      plant_type_id: "Jenis tanaman",
-      overview: "Ringkasan",
-      description: "Deskripsi",
-      benefits: "Manfaat",
-      characteristics: "Ciri-ciri",
-      origin: "Asal",
-      cultivation: "Budidaya",
-      source_ref: "Sumber referensi",
-      eng_name: "Nama inggris",
-      arab_name: "Nama arab",
-    };
-
-    // Validate chemical components
     if (selectedChemicalComponents.length === 0) {
       setTouched(prev => ({ ...prev, chemical_components: true }));
       setError("Pilih minimal satu komponen kimia");
@@ -431,7 +406,7 @@ function AddSpecificPlantPage() {
         </p>
       )}
       <p className="text-xs text-gray-500 mt-1">
-        Tekan Ctrl (Windows) atau Command (Mac) untuk memilih beberapa komponen
+        Tekan Ctrl (Windows) untuk memilih beberapa komponen
       </p>
     </div>
   );

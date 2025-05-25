@@ -486,19 +486,16 @@ function SpecificPlantsPage() {
                       </div>
                     </td>
                     <td className="px-4 py-4 text-center min-w-40 w-40">
-                      <div className="flex flex-col gap-1">
+                      <div className="flex space-x-2">
                         <button
+                          onClick={() => navigate(`/specific-plants/edit/${plant.id}`)}
                           className="px-3 py-1 text-white bg-blue-600 rounded hover:bg-blue-700"
-                          onClick={() => {
-                            setEditing(plant);
-                            setSelectedChemicalComponents(plant.chemical_components?.map(comp => comp.id) || []);
-                          }}
                         >
                           Edit
                         </button>
                         <button
-                          className="px-3 py-1 text-white bg-red-600 rounded hover:bg-red-700"
                           onClick={() => handleDeleteClick(plant)}
+                          className="px-3 py-1 text-white bg-red-600 rounded hover:bg-red-700"
                         >
                           Hapus
                         </button>
