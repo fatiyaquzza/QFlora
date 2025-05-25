@@ -1,4 +1,4 @@
-const { Suggestion, User } = require("../models");
+const { Suggestion, User, SuggestionType } = require("../models");
 
 exports.createSuggestion = async (req, res) => {
   try {
@@ -11,25 +11,31 @@ exports.createSuggestion = async (req, res) => {
         .json({ error: "User tidak ditemukan di database." });
     }
 
-    const { type, description } = req.body;
+    const { suggestion_type_id, description } = req.body;
 
-    if (!type || !description) {
+    if (!suggestion_type_id || !description) {
       return res.status(400).json({ error: "Tipe dan deskripsi wajib diisi" });
     }
 
     const suggestion = await Suggestion.create({
       user_id: user.id,
-      type,
+      suggestion_type_id,
       description,
     });
 
     // Fetch the created suggestion with user data
     const suggestionWithUser = await Suggestion.findByPk(suggestion.id, {
-      include: {
-        model: User,
-        as: 'user',
-        attributes: ["name", "email"],
-      },
+      include: [
+        {
+          model: User,
+          as: "user",
+          attributes: ["name", "email"],
+        },
+        {
+          model: SuggestionType,
+          as: "suggestion_type",
+        },
+      ],
     });
 
     res.status(201).json(suggestionWithUser);
@@ -42,11 +48,17 @@ exports.createSuggestion = async (req, res) => {
 exports.getAllSuggestions = async (req, res) => {
   try {
     const suggestions = await Suggestion.findAll({
-      include: {
-        model: User,
-        as: 'user',
-        attributes: ["name", "email"],
-      },
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ["name", "email"],
+        },
+        {
+          model: SuggestionType,
+          as: 'suggestion_type',
+        },
+      ],
       order: [["createdAt", "DESC"]],
     });
     res.json(suggestions);
@@ -62,13 +74,19 @@ exports.updateSuggestionNote = async (req, res) => {
     const { status } = req.body;
 
     const suggestion = await Suggestion.findByPk(id, {
-      include: {
-        model: User,
-        as: 'user',
-        attributes: ["name", "email"],
-      },
+      include: [
+        {
+          model: User,
+          as: "user",
+          attributes: ["name", "email"],
+        },
+        {
+          model: SuggestionType,
+          as: "suggestion_type",
+        },
+      ],
     });
-    
+
     if (!suggestion) {
       return res.status(404).json({ error: "Saran tidak ditemukan" });
     }
@@ -84,5 +102,17 @@ exports.updateSuggestionNote = async (req, res) => {
   } catch (err) {
     console.error("❌ Gagal update status:", err);
     res.status(500).json({ error: "Gagal update status saran" });
+  }
+};
+
+exports.getSuggestionTypes = async (req, res) => {
+  try {
+    const types = await SuggestionType.findAll({
+      order: [["name", "ASC"]],
+    });
+    res.json(types);
+  } catch (err) {
+    console.error("❌ Gagal mengambil tipe saran:", err);
+    res.status(500).json({ error: "Gagal mengambil tipe saran" });
   }
 };

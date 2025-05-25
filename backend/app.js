@@ -49,8 +49,9 @@ app.get("/", (req, res) => {
     await db.GeneralCategoryVerse.sync();
     await db.GeneralFavorite.sync();
     await db.Favorite.sync();
-    await db.Suggestion.sync();
     await db.User.sync();
+    await db.SuggestionType.sync();
+    await db.Suggestion.sync();
 
     console.log("✅ All models synced.");
 

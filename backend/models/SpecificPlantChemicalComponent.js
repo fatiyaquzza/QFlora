@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
       specific_plant_id: {
         type: DataTypes.INTEGER,
         references: {
-          model: "specific_plants", // table name
+          model: "specific_plants", 
           key: "id",
         },
         allowNull: false,
@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       chemical_component_id: {
         type: DataTypes.INTEGER,
         references: {
-          model: "chemical_components", // table name
+          model: "chemical_components", 
           key: "id",
         },
         allowNull: false,
@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       tableName: "specific_plant_chemical_components",
-      timestamps: false, // Junction tables often don't need timestamps
+      timestamps: false, 
     }
   );
 

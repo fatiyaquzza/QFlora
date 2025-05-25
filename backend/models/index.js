@@ -15,6 +15,7 @@ db.SpecificPlantVerse = require("./SpecificPlantVerse")(sequelize, Sequelize.Dat
 db.SpecificPlantClassification = require("./SpecificPlantClassification")(sequelize, Sequelize.DataTypes);
 db.GeneralFavorite = require("./GeneralFavorite")(sequelize, Sequelize.DataTypes);
 db.Suggestion = require("./Suggestion")(sequelize, Sequelize.DataTypes);
+db.SuggestionType = require("./SuggestionType")(sequelize, Sequelize.DataTypes);
 db.Subkingdom = require("./Subkingdom")(sequelize, Sequelize.DataTypes);
 db.Superdivision = require("./Superdivision")(sequelize, Sequelize.DataTypes);
 db.Division = require("./Division")(sequelize, Sequelize.DataTypes);

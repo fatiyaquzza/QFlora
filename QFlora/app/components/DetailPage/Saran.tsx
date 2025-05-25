@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
   Text,
@@ -7,40 +7,89 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import { Stack, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import RadioGroup, { RadioButtonProps } from "react-native-radio-buttons-group";
 import axiosClient from "../../../api/axioxClient";
 import { useAuth } from "../../../context/authContext";
-import Toast from "react-native-toast-message"; // <== tambahkan ini
+import Toast from "react-native-toast-message";
+
+interface SuggestionType {
+  id: number;
+  name: string;
+}
 
 const Saran = () => {
   const [selectedId, setSelectedId] = useState<string | undefined>();
   const [desc, setDesc] = useState("");
+  const [types, setTypes] = useState<SuggestionType[]>([]);
+  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
-  const radioButtons: RadioButtonProps[] = useMemo(
-    () => [
-      { id: "Kritik", label: "Kritik", value: "Kritik" },
-      { id: "Saran", label: "Saran", value: "Saran" },
-      { id: "Pertanyaan", label: "Pertanyaan", value: "Pertanyaan" },
-    ],
-    []
-  );
+  useEffect(() => {
+    fetchSuggestionTypes();
+  }, []);
+
+  const fetchSuggestionTypes = async () => {
+    try {
+      const response = await axiosClient.get("/suggestions/types");
+      setTypes(response.data);
+    } catch (error) {
+      console.error("❌ Gagal mengambil tipe saran:", error);
+      Toast.show({
+        type: "error",
+        text1: "Gagal memuat tipe saran",
+        position: "bottom",
+        visibilityTime: 3000,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const radioButtons: RadioButtonProps[] = types.map((type) => ({
+    id: type.id.toString(),
+    label: type.name,
+    value: type.name,
+    labelStyle: { fontFamily: "poppins" },
+  }));
 
   const handleBack = () => {
     router.replace("../../main/Profile");
   };
 
   const handleSubmit = async () => {
+    const selectedType = types.find(
+      (type) => type.id.toString() === selectedId
+    );
+    if (!selectedType) {
+      Toast.show({
+        type: "error",
+        text1: "Pilih tipe saran terlebih dahulu",
+        position: "bottom",
+        visibilityTime: 3000,
+      });
+      return;
+    }
+
+    if (!desc.trim()) {
+      Toast.show({
+        type: "error",
+        text1: "Deskripsi tidak boleh kosong",
+        position: "bottom",
+        visibilityTime: 3000,
+      });
+      return;
+    }
+
     try {
       await axiosClient.post("/suggestions", {
-        type: selectedId,
+        suggestion_type_id: selectedType.id,
         description: desc,
       });
 
-      // tampilkan toast sukses
       Toast.show({
         type: "success",
         text1: "Saran berhasil dikirim",
@@ -48,7 +97,6 @@ const Saran = () => {
         visibilityTime: 3000,
       });
 
-      // reset form (opsional)
       setSelectedId(undefined);
       setDesc("");
     } catch (error) {
@@ -91,17 +139,22 @@ const Saran = () => {
             {/* Form */}
             <View className="mt-6">
               <Text className="text-lg font-poppinsSemiBold">Tipe</Text>
-              <View className="mt-2">
-                <RadioGroup
-                  layout="row"
-                  radioButtons={radioButtons.map((button) => ({
-                    ...button,
-                    labelStyle: { fontFamily: "poppins" },
-                  }))}
-                  onPress={setSelectedId}
-                  selectedId={selectedId}
+              {loading ? (
+                <ActivityIndicator
+                  size="small"
+                  color="#0B2D12"
+                  className="mt-4"
                 />
-              </View>
+              ) : (
+                <View className="mt-2 ">
+                  <RadioGroup
+                    layout="row"
+                    radioButtons={radioButtons}
+                    onPress={setSelectedId}
+                    selectedId={selectedId}
+                  />
+                </View>
+              )}
 
               <Text className="mt-6 text-lg font-poppinsSemiBold">
                 Deskripsi
@@ -119,7 +172,10 @@ const Saran = () => {
 
               <TouchableOpacity
                 onPress={handleSubmit}
-                className="mt-8 w-full p-4 mb-10 bg-[#0B2D12] rounded-md"
+                disabled={loading}
+                className={`mt-8 w-full p-4 mb-10 rounded-md ${
+                  loading ? "bg-gray-400" : "bg-[#0B2D12]"
+                }`}
               >
                 <Text className="text-lg text-center text-white font-poppinsSemiBold">
                   Submit

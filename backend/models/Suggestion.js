@@ -1,16 +1,11 @@
 module.exports = (sequelize, DataTypes) => {
   const Suggestion = sequelize.define("Suggestion", {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    type: {
-      type: DataTypes.ENUM("Kritik", "Saran", "Pertanyaan"),
+    suggestion_type_id: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     description: {
@@ -29,8 +24,12 @@ module.exports = (sequelize, DataTypes) => {
 
   Suggestion.associate = (models) => {
     Suggestion.belongsTo(models.User, {
-      foreignKey: 'user_id',
-      as: 'user'
+      foreignKey: "user_id",
+      as: "user",
+    });
+    Suggestion.belongsTo(models.SuggestionType, {
+      foreignKey: "suggestion_type_id",
+      as: "suggestion_type",
     });
   };
 
