@@ -42,6 +42,7 @@ export interface SpecificPlant {
   latin_name: string;
   image_url: string;
   plant_type_id: number;
+  species_id: number;
   overview: string;
   description: string;
   benefits: string;

@@ -14,12 +14,39 @@ import axiosClient from "../../../api/axioxClient";
 import { SpecificPlant } from "../type";
 import { useFavorite } from "../../../context/FavoriteContext";
 
+interface TaxonomyData {
+  subkingdoms: Array<{ id: number; name: string }>;
+  superdivisions: Array<{ id: number; name: string; subkingdom_id: number }>;
+  divisions: Array<{ id: number; name: string; superdivision_id: number }>;
+  classes: Array<{ id: number; name: string; division_id: number }>;
+  subclasses: Array<{ id: number; name: string; class_id: number }>;
+  orders: Array<{ id: number; name: string; subclass_id: number }>;
+  families: Array<{ id: number; name: string; order_id: number }>;
+  genuses: Array<{ id: number; name: string; family_id: number }>;
+  species: Array<{ id: number; name: string; genus_id: number }>;
+}
+
+interface TaxonomyMap {
+  [species_id: number]: {
+    kingdom: string;
+    subkingdom: string;
+    superdivision: string;
+    division: string;
+    class: string;
+    subclass: string;
+    order: string;
+    family: string;
+    genus: string;
+    species: string;
+  };
+}
+
 const FullDetail = () => {
   const { favorites, toggleFavorite } = useFavorite();
   const [isFavorite, setIsFavorite] = useState(false);
   const [sections, setSections] = useState({
     deskripsi: false,
-    // klasifikasi: false,
+    klasifikasi: false,
     manfaat: false,
     karakteristik: false,
     asalUsul: false,
@@ -30,6 +57,7 @@ const FullDetail = () => {
   const { id } = useLocalSearchParams();
   const [plant, setPlant] = useState<SpecificPlant | null>(null);
   const [loading, setLoading] = useState(true);
+  const [taxonomyMap, setTaxonomyMap] = useState<TaxonomyMap>({});
 
   const toggleSection = (section: string) => {
     setSections((prevSections) => ({
@@ -81,6 +109,65 @@ const FullDetail = () => {
       setIsFavorite(favorites.includes(plant.id));
     }
   }, [favorites, plant]);
+
+  useEffect(() => {
+    const fetchTaxonomyData = async () => {
+      try {
+        const response = await axiosClient.get("/api/taxonomy/full");
+        const data: TaxonomyData = response.data;
+        const map: TaxonomyMap = {};
+
+        data.species.forEach((species) => {
+          const genus = data.genuses.find((g) => g.id === species.genus_id);
+          if (!genus) return;
+
+          const family = data.families.find((f) => f.id === genus.family_id);
+          if (!family) return;
+
+          const order = data.orders.find((o) => o.id === family.order_id);
+          if (!order) return;
+
+          const subclass = data.subclasses.find((sc) => sc.id === order.subclass_id);
+          if (!subclass) return;
+
+          const classData = data.classes.find((c) => c.id === subclass.class_id);
+          if (!classData) return;
+
+          const division = data.divisions.find((d) => d.id === classData.division_id);
+          if (!division) return;
+
+          const superdivision = data.superdivisions.find(
+            (sd) => sd.id === division.superdivision_id
+          );
+          if (!superdivision) return;
+
+          const subkingdom = data.subkingdoms.find(
+            (sk) => sk.id === superdivision.subkingdom_id
+          );
+          if (!subkingdom) return;
+
+          map[species.id] = {
+            kingdom: "Plantae",
+            subkingdom: subkingdom.name,
+            superdivision: superdivision.name,
+            division: division.name,
+            class: classData.name,
+            subclass: subclass.name,
+            order: order.name,
+            family: family.name,
+            genus: genus.name,
+            species: species.name,
+          };
+        });
+
+        setTaxonomyMap(map);
+      } catch (err) {
+        console.error("❌ Gagal fetch taxonomy data:", err);
+      }
+    };
+
+    fetchTaxonomyData();
+  }, []);
 
   return (
     <>
@@ -187,7 +274,7 @@ const FullDetail = () => {
           </TouchableOpacity>
           {sections.komposisiKimia && (
             <View className="px-4 pb-4">
-              {plant?.chemical_components?.length > 0 ? (
+              {plant?.chemical_components && plant.chemical_components.length > 0 ? (
                 <View className="flex flex-wrap flex-row gap-2">
                   {plant.chemical_components.map((comp, index) => (
                     <View
@@ -217,8 +304,7 @@ const FullDetail = () => {
           )}
         </View>
 
-        {/* Klasifikasi */}
-        {/* <View className="mx-4 mb-3 overflow-hidden bg-white shadow-md rounded-xl">
+        <View className="mx-4 mb-3 overflow-hidden bg-white shadow-md rounded-xl">
           <TouchableOpacity
             onPress={() => toggleSection("klasifikasi")}
             className="flex-row items-center justify-between px-4 py-4"
@@ -232,44 +318,43 @@ const FullDetail = () => {
               color="#333"
             />
           </TouchableOpacity>
-          {sections.klasifikasi && !!plant?.classifications?.length && (
+          {sections.klasifikasi && plant?.species_id && taxonomyMap[plant.species_id] && (
             <View className="px-4 pb-4">
               <View className="border border-primary">
-                {Object.entries(plant.classifications[0]).map(
-                  ([key, value]) => {
-                    if (
-                      [
-                        "id",
-                        "specific_plant_id",
-                        "createdAt",
-                        "updatedAt",
-                      ].includes(key)
-                    )
-                      return null;
-                    return (
-                      <View
-                        key={key}
-                        className="flex-row border border-primary"
-                      >
-                        <Text className="w-1/3 p-2 text-sm text-white font-poppinsSemiBold bg-primary">
-                          {key.charAt(0).toUpperCase() + key.slice(1)}
-                        </Text>
-                        <Text className="w-2/3 p-2 text-sm text-black bg-white font-poppins">
-                          {typeof value === "string" ||
-                          typeof value === "number"
-                            ? value
-                            : "-"}
-                        </Text>
-                      </View>
-                    );
-                  }
-                )}
+                {[
+                  "kingdom",
+                  "subkingdom",
+                  "superdivision",
+                  "division",
+                  "class",
+                  "subclass",
+                  "order",
+                  "family",
+                  "genus",
+                  "species"
+                ].map((key) => {
+                  const value = taxonomyMap[plant.species_id][key as keyof typeof taxonomyMap[number]];
+                  if (!value) return null;
+                  
+                  return (
+                    <View
+                      key={key}
+                      className="flex-row border border-primary"
+                    >
+                      <Text className="w-1/3 p-2 text-sm text-white font-poppinsSemiBold bg-primary">
+                        {key.charAt(0).toUpperCase() + key.slice(1)}
+                      </Text>
+                      <Text className="w-2/3 p-2 text-sm text-black bg-white font-poppins">
+                        {value}
+                      </Text>
+                    </View>
+                  );
+                })}
               </View>
             </View>
           )}
-        </View> */}
+        </View>
 
-        {/* Manfaat */}
         <View className="mx-4 mb-3 overflow-hidden bg-white shadow-md rounded-xl">
           <TouchableOpacity
             onPress={() => toggleSection("manfaat")}
