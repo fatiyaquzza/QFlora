@@ -95,8 +95,14 @@ function EditSpecificPlantPage() {
       try {
         // First fetch taxonomy data
         const taxonomyRes = await axiosClient.get("/api/taxonomy/full");
-        setTaxonomyData(taxonomyRes.data);
-        setSubkingdoms(taxonomyRes.data.subkingdoms);
+        console.log("Taxonomy Data:", taxonomyRes.data);
+        
+        // Store taxonomy data first
+        const taxonomyData = taxonomyRes.data;
+        setTaxonomyData(taxonomyData);
+        
+        // Set initial subkingdoms
+        setSubkingdoms(taxonomyData.subkingdoms || []);
 
         // Then fetch plant data and other data
         const [plantRes, typesRes, chemicalsRes] = await Promise.all([
@@ -104,6 +110,8 @@ function EditSpecificPlantPage() {
           axiosClient.get("/api/plant-types"),
           axiosClient.get("/api/chemical-components"),
         ]);
+
+        console.log("Plant Data:", plantRes.data);
 
         // Set form data
         setForm(plantRes.data);
@@ -116,109 +124,106 @@ function EditSpecificPlantPage() {
 
         // Set selected chemical components
         const selectedChemIds =
-          plantRes.data.chemical_components?.map((comp) => comp.id) || [];
+          plantRes.data.chemical_components?.map((comp) => comp.id.toString()) || [];
         setSelectedChemicalComponents(selectedChemIds);
 
-        // Set classification data if exists
-        if (plantRes.data.classification) {
-          const speciesId = plantRes.data.classification.species_id;
-          setSelectedSpeciesId(speciesId);
+        // If we have a species_id, fetch its complete classification
+        if (plantRes.data.species_id) {
+          try {
+            // Find the species in taxonomy data
+            const species = taxonomyData.species.find(s => s.id === plantRes.data.species_id);
+            if (species) {
+              console.log("Found species:", species);
+              
+              // Find genus
+              const genus = taxonomyData.genuses.find(g => g.id === species.genus_id);
+              if (genus) {
+                // Find family
+                const family = taxonomyData.families.find(f => f.id === genus.family_id);
+                if (family) {
+                  // Find order
+                  const order = taxonomyData.orders.find(o => o.id === family.order_id);
+                  if (order) {
+                    // Find subclass
+                    const subclass = taxonomyData.subclasses.find(sc => sc.id === order.subclass_id);
+                    if (subclass) {
+                      // Find class
+                      const classData = taxonomyData.classes.find(c => c.id === subclass.class_id);
+                      if (classData) {
+                        // Find division
+                        const division = taxonomyData.divisions.find(d => d.id === classData.division_id);
+                        if (division) {
+                          // Find superdivision
+                          const superdivision = taxonomyData.superdivisions.find(sd => sd.id === division.superdivision_id);
+                          if (superdivision) {
+                            // Find subkingdom
+                            const subkingdom = taxonomyData.subkingdoms.find(sk => sk.id === superdivision.subkingdom_id);
+                            
+                            if (subkingdom) {
+                              console.log("Complete classification found:", {
+                                subkingdom,
+                                superdivision,
+                                division,
+                                classData,
+                                subclass,
+                                order,
+                                family,
+                                genus,
+                                species
+                              });
 
-          const species = taxonomyRes.data.species.find(
-            (s) => s.id === speciesId
-          );
-          if (species) {
-            setSpecies(
-              taxonomyRes.data.species.filter(
-                (s) => s.genus_id === species.genus_id
-              )
-            );
+                              // Set all taxonomy data as strings
+                              setSelectedSubkingdom(subkingdom.id.toString());
+                              setSelectedSuperdivision(superdivision.id.toString());
+                              setSelectedDivision(division.id.toString());
+                              setSelectedClass(classData.id.toString());
+                              setSelectedSubclass(subclass.id.toString());
+                              setSelectedOrder(order.id.toString());
+                              setSelectedFamily(family.id.toString());
+                              setSelectedGenus(genus.id.toString());
+                              setSelectedSpeciesId(species.id.toString());
 
-            const genus = taxonomyRes.data.genuses.find(
-              (g) => g.id === species.genus_id
-            );
-            if (genus) {
-              setSelectedGenus(genus.id);
-              setGenera(
-                taxonomyRes.data.genuses.filter(
-                  (g) => g.family_id === genus.family_id
-                )
-              );
+                              // Filter and set options for each level
+                              const filteredSuperdivisions = taxonomyData.superdivisions.filter(
+                                (sd) => sd.subkingdom_id === subkingdom.id
+                              );
+                              setSuperdivisions(filteredSuperdivisions);
 
-              const family = taxonomyRes.data.families.find(
-                (f) => f.id === genus.family_id
-              );
-              if (family) {
-                setSelectedFamily(family.id);
-                setFamilies(
-                  taxonomyRes.data.families.filter(
-                    (f) => f.order_id === family.order_id
-                  )
-                );
+                              const filteredDivisions = taxonomyData.divisions.filter(
+                                (d) => d.superdivision_id === superdivision.id
+                              );
+                              setDivisions(filteredDivisions);
 
-                const order = taxonomyRes.data.orders.find(
-                  (o) => o.id === family.order_id
-                );
-                if (order) {
-                  setSelectedOrder(order.id);
-                  setOrders(
-                    taxonomyRes.data.orders.filter(
-                      (o) => o.subclass_id === order.subclass_id
-                    )
-                  );
+                              const filteredClasses = taxonomyData.classes.filter(
+                                (c) => c.division_id === division.id
+                              );
+                              setClasses(filteredClasses);
 
-                  const subclass = taxonomyRes.data.subclasses.find(
-                    (sc) => sc.id === order.subclass_id
-                  );
-                  if (subclass) {
-                    setSelectedSubclass(subclass.id);
-                    setSubclasses(
-                      taxonomyRes.data.subclasses.filter(
-                        (sc) => sc.class_id === subclass.class_id
-                      )
-                    );
+                              const filteredSubclasses = taxonomyData.subclasses.filter(
+                                (sc) => sc.class_id === classData.id
+                              );
+                              setSubclasses(filteredSubclasses);
 
-                    const classItem = taxonomyRes.data.classes.find(
-                      (c) => c.id === subclass.class_id
-                    );
-                    if (classItem) {
-                      setSelectedClass(classItem.id);
-                      setClasses(
-                        taxonomyRes.data.classes.filter(
-                          (c) => c.division_id === classItem.division_id
-                        )
-                      );
+                              const filteredOrders = taxonomyData.orders.filter(
+                                (o) => o.subclass_id === subclass.id
+                              );
+                              setOrders(filteredOrders);
 
-                      const division = taxonomyRes.data.divisions.find(
-                        (d) => d.id === classItem.division_id
-                      );
-                      if (division) {
-                        setSelectedDivision(division.id);
-                        setDivisions(
-                          taxonomyRes.data.divisions.filter(
-                            (d) =>
-                              d.superdivision_id === division.superdivision_id
-                          )
-                        );
+                              const filteredFamilies = taxonomyData.families.filter(
+                                (f) => f.order_id === order.id
+                              );
+                              setFamilies(filteredFamilies);
 
-                        const superdivision =
-                          taxonomyRes.data.superdivisions.find(
-                            (sd) => sd.id === division.superdivision_id
-                          );
-                        if (superdivision) {
-                          setSelectedSuperdivision(superdivision.id);
-                          setSuperdivisions(
-                            taxonomyRes.data.superdivisions.filter(
-                              (sd) =>
-                                sd.subkingdom_id === superdivision.subkingdom_id
-                            )
-                          );
+                              const filteredGenera = taxonomyData.genuses.filter(
+                                (g) => g.family_id === family.id
+                              );
+                              setGenera(filteredGenera);
 
-                          const subkingdom = taxonomyRes.data.subkingdoms.find(
-                            (sk) => sk.id === superdivision.subkingdom_id
-                          );
-                          if (subkingdom) {
-                            setSelectedSubkingdom(subkingdom.id);
+                              const filteredSpecies = taxonomyData.species.filter(
+                                (s) => s.genus_id === genus.id
+                              );
+                              setSpecies(filteredSpecies);
+                            }
                           }
                         }
                       }
@@ -227,6 +232,8 @@ function EditSpecificPlantPage() {
                 }
               }
             }
+          } catch (err) {
+            console.error("Error building classification:", err);
           }
         }
       } catch (err) {
@@ -274,8 +281,22 @@ function EditSpecificPlantPage() {
     setIsLoading(true);
 
     try {
-      await axiosClient.put(`/specific-plants/${id}/classification`, {
-        species_id: selectedSpeciesId,
+      // Get the names of selected taxonomy items
+      const selectedSubkingdomName = subkingdoms.find(sk => sk.id === parseInt(selectedSubkingdom))?.name;
+      const selectedSuperdivisionName = superdivisions.find(sd => sd.id === parseInt(selectedSuperdivision))?.name;
+      const selectedDivisionName = divisions.find(d => d.id === parseInt(selectedDivision))?.name;
+      const selectedClassName = classes.find(c => c.id === parseInt(selectedClass))?.name;
+      const selectedSubclassName = subclasses.find(sc => sc.id === parseInt(selectedSubclass))?.name;
+      const selectedOrderName = orders.find(o => o.id === parseInt(selectedOrder))?.name;
+      const selectedFamilyName = families.find(f => f.id === parseInt(selectedFamily))?.name;
+      const selectedGenusName = genera.find(g => g.id === parseInt(selectedGenus))?.name;
+      const selectedSpeciesName = species.find(s => s.id === parseInt(selectedSpeciesId))?.name;
+
+      console.log("Updating plant with species_id:", selectedSpeciesId);
+
+      // Update the specific plant with the new species_id
+      await axiosClient.put(`/specific-plants/${id}`, {
+        species_id: parseInt(selectedSpeciesId)
       });
 
       navigate("/specific-plants");
@@ -314,6 +335,144 @@ function EditSpecificPlantPage() {
       </select>
     </div>
   );
+
+  // --- CASCADE LOGIC FOR EDIT PAGE ---
+  // When a parent is changed, only reset lower levels, not upper ones
+  // Subkingdom
+  const handleSubkingdomChange = (value) => {
+    setSelectedSubkingdom(value);
+    const filteredSuperdivisions = taxonomyData.superdivisions.filter(
+      (sd) => sd.subkingdom_id === parseInt(value)
+    );
+    setSuperdivisions(filteredSuperdivisions);
+    setSelectedSuperdivision("");
+    setDivisions([]);
+    setSelectedDivision("");
+    setClasses([]);
+    setSelectedClass("");
+    setSubclasses([]);
+    setSelectedSubclass("");
+    setOrders([]);
+    setSelectedOrder("");
+    setFamilies([]);
+    setSelectedFamily("");
+    setGenera([]);
+    setSelectedGenus("");
+    setSpecies([]);
+    setSelectedSpeciesId(null);
+  };
+
+  // Superdivision
+  const handleSuperdivisionChange = (value) => {
+    setSelectedSuperdivision(value);
+    const filteredDivisions = taxonomyData.divisions.filter(
+      (d) => d.superdivision_id === parseInt(value)
+    );
+    setDivisions(filteredDivisions);
+    setSelectedDivision("");
+    setClasses([]);
+    setSelectedClass("");
+    setSubclasses([]);
+    setSelectedSubclass("");
+    setOrders([]);
+    setSelectedOrder("");
+    setFamilies([]);
+    setSelectedFamily("");
+    setGenera([]);
+    setSelectedGenus("");
+    setSpecies([]);
+    setSelectedSpeciesId(null);
+  };
+
+  // Division
+  const handleDivisionChange = (value) => {
+    setSelectedDivision(value);
+    const filteredClasses = taxonomyData.classes.filter(
+      (c) => c.division_id === parseInt(value)
+    );
+    setClasses(filteredClasses);
+    setSelectedClass("");
+    setSubclasses([]);
+    setSelectedSubclass("");
+    setOrders([]);
+    setSelectedOrder("");
+    setFamilies([]);
+    setSelectedFamily("");
+    setGenera([]);
+    setSelectedGenus("");
+    setSpecies([]);
+    setSelectedSpeciesId(null);
+  };
+
+  // Class
+  const handleClassChange = (value) => {
+    setSelectedClass(value);
+    const filteredSubclasses = taxonomyData.subclasses.filter(
+      (sc) => sc.class_id === parseInt(value)
+    );
+    setSubclasses(filteredSubclasses);
+    setSelectedSubclass("");
+    setOrders([]);
+    setSelectedOrder("");
+    setFamilies([]);
+    setSelectedFamily("");
+    setGenera([]);
+    setSelectedGenus("");
+    setSpecies([]);
+    setSelectedSpeciesId(null);
+  };
+
+  // Subclass
+  const handleSubclassChange = (value) => {
+    setSelectedSubclass(value);
+    const filteredOrders = taxonomyData.orders.filter(
+      (o) => o.subclass_id === parseInt(value)
+    );
+    setOrders(filteredOrders);
+    setSelectedOrder("");
+    setFamilies([]);
+    setSelectedFamily("");
+    setGenera([]);
+    setSelectedGenus("");
+    setSpecies([]);
+    setSelectedSpeciesId(null);
+  };
+
+  // Order
+  const handleOrderChange = (value) => {
+    setSelectedOrder(value);
+    const filteredFamilies = taxonomyData.families.filter(
+      (f) => f.order_id === parseInt(value)
+    );
+    setFamilies(filteredFamilies);
+    setSelectedFamily("");
+    setGenera([]);
+    setSelectedGenus("");
+    setSpecies([]);
+    setSelectedSpeciesId(null);
+  };
+
+  // Family
+  const handleFamilyChange = (value) => {
+    setSelectedFamily(value);
+    const filteredGenera = taxonomyData.genuses.filter(
+      (g) => g.family_id === parseInt(value)
+    );
+    setGenera(filteredGenera);
+    setSelectedGenus("");
+    setSpecies([]);
+    setSelectedSpeciesId(null);
+  };
+
+  // Genus
+  const handleGenusChange = (value) => {
+    setSelectedGenus(value);
+    const filteredSpecies = taxonomyData.species.filter(
+      (s) => s.genus_id === parseInt(value)
+    );
+    setSpecies(filteredSpecies);
+    setSelectedSpeciesId(null);
+  };
 
   // Render step one (plant details)
   const renderStepOne = () => (
@@ -538,36 +697,14 @@ function EditSpecificPlantPage() {
             Subkingdom
           </label>
           <select
-            value={selectedSubkingdom}
-            onChange={(e) => {
-              setSelectedSubkingdom(e.target.value);
-              const superdivisions = taxonomyData.superdivisions.filter(
-                (sd) => sd.subkingdom_id === parseInt(e.target.value)
-              );
-              setSuperdivisions(superdivisions);
-              // Only reset if the selected value doesn't exist in new options
-              if (
-                !superdivisions.find(
-                  (sd) => sd.id === parseInt(selectedSuperdivision)
-                )
-              ) {
-                setSelectedSuperdivision("");
-                setDivisions([]);
-                setClasses([]);
-                setSubclasses([]);
-                setOrders([]);
-                setFamilies([]);
-                setGenera([]);
-                setSpecies([]);
-                setSelectedSpeciesId(null);
-              }
-            }}
+            value={selectedSubkingdom || ""}
+            onChange={(e) => handleSubkingdomChange(e.target.value)}
             className="w-full p-2 border rounded"
             required
           >
             <option value="">Pilih Subkingdom</option>
             {subkingdoms.map((sk) => (
-              <option key={sk.id} value={sk.id}>
+              <option key={sk.id} value={sk.id.toString()}>
                 {sk.name}
               </option>
             ))}
@@ -579,31 +716,14 @@ function EditSpecificPlantPage() {
             Superdivision
           </label>
           <select
-            value={selectedSuperdivision}
-            onChange={(e) => {
-              setSelectedSuperdivision(e.target.value);
-              const divisions = taxonomyData.divisions.filter(
-                (d) => d.superdivision_id === parseInt(e.target.value)
-              );
-              setDivisions(divisions);
-              // Only reset if the selected value doesn't exist in new options
-              if (!divisions.find((d) => d.id === parseInt(selectedDivision))) {
-                setSelectedDivision("");
-                setClasses([]);
-                setSubclasses([]);
-                setOrders([]);
-                setFamilies([]);
-                setGenera([]);
-                setSpecies([]);
-                setSelectedSpeciesId(null);
-              }
-            }}
+            value={selectedSuperdivision || ""}
+            onChange={(e) => handleSuperdivisionChange(e.target.value)}
             className="w-full p-2 border rounded"
             required
           >
             <option value="">Pilih Superdivision</option>
             {superdivisions.map((sd) => (
-              <option key={sd.id} value={sd.id}>
+              <option key={sd.id} value={sd.id.toString()}>
                 {sd.name}
               </option>
             ))}
@@ -615,30 +735,14 @@ function EditSpecificPlantPage() {
             Division
           </label>
           <select
-            value={selectedDivision}
-            onChange={(e) => {
-              setSelectedDivision(e.target.value);
-              const classes = taxonomyData.classes.filter(
-                (c) => c.division_id === parseInt(e.target.value)
-              );
-              setClasses(classes);
-              // Only reset if the selected value doesn't exist in new options
-              if (!classes.find((c) => c.id === parseInt(selectedClass))) {
-                setSelectedClass("");
-                setSubclasses([]);
-                setOrders([]);
-                setFamilies([]);
-                setGenera([]);
-                setSpecies([]);
-                setSelectedSpeciesId(null);
-              }
-            }}
+            value={selectedDivision || ""}
+            onChange={(e) => handleDivisionChange(e.target.value)}
             className="w-full p-2 border rounded"
             required
           >
             <option value="">Pilih Division</option>
             {divisions.map((d) => (
-              <option key={d.id} value={d.id}>
+              <option key={d.id} value={d.id.toString()}>
                 {d.name}
               </option>
             ))}
@@ -650,31 +754,14 @@ function EditSpecificPlantPage() {
             Class
           </label>
           <select
-            value={selectedClass}
-            onChange={(e) => {
-              setSelectedClass(e.target.value);
-              const subclasses = taxonomyData.subclasses.filter(
-                (sc) => sc.class_id === parseInt(e.target.value)
-              );
-              setSubclasses(subclasses);
-              // Only reset if the selected value doesn't exist in new options
-              if (
-                !subclasses.find((sc) => sc.id === parseInt(selectedSubclass))
-              ) {
-                setSelectedSubclass("");
-                setOrders([]);
-                setFamilies([]);
-                setGenera([]);
-                setSpecies([]);
-                setSelectedSpeciesId(null);
-              }
-            }}
+            value={selectedClass || ""}
+            onChange={(e) => handleClassChange(e.target.value)}
             className="w-full p-2 border rounded"
             required
           >
             <option value="">Pilih Class</option>
             {classes.map((c) => (
-              <option key={c.id} value={c.id}>
+              <option key={c.id} value={c.id.toString()}>
                 {c.name}
               </option>
             ))}
@@ -686,28 +773,14 @@ function EditSpecificPlantPage() {
             Subclass
           </label>
           <select
-            value={selectedSubclass}
-            onChange={(e) => {
-              setSelectedSubclass(e.target.value);
-              const orders = taxonomyData.orders.filter(
-                (o) => o.subclass_id === parseInt(e.target.value)
-              );
-              setOrders(orders);
-              // Only reset if the selected value doesn't exist in new options
-              if (!orders.find((o) => o.id === parseInt(selectedOrder))) {
-                setSelectedOrder("");
-                setFamilies([]);
-                setGenera([]);
-                setSpecies([]);
-                setSelectedSpeciesId(null);
-              }
-            }}
+            value={selectedSubclass || ""}
+            onChange={(e) => handleSubclassChange(e.target.value)}
             className="w-full p-2 border rounded"
             required
           >
             <option value="">Pilih Subclass</option>
             {subclasses.map((sc) => (
-              <option key={sc.id} value={sc.id}>
+              <option key={sc.id} value={sc.id.toString()}>
                 {sc.name}
               </option>
             ))}
@@ -719,27 +792,14 @@ function EditSpecificPlantPage() {
             Order
           </label>
           <select
-            value={selectedOrder}
-            onChange={(e) => {
-              setSelectedOrder(e.target.value);
-              const families = taxonomyData.families.filter(
-                (f) => f.order_id === parseInt(e.target.value)
-              );
-              setFamilies(families);
-              // Only reset if the selected value doesn't exist in new options
-              if (!families.find((f) => f.id === parseInt(selectedFamily))) {
-                setSelectedFamily("");
-                setGenera([]);
-                setSpecies([]);
-                setSelectedSpeciesId(null);
-              }
-            }}
+            value={selectedOrder || ""}
+            onChange={(e) => handleOrderChange(e.target.value)}
             className="w-full p-2 border rounded"
             required
           >
             <option value="">Pilih Order</option>
             {orders.map((o) => (
-              <option key={o.id} value={o.id}>
+              <option key={o.id} value={o.id.toString()}>
                 {o.name}
               </option>
             ))}
@@ -751,26 +811,14 @@ function EditSpecificPlantPage() {
             Family
           </label>
           <select
-            value={selectedFamily}
-            onChange={(e) => {
-              setSelectedFamily(e.target.value);
-              const genera = taxonomyData.genuses.filter(
-                (g) => g.family_id === parseInt(e.target.value)
-              );
-              setGenera(genera);
-              // Only reset if the selected value doesn't exist in new options
-              if (!genera.find((g) => g.id === parseInt(selectedGenus))) {
-                setSelectedGenus("");
-                setSpecies([]);
-                setSelectedSpeciesId(null);
-              }
-            }}
+            value={selectedFamily || ""}
+            onChange={(e) => handleFamilyChange(e.target.value)}
             className="w-full p-2 border rounded"
             required
           >
             <option value="">Pilih Family</option>
             {families.map((f) => (
-              <option key={f.id} value={f.id}>
+              <option key={f.id} value={f.id.toString()}>
                 {f.name}
               </option>
             ))}
@@ -782,24 +830,14 @@ function EditSpecificPlantPage() {
             Genus
           </label>
           <select
-            value={selectedGenus}
-            onChange={(e) => {
-              setSelectedGenus(e.target.value);
-              const species = taxonomyData.species.filter(
-                (s) => s.genus_id === parseInt(e.target.value)
-              );
-              setSpecies(species);
-              // Only reset if the selected value doesn't exist in new options
-              if (!species.find((s) => s.id === parseInt(selectedSpeciesId))) {
-                setSelectedSpeciesId(null);
-              }
-            }}
+            value={selectedGenus || ""}
+            onChange={(e) => handleGenusChange(e.target.value)}
             className="w-full p-2 border rounded"
             required
           >
             <option value="">Pilih Genus</option>
             {genera.map((g) => (
-              <option key={g.id} value={g.id}>
+              <option key={g.id} value={g.id.toString()}>
                 {g.name}
               </option>
             ))}
@@ -818,7 +856,7 @@ function EditSpecificPlantPage() {
           >
             <option value="">Pilih Species</option>
             {species.map((s) => (
-              <option key={s.id} value={s.id}>
+              <option key={s.id} value={s.id.toString()}>
                 {s.name}
               </option>
             ))}

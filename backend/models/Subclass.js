@@ -1,6 +1,6 @@
 // models/GeneralCategoryVerse.js
 module.exports = (sequelize, DataTypes) => {
-    return sequelize.define(
+    const Subclass = sequelize.define(
       "Subclass",
       {
         class_id: {
@@ -14,5 +14,18 @@ module.exports = (sequelize, DataTypes) => {
         timestamps: false,
       }
     );
+
+    Subclass.associate = (models) => {
+      Subclass.belongsTo(models.Class, {
+        foreignKey: 'class_id',
+        as: 'class'
+      });
+      Subclass.hasMany(models.Order, {
+        foreignKey: 'subclass_id',
+        as: 'orders'
+      });
+    };
+
+    return Subclass;
   };
   

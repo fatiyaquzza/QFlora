@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  return sequelize.define(
+  const Genus = sequelize.define(
     "Genus",
     {
       family_id: {
@@ -16,4 +16,17 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: false,
     }
   );
+
+  Genus.associate = (models) => {
+    Genus.belongsTo(models.Family, {
+      foreignKey: 'family_id',
+      as: 'family'
+    });
+    Genus.hasMany(models.Species, {
+      foreignKey: 'genus_id',
+      as: 'species'
+    });
+  };
+
+  return Genus;
 };

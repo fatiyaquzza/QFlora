@@ -215,11 +215,31 @@ function TaxonomyFormPage() {
                           }`}
                           value={selected[key] || ""}
                           onChange={(e) => {
+                            const value = e.target.value;
                             setSelected((prev) => ({
                               ...prev,
-                              [key]: parseInt(e.target.value),
+                              [key]: parseInt(value),
                             }));
                             setTouched((prev) => ({ ...prev, [key]: true }));
+
+                            // If previous selectedClass is still valid, keep it
+                            if (key === "division") {
+                              const filteredClasses = taxonomyData.classes.filter(
+                                (c) => c.division_id === parseInt(value)
+                              );
+                              if (!filteredClasses.find((c) => c.id === parseInt(selected.class_))) {
+                                setSelected((prev) => ({
+                                  ...prev,
+                                  class_: "",
+                                  subclass: "",
+                                  order: "",
+                                  family: "",
+                                  genus: "",
+                                  species: "",
+                                  selectedSpeciesId: null,
+                                }));
+                              }
+                            }
                           }}
                           onBlur={() =>
                             setTouched((prev) => ({ ...prev, [key]: true }))

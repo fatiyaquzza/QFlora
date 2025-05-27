@@ -1,6 +1,6 @@
 // models/GeneralCategoryVerse.js
 module.exports = (sequelize, DataTypes) => {
-  return sequelize.define(
+  const Family = sequelize.define(
     "Family",
     {
       order_id: {
@@ -14,4 +14,17 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: false,
     }
   );
+
+  Family.associate = (models) => {
+    Family.belongsTo(models.Order, {
+      foreignKey: 'order_id',
+      as: 'order'
+    });
+    Family.hasMany(models.Genus, {
+      foreignKey: 'family_id',
+      as: 'genera'
+    });
+  };
+
+  return Family;
 };

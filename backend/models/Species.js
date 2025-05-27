@@ -1,6 +1,6 @@
 // models/GeneralCategoryVerse.js
 module.exports = (sequelize, DataTypes) => {
-  return sequelize.define(
+  const Species = sequelize.define(
     "Species",
     {
       genus_id: {
@@ -14,4 +14,13 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: false,
     }
   );
+
+  Species.associate = (models) => {
+    Species.belongsTo(models.Genus, {
+      foreignKey: 'genus_id',
+      as: 'genus'
+    });
+  };
+
+  return Species;
 };

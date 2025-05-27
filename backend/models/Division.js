@@ -1,6 +1,6 @@
 // models/GeneralCategoryVerse.js
 module.exports = (sequelize, DataTypes) => {
-  return sequelize.define(
+  const Division = sequelize.define(
     "Division",
     {
       superdivision_id: {
@@ -14,4 +14,17 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: false,
     }
   );
+
+  Division.associate = (models) => {
+    Division.belongsTo(models.Superdivision, {
+      foreignKey: 'superdivision_id',
+      as: 'superdivision'
+    });
+    Division.hasMany(models.Class, {
+      foreignKey: 'division_id',
+      as: 'classes'
+    });
+  };
+
+  return Division;
 };
