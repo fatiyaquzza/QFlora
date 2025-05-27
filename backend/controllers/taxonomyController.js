@@ -21,7 +21,7 @@ exports.getAllFull = async (req, res) => {
   }
 };
 
-// ✅ Tambah seluruh taksonomi secara sekaligus
+
 exports.createFullTaxonomy = async (req, res) => {
   const {
     subkingdom,

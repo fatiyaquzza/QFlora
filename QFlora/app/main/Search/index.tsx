@@ -46,18 +46,20 @@ const Search = (): JSX.Element => {
     try {
       const [plantsRes, typesRes] = await Promise.all([
         axiosClient.get<SpecificPlant[]>("/specific-plants"),
-        axiosClient.get<PlantType[]>("/api/plant-types")
+        axiosClient.get<PlantType[]>("/api/plant-types"),
       ]);
-      
+
       setPlantTypes(typesRes.data);
-      
+
       const mapped = plantsRes.data.map(
         (item): SearchPlant => ({
           id: item.id.toString(),
           name: item.name,
           image: { uri: item.image_url },
           liked: favorites.includes(item.id),
-          plant_type: typesRes.data.find(type => type.id === item.plant_type_id) || typesRes.data[0],
+          plant_type:
+            typesRes.data.find((type) => type.id === item.plant_type_id) ||
+            typesRes.data[0],
           chemical_components: item.chemical_components,
           verses: item.verses.map((v) => ({
             surah: v.surah,

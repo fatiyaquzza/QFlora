@@ -11,6 +11,7 @@ import TaxonomyFormPage from "./pages/TaxonomyFormPage";
 import AddSpecificPlantPage from "./pages/AddSpecificPlantPage";
 import EditSpecificPlantPage from "./pages/EditSpecificPlantPage";
 import AddGeneralPlantPage from "./pages/AddGeneralPlantPage";
+import AddChemicalPage from "./pages/AddChemicalPage";
 
 function App() {
   return (
@@ -86,7 +87,15 @@ function App() {
             path="/general-categories/add"
             element={
               <PrivateRoute>
-                <AddGeneralPlantPage/>
+                <AddGeneralPlantPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/chemical-comp"
+            element={
+              <PrivateRoute>
+                <AddChemicalPage />
               </PrivateRoute>
             }
           />
