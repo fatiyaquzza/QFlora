@@ -12,7 +12,6 @@ db.Favorite = require("./Favorite")(sequelize, Sequelize.DataTypes);
 db.GeneralCategory = require("./GeneralCategory")(sequelize, Sequelize.DataTypes);
 db.GeneralCategoryVerse = require("./GeneralCategoryVerse")(sequelize, Sequelize.DataTypes);
 db.SpecificPlantVerse = require("./SpecificPlantVerse")(sequelize, Sequelize.DataTypes);
-db.SpecificPlantClassification = require("./SpecificPlantClassification")(sequelize, Sequelize.DataTypes);
 db.GeneralFavorite = require("./GeneralFavorite")(sequelize, Sequelize.DataTypes);
 db.Suggestion = require("./Suggestion")(sequelize, Sequelize.DataTypes);
 db.SuggestionType = require("./SuggestionType")(sequelize, Sequelize.DataTypes);

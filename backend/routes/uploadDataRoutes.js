@@ -4,7 +4,6 @@ const {
   importGeneralVerses,
   importSpecificPlantVerses,
   importSpecificPlants,
-  importSpecificPlantClassifications,
   importGeneralPlants
 } = require("../controllers/uploadDataController");
 
@@ -25,11 +24,6 @@ router.post(
   "/import-specific-plants",
   upload.single("file"),
   importSpecificPlants
-);
-router.post(
-  "/import-specific-classifications",
-  upload.single("file"),
-  importSpecificPlantClassifications
 );
 router.post(
   "/import-general-plants",

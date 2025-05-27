@@ -1,4 +1,4 @@
-const { SpecificPlant, SpecificPlantVerse, SpecificPlantClassification, ChemicalComponent, SpecificPlantChemicalComponent } = require("../models");
+const { SpecificPlant, SpecificPlantVerse, ChemicalComponent, SpecificPlantChemicalComponent } = require("../models");
 const db = require("../models");
 
 exports.getAll = async (req, res) => {
@@ -6,7 +6,6 @@ exports.getAll = async (req, res) => {
     const data = await SpecificPlant.findAll({
       include: [
         { model: SpecificPlantVerse, as: "verses" },
-        { model: SpecificPlantClassification, as: "classification" },
         { model: db.ChemicalComponent, as: "chemical_components", through: { attributes: [] } }
       ],
     });
@@ -22,7 +21,6 @@ exports.getById = async (req, res) => {
     const data = await SpecificPlant.findByPk(req.params.id, {
       include: [
         { model: SpecificPlantVerse, as: "verses" },
-        { model: SpecificPlantClassification, as: "classification" },
         { model: db.ChemicalComponent, as: "chemical_components", through: { attributes: [] } }
       ],
     });
@@ -49,7 +47,6 @@ exports.create = async (req, res) => {
     const result = await SpecificPlant.findByPk(data.id, {
       include: [
         { model: SpecificPlantVerse, as: "verses" },
-        { model: SpecificPlantClassification, as: "classification" },
         { model: db.ChemicalComponent, as: "chemical_components", through: { attributes: [] } }
       ],
     });
@@ -80,7 +77,6 @@ exports.update = async (req, res) => {
     const result = await SpecificPlant.findByPk(req.params.id, {
       include: [
         { model: SpecificPlantVerse, as: "verses" },
-        { model: SpecificPlantClassification, as: "classification" },
         { model: db.ChemicalComponent, as: "chemical_components", through: { attributes: [] } }
       ],
     });
@@ -145,44 +141,6 @@ exports.updateVerse = async (req, res) => {
     res.json({ message: "Ayat berhasil diperbarui", updated });
   } catch (err) {
     res.status(500).json({ error: "Gagal memperbarui ayat" });
-  }
-};
-
-exports.addClassification = async (req, res) => {
-  try {
-    const { specific_plant_id } = req.params;
-    const newData = await SpecificPlantClassification.create({
-      ...req.body,
-      specific_plant_id,
-    });
-    res.status(201).json(newData);
-  } catch (err) {
-    res.status(500).json({ error: "Gagal menambahkan klasifikasi" });
-  }
-};
-
-exports.updateClassification = async (req, res) => {
-  try {
-    const { specific_plant_id, classificationId } = req.params;
-    const updated = await SpecificPlantClassification.update(req.body, {
-      where: { id: classificationId, specific_plant_id },
-    });
-    res.json({ message: "Klasifikasi diperbarui", updated });
-  } catch (err) {
-    res.status(500).json({ error: "Gagal memperbarui klasifikasi" });
-  }
-};
-
-exports.deleteClassification = async (req, res) => {
-  try {
-    const { specific_plant_id, classificationId } = req.params;
-    const deleted = await SpecificPlantClassification.destroy({
-      where: { id: classificationId, specific_plant_id },
-    });
-    if (!deleted) return res.status(404).json({ error: "Tidak ditemukan" });
-    res.json({ message: "Klasifikasi dihapus" });
-  } catch (err) {
-    res.status(500).json({ error: "Gagal menghapus klasifikasi" });
   }
 };
 

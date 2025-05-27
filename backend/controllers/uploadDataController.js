@@ -6,82 +6,7 @@ const {
   SpecificPlantVerse,
   GeneralCategory,
   GeneralCategoryVerse,
-  SpecificPlantClassification,
 } = require("../models");
-
-const importSpecificPlantClassifications = async (req, res) => {
-  try {
-    if (!req.file) {
-      return res
-        .status(400)
-        .json({ message: "File tidak ditemukan dalam request." });
-    }
-
-    const workbook = xlsx.readFile(req.file.path);
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const data = xlsx.utils.sheet_to_json(sheet);
-
-    if (!data || data.length === 0) {
-      return res
-        .status(400)
-        .json({ message: "File Excel kosong atau tidak terbaca." });
-    }
-
-    for (const [index, row] of data.entries()) {
-      try {
-        const name = row["Nama Tumbuhan"]?.trim();
-        if (!name) {
-          console.warn(`❗ Baris ke-${index + 2}: Nama Tumbuhan kosong`);
-          continue;
-        }
-
-        const plant = await SpecificPlant.findOne({ where: { name } });
-        if (!plant) {
-          console.warn(
-            `❗ Baris ke-${index + 2}: Tumbuhan "${name}" tidak ditemukan`
-          );
-          continue;
-        }
-
-        const existingClassification =
-          await SpecificPlantClassification.findOne({
-            where: { specific_plant_id: plant.id },
-          });
-
-        if (existingClassification) {
-          console.warn(
-            `❗ Baris ke-${index + 2}: Klasifikasi untuk "${name}" sudah ada`
-          );
-          continue;
-        }
-
-        await SpecificPlantClassification.create({
-          specific_plant_id: plant.id,
-          kingdom: row["kingdom"] || "Plantae",
-          subkingdom: row["subkingdom"] || "",
-          superdivision: row["superdivision"] || "",
-          division: row["division"] || "",
-          class: row["class"] || "",
-          subclass: row["subclass"] || "",
-          order: row["order"] || "",
-          family: row["family"] || "",
-          genus: row["genus"] || "",
-          species: row["species"] || "",
-        });
-      } catch (rowErr) {
-        console.error(`❌ Gagal proses baris ${index + 2}:`, rowErr);
-      }
-    }
-
-    fs.unlinkSync(req.file.path);
-    res.status(200).json({ message: "Import klasifikasi berhasil!" });
-  } catch (err) {
-    console.error("❌ ERROR IMPORT KLASIFIKASI:", err);
-    res
-      .status(500)
-      .json({ message: "Gagal import klasifikasi.", error: err.message });
-  }
-};
 
 const importSpecificPlantVerses = async (req, res) => {
   try {
@@ -247,7 +172,6 @@ const importGeneralVerses = async (req, res) => {
   }
 };
 
-
 const importSpecificPlants = async (req, res) => {
   try {
     if (!req.file) {
@@ -365,6 +289,5 @@ module.exports = {
   importGeneralVerses,
   importSpecificPlantVerses,
   importSpecificPlants,
-  importSpecificPlantClassifications,
   importGeneralPlants,
 };

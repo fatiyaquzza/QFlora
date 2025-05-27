@@ -19,23 +19,6 @@ export interface SpecificVerse {
   keyword_arab: string;
 }
 
-export interface SpecificPlantClassification {
-  id: number;
-  specific_plant_id: number;
-  kingdom: string;
-  subkingdom: string;
-  superdivision: string;
-  division: string;
-  class: string;
-  subclass: string;
-  order: string;
-  family: string;
-  genus: string;
-  species: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
 export interface SpecificPlant {
   id: number;
   name: string;
@@ -53,7 +36,6 @@ export interface SpecificPlant {
   eng_name: string;
   arab_name: string;
   verses: SpecificVerse[];
-  classification: SpecificPlantClassification;
   chemical_components: ChemicalComponent[];
 }
 

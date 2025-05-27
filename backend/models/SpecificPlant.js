@@ -50,10 +50,6 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "species_id",
       as: "species_detail"
     });
-    SpecificPlant.hasOne(models.SpecificPlantClassification, {
-      foreignKey: 'specific_plant_id',
-      as: 'classification'
-    });
   };
 
   return SpecificPlant;

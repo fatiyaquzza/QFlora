@@ -15,19 +15,4 @@ router.post("/:specific_plant_id/verses", controller.addVerse);
 router.delete("/:specific_plant_id/verses/:verseId", controller.deleteVerse);
 router.put("/:specific_plant_id/verses/:verseId", controller.updateVerse);
 
-// Classifications
-router.post(
-  "/:specific_plant_id/classifications",
-  controller.addClassification
-);
-router.put(
-  "/:specific_plant_id/classifications/:classificationId",
-  controller.updateClassification
-);
-router.delete(
-  "/:specific_plant_id/classifications/:classificationId",
-  controller.deleteClassification
-);
-
-
 module.exports = router;
