@@ -8,6 +8,7 @@ import {
   MdPerson,
   MdCategory,
   MdScience,
+  MdAccountTree,
 } from "react-icons/md";
 
 const navItems = [
@@ -26,6 +27,11 @@ const navItems = [
     path: "/taxonomy",
     label: "Tambah Klasifikasi",
     icon: <MdCategory size={20} />,
+  },
+  {
+    path: "/taxonomy/view",
+    label: "Lihat Klasifikasi",
+    icon: <MdAccountTree size={20} />,
   },
   {
     path: "/chemical-comp",

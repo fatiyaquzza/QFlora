@@ -196,3 +196,116 @@ exports.createFullTaxonomy = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// Delete functions for each taxonomy level
+exports.deleteSpecies = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Check if species is used in specific_plants
+    const specificPlants = await db.SpecificPlant.findAll({
+      where: { species_id: id }
+    });
+
+    if (specificPlants.length > 0) {
+      return res.status(400).json({ 
+        error: "Species ini tidak dapat dihapus karena masih digunakan di data tanaman spesifik",
+        usedIn: specificPlants.length
+      });
+    }
+
+    await db.Species.destroy({ where: { id } });
+    res.json({ message: "Species berhasil dihapus" });
+  } catch (err) {
+    console.error("❌ Gagal menghapus species:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.deleteGenus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.Genus.destroy({ where: { id } });
+    res.json({ message: "Genus berhasil dihapus" });
+  } catch (err) {
+    console.error("❌ Gagal menghapus genus:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.deleteFamily = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.Family.destroy({ where: { id } });
+    res.json({ message: "Family berhasil dihapus" });
+  } catch (err) {
+    console.error("❌ Gagal menghapus family:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.deleteOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.Order.destroy({ where: { id } });
+    res.json({ message: "Order berhasil dihapus" });
+  } catch (err) {
+    console.error("❌ Gagal menghapus order:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.deleteSubclass = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.Subclass.destroy({ where: { id } });
+    res.json({ message: "Subclass berhasil dihapus" });
+  } catch (err) {
+    console.error("❌ Gagal menghapus subclass:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.deleteClass = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.Class.destroy({ where: { id } });
+    res.json({ message: "Class berhasil dihapus" });
+  } catch (err) {
+    console.error("❌ Gagal menghapus class:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.deleteDivision = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.Division.destroy({ where: { id } });
+    res.json({ message: "Division berhasil dihapus" });
+  } catch (err) {
+    console.error("❌ Gagal menghapus division:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.deleteSuperdivision = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.Superdivision.destroy({ where: { id } });
+    res.json({ message: "Superdivision berhasil dihapus" });
+  } catch (err) {
+    console.error("❌ Gagal menghapus superdivision:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.deleteSubkingdom = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.Subkingdom.destroy({ where: { id } });
+    res.json({ message: "Subkingdom berhasil dihapus" });
+  } catch (err) {
+    console.error("❌ Gagal menghapus subkingdom:", err);
+    res.status(500).json({ error: err.message });
+  }
+};

@@ -45,10 +45,8 @@ function AddSpecificPlantPage() {
     chemical_components: false,
   });
 
-  // Store only the selected species ID for the final classification
   const [selectedSpeciesId, setSelectedSpeciesId] = useState(null);
 
-  // All taxonomy data
   const [taxonomyData, setTaxonomyData] = useState({
     subkingdoms: [],
     superdivisions: [],
@@ -57,11 +55,10 @@ function AddSpecificPlantPage() {
     subclasses: [],
     orders: [],
     families: [],
-    genuses: [], // Note: Backend returns 'genuses' but we'll use 'genera' in our frontend
+    genuses: [], 
     species: [],
   });
 
-  // States for taxonomy dropdown options (filtered)
   const [subkingdoms, setSubkingdoms] = useState([]);
   const [superdivisions, setSuperdivisions] = useState([]);
   const [divisions, setDivisions] = useState([]);
@@ -72,7 +69,6 @@ function AddSpecificPlantPage() {
   const [genera, setGenera] = useState([]);
   const [species, setSpecies] = useState([]);
 
-  // Selected taxonomy items
   const [selectedSubkingdom, setSelectedSubkingdom] = useState("");
   const [selectedSuperdivision, setSelectedSuperdivision] = useState("");
   const [selectedDivision, setSelectedDivision] = useState("");
@@ -85,16 +81,13 @@ function AddSpecificPlantPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Add state for plant types
   const [plantTypes, setPlantTypes] = useState([]);
 
-  // Fetch plant types on component mount
   useEffect(() => {
     const fetchPlantTypes = async () => {
       try {
         const response = await axiosClient.get("/api/plant-types");
         setPlantTypes(response.data);
-        // Set default plant type if available
         if (response.data.length > 0) {
           setForm((prev) => ({ ...prev, plant_type_id: response.data[0].id }));
         }

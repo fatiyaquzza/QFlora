@@ -8,6 +8,7 @@ import UserListPage from "./pages/UserListPage";
 import DashboardPage from "./pages/DashboardPage";
 import SuggestionsPage from "./pages/SuggestionPage";
 import TaxonomyFormPage from "./pages/TaxonomyFormPage";
+import TaxonomyViewPage from "./pages/TaxonomyViewPage";
 import AddSpecificPlantPage from "./pages/AddSpecificPlantPage";
 import EditSpecificPlantPage from "./pages/EditSpecificPlantPage";
 import AddGeneralPlantPage from "./pages/AddGeneralPlantPage";
@@ -56,6 +57,14 @@ function App() {
             element={
               <PrivateRoute>
                 <TaxonomyFormPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/taxonomy/view"
+            element={
+              <PrivateRoute>
+                <TaxonomyViewPage />
               </PrivateRoute>
             }
           />
