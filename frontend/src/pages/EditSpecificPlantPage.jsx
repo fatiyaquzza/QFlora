@@ -7,6 +7,7 @@ function EditSpecificPlantPage() {
   const navigate = useNavigate();
   const { id } = useParams(); // Get plant ID from URL
   const [currentStep, setCurrentStep] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
   const [form, setForm] = useState({
     name: "",
     latin_name: "",
@@ -27,24 +28,6 @@ function EditSpecificPlantPage() {
   const [selectedChemicalComponents, setSelectedChemicalComponents] = useState(
     []
   );
-
-  // Add touched state
-  const [touched, setTouched] = useState({
-    name: false,
-    latin_name: false,
-    image_url: false,
-    plant_type_id: false,
-    overview: false,
-    description: false,
-    benefits: false,
-    characteristics: false,
-    origin: false,
-    cultivation: false,
-    source_ref: false,
-    eng_name: false,
-    arab_name: false,
-    chemical_components: false,
-  });
 
   // Store only the selected species ID for the final classification
   const [selectedSpeciesId, setSelectedSpeciesId] = useState(null);
@@ -250,8 +233,10 @@ function EditSpecificPlantPage() {
   // Handle form changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-    setTouched((prev) => ({ ...prev, [name]: true }));
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   // Handle form submission
@@ -281,17 +266,6 @@ function EditSpecificPlantPage() {
     setIsLoading(true);
 
     try {
-      // Get the names of selected taxonomy items
-      const selectedSubkingdomName = subkingdoms.find(sk => sk.id === parseInt(selectedSubkingdom))?.name;
-      const selectedSuperdivisionName = superdivisions.find(sd => sd.id === parseInt(selectedSuperdivision))?.name;
-      const selectedDivisionName = divisions.find(d => d.id === parseInt(selectedDivision))?.name;
-      const selectedClassName = classes.find(c => c.id === parseInt(selectedClass))?.name;
-      const selectedSubclassName = subclasses.find(sc => sc.id === parseInt(selectedSubclass))?.name;
-      const selectedOrderName = orders.find(o => o.id === parseInt(selectedOrder))?.name;
-      const selectedFamilyName = families.find(f => f.id === parseInt(selectedFamily))?.name;
-      const selectedGenusName = genera.find(g => g.id === parseInt(selectedGenus))?.name;
-      const selectedSpeciesName = species.find(s => s.id === parseInt(selectedSpeciesId))?.name;
-
       console.log("Updating plant with species_id:", selectedSpeciesId);
 
       // Update the specific plant with the new species_id
@@ -308,33 +282,70 @@ function EditSpecificPlantPage() {
     }
   };
 
-  // Render chemical components select
-  const renderChemicalComponentsSelect = () => (
-    <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        Kandungan Kimia
-      </label>
-      <select
-        multiple
-        className="w-full p-2 border rounded"
-        value={selectedChemicalComponents}
-        onChange={(e) => {
-          const values = Array.from(
-            e.target.selectedOptions,
-            (option) => option.value
-          );
-          setSelectedChemicalComponents(values);
-          setTouched((prev) => ({ ...prev, chemical_components: true }));
-        }}
-      >
-        {chemicalComponents.map((comp) => (
-          <option key={comp.id} value={comp.id}>
-            {comp.name}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
+  // Replace the chemical_comp textarea with this new component
+  const renderChemicalComponentsSelect = () => {
+    const filteredComponents = chemicalComponents.filter(comp => 
+      comp.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    return (
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Kandungan Kimia
+        </label>
+        <div className="relative border rounded-lg p-4 space-y-3">
+          {/* Search input */}
+          <div className="sticky top-0 bg-white pb-2">
+            <input
+              type="text"
+              placeholder="Cari komposisi kimia..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full p-2 border rounded-md"
+            />
+          </div>
+
+          {/* Selected count */}
+          <div className="text-sm text-gray-600 mb-2">
+            {selectedChemicalComponents.length} komposisi terpilih
+          </div>
+
+          {/* Checkbox list container with scrollbar */}
+          <div className="max-h-60 overflow-y-auto space-y-2">
+            {filteredComponents.map((component) => (
+              <div key={component.id} className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded">
+                <input
+                  type="checkbox"
+                  id={`comp-${component.id}`}
+                  value={component.id}
+                  checked={selectedChemicalComponents.includes(component.id.toString())}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setSelectedChemicalComponents(prev =>
+                      e.target.checked
+                        ? [...prev, value]
+                        : prev.filter(id => id !== value)
+                    );
+                  }}
+                  className="h-4 w-4 text-green-600 rounded border-gray-300 focus:ring-green-500"
+                />
+                <label htmlFor={`comp-${component.id}`} className="text-sm text-gray-700 cursor-pointer select-none">
+                  {component.name}
+                </label>
+              </div>
+            ))}
+          </div>
+
+          {/* Show message if no results */}
+          {filteredComponents.length === 0 && (
+            <div className="text-center text-gray-500 py-4">
+              Tidak ada komposisi kimia yang cocok dengan pencarian
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   // --- CASCADE LOGIC FOR EDIT PAGE ---
   // When a parent is changed, only reset lower levels, not upper ones

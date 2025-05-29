@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 function AddSpecificPlantPage() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
   const [form, setForm] = useState({
     name: "",
     latin_name: "",
@@ -371,45 +372,76 @@ function AddSpecificPlantPage() {
     }
   };
 
-  // Replace the chemical_comp textarea with this new component
-  const renderChemicalComponentsSelect = () => (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        Kandungan Kimia
-      </label>
-      <div className="relative">
-        <select
-          multiple
-          value={selectedChemicalComponents}
-          onChange={(e) => {
-            const values = Array.from(e.target.selectedOptions, option => option.value);
-            setSelectedChemicalComponents(values);
-            setTouched(prev => ({ ...prev, chemical_components: true }));
-          }}
-          className={`w-full p-2 border rounded transition-colors ${
-            touched.chemical_components && selectedChemicalComponents.length === 0
-              ? "border-red-500"
-              : "border-gray-300 hover:border-gray-400"
-          }`}
-          size="5"
-        >
-          {chemicalComponents.map((component) => (
-            <option key={component.id} value={component.id}>
-              {component.name}
-            </option>
-          ))}
-        </select>
+  const renderChemicalComponentsSelect = () => {
+    const filteredComponents = chemicalComponents.filter(comp => 
+      comp.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    return (
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Kandungan Kimia
+        </label>
+        <div className="relative border rounded-lg p-4 space-y-3">
+          {/* Search input */}
+          <div className="sticky top-0 bg-white pb-2">
+            <input
+              type="text"
+              placeholder="Cari komposisi kimia..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full p-2 border rounded-md"
+            />
+          </div>
+
+          {/* Selected count */}
+          <div className="text-sm text-gray-600 mb-2">
+            {selectedChemicalComponents.length} komposisi terpilih
+          </div>
+
+          {/* Checkbox list container with scrollbar */}
+          <div className="max-h-60 overflow-y-auto space-y-2">
+            {filteredComponents.map((component) => (
+              <div key={component.id} className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded">
+                <input
+                  type="checkbox"
+                  id={`comp-${component.id}`}
+                  value={component.id}
+                  checked={selectedChemicalComponents.includes(component.id.toString())}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setSelectedChemicalComponents(prev =>
+                      e.target.checked
+                        ? [...prev, value]
+                        : prev.filter(id => id !== value)
+                    );
+                    setTouched(prev => ({ ...prev, chemical_components: true }));
+                  }}
+                  className="h-4 w-4 text-green-600 rounded border-gray-300 focus:ring-green-500"
+                />
+                <label htmlFor={`comp-${component.id}`} className="text-sm text-gray-700 cursor-pointer select-none">
+                  {component.name}
+                </label>
+              </div>
+            ))}
+          </div>
+
+          {/* Show message if no results */}
+          {filteredComponents.length === 0 && (
+            <div className="text-center text-gray-500 py-4">
+              Tidak ada komposisi kimia yang cocok dengan pencarian
+            </div>
+          )}
+        </div>
+        
+        {touched.chemical_components && selectedChemicalComponents.length === 0 && (
+          <p className="text-sm text-red-500 mt-1">
+            Pilih minimal satu komponen kimia
+          </p>
+        )}
       </div>
-      {touched.chemical_components && selectedChemicalComponents.length === 0 && (
-        <p className="text-sm text-red-500 mt-1">
-          Pilih minimal satu komponen kimia
-        </p>
-      )}
-      <p className="text-xs text-gray-500 mt-1">
-        Tekan Ctrl (Windows) untuk memilih beberapa komponen
-      </p>
-    </div>
-  );
+    );
+  };
 
   const renderStepOne = () => {
     return (

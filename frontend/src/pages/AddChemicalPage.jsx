@@ -7,6 +7,7 @@ import { FaTrash } from "react-icons/fa";
 function AddChemicalPage() {
   const [chemComp, setchemComp] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
+  const [formError, setFormError] = useState("");
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [componentToDelete, setComponentToDelete] = useState(null);
@@ -31,10 +32,19 @@ function AddChemicalPage() {
 
   const handleAdd = async (e) => {
     e.preventDefault();
-    await axiosClient.post("/api/chemical-components", form);
-    setForm({ name: "" });
-    setShowForm(false);
-    fetchChemComp();
+    try {
+      await axiosClient.post("/api/chemical-components", form);
+      setForm({ name: "" });
+      setShowForm(false);
+      setFormError("");
+      fetchChemComp();
+    } catch (err) {
+      if (err.response?.status === 409) {
+        setFormError(`Komposisi kimia "${form.name}" sudah ada dalam daftar`);
+      } else {
+        setFormError("Terjadi kesalahan saat menambahkan komposisi kimia");
+      }
+    }
   };
 
   const handleDeleteClick = (component) => {
@@ -140,9 +150,17 @@ function AddChemicalPage() {
       <Modal
         show={showForm}
         title="Tambah Kategori Umum"
-        onClose={() => setShowForm(false)}
+        onClose={() => {
+          setShowForm(false);
+          setFormError("");
+        }}
       >
         <form onSubmit={handleAdd} className="space-y-3">
+          {formError && (
+            <div className="p-3 text-red-800 bg-red-100 rounded text-sm">
+              {formError}
+            </div>
+          )}
           {Object.keys(form).map((key) => (
             <input
               key={key}
@@ -157,7 +175,10 @@ function AddChemicalPage() {
             <button
               type="button"
               className="px-4 py-2 bg-gray-300 rounded"
-              onClick={() => setShowForm(false)}
+              onClick={() => {
+                setShowForm(false);
+                setFormError("");
+              }}
             >
               Batal
             </button>
