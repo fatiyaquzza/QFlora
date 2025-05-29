@@ -56,15 +56,15 @@ function App() {
             path="/taxonomy"
             element={
               <PrivateRoute>
-                <TaxonomyFormPage />
+                <TaxonomyViewPage />
               </PrivateRoute>
             }
           />
           <Route
-            path="/taxonomy/view"
+            path="/taxonomy/add"
             element={
               <PrivateRoute>
-                <TaxonomyViewPage />
+                <TaxonomyFormPage />
               </PrivateRoute>
             }
           />

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axiosClient from "../api/axiosClient";
 import AdminLayout from "../components/AdminLayout";
 
@@ -35,6 +36,7 @@ const TAXONOMY_LEVELS = [
 ];
 
 function TaxonomyFormPage() {
+  const navigate = useNavigate();
   const [taxonomyData, setTaxonomyData] = useState({});
   const [selected, setSelected] = useState({});
   const [newEntries, setNewEntries] = useState({});
@@ -109,16 +111,8 @@ function TaxonomyFormPage() {
     }
   };
 
-  const handleReset = () => {
-    setSelected({});
-    setNewEntries({});
-    setError("");
-    setTouched({});
-    const defaultModes = {};
-    TAXONOMY_LEVELS.forEach(({ key, plural }) => {
-      defaultModes[key] = taxonomyData[plural]?.length > 0 ? "existing" : "new";
-    });
-    setInputModes(defaultModes);
+  const handleCancel = () => {
+    navigate('/taxonomy');
   };
 
   const handleInputModeChange = (key, mode) => {
@@ -153,6 +147,12 @@ function TaxonomyFormPage() {
           <div className="border-t border-gray-300 mb-4"></div>
 
           <div className="space-y-6 mx-auto">
+            {error && (
+              <div className="bg-red-50 p-4 rounded-lg mb-4 border border-red-200">
+                <p className="text-red-700">{error}</p>
+              </div>
+            )}
+
             <div className="bg-green-50 p-4 rounded-lg mb-4 border border-green-200">
               <h3 className="text-green-800 font-medium">
                 Petunjuk Penambahan Klasifikasi
@@ -298,10 +298,10 @@ function TaxonomyFormPage() {
             <div className="pt-4 flex justify-end gap-3">
               <button
                 type="button"
-                onClick={handleReset}
+                onClick={handleCancel}
                 className="px-4 py-2 text-white bg-gray-600 rounded hover:bg-gray-700"
               >
-                Reset
+                Batal
               </button>
               <button
                 type="button"
