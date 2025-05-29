@@ -79,11 +79,11 @@ function EditSpecificPlantPage() {
         // First fetch taxonomy data
         const taxonomyRes = await axiosClient.get("/api/taxonomy/full");
         console.log("Taxonomy Data:", taxonomyRes.data);
-        
+
         // Store taxonomy data first
         const taxonomyData = taxonomyRes.data;
         setTaxonomyData(taxonomyData);
-        
+
         // Set initial subkingdoms
         setSubkingdoms(taxonomyData.subkingdoms || []);
 
@@ -107,41 +107,62 @@ function EditSpecificPlantPage() {
 
         // Set selected chemical components
         const selectedChemIds =
-          plantRes.data.chemical_components?.map((comp) => comp.id.toString()) || [];
+          plantRes.data.chemical_components?.map((comp) =>
+            comp.id.toString()
+          ) || [];
         setSelectedChemicalComponents(selectedChemIds);
 
         // If we have a species_id, fetch its complete classification
         if (plantRes.data.species_id) {
           try {
             // Find the species in taxonomy data
-            const species = taxonomyData.species.find(s => s.id === plantRes.data.species_id);
+            const species = taxonomyData.species.find(
+              (s) => s.id === plantRes.data.species_id
+            );
             if (species) {
               console.log("Found species:", species);
-              
+
               // Find genus
-              const genus = taxonomyData.genuses.find(g => g.id === species.genus_id);
+              const genus = taxonomyData.genuses.find(
+                (g) => g.id === species.genus_id
+              );
               if (genus) {
                 // Find family
-                const family = taxonomyData.families.find(f => f.id === genus.family_id);
+                const family = taxonomyData.families.find(
+                  (f) => f.id === genus.family_id
+                );
                 if (family) {
                   // Find order
-                  const order = taxonomyData.orders.find(o => o.id === family.order_id);
+                  const order = taxonomyData.orders.find(
+                    (o) => o.id === family.order_id
+                  );
                   if (order) {
                     // Find subclass
-                    const subclass = taxonomyData.subclasses.find(sc => sc.id === order.subclass_id);
+                    const subclass = taxonomyData.subclasses.find(
+                      (sc) => sc.id === order.subclass_id
+                    );
                     if (subclass) {
                       // Find class
-                      const classData = taxonomyData.classes.find(c => c.id === subclass.class_id);
+                      const classData = taxonomyData.classes.find(
+                        (c) => c.id === subclass.class_id
+                      );
                       if (classData) {
                         // Find division
-                        const division = taxonomyData.divisions.find(d => d.id === classData.division_id);
+                        const division = taxonomyData.divisions.find(
+                          (d) => d.id === classData.division_id
+                        );
                         if (division) {
                           // Find superdivision
-                          const superdivision = taxonomyData.superdivisions.find(sd => sd.id === division.superdivision_id);
+                          const superdivision =
+                            taxonomyData.superdivisions.find(
+                              (sd) => sd.id === division.superdivision_id
+                            );
                           if (superdivision) {
                             // Find subkingdom
-                            const subkingdom = taxonomyData.subkingdoms.find(sk => sk.id === superdivision.subkingdom_id);
-                            
+                            const subkingdom = taxonomyData.subkingdoms.find(
+                              (sk) => sk.id === superdivision.subkingdom_id
+                            );
+
                             if (subkingdom) {
                               console.log("Complete classification found:", {
                                 subkingdom,
@@ -152,12 +173,14 @@ function EditSpecificPlantPage() {
                                 order,
                                 family,
                                 genus,
-                                species
+                                species,
                               });
 
                               // Set all taxonomy data as strings
                               setSelectedSubkingdom(subkingdom.id.toString());
-                              setSelectedSuperdivision(superdivision.id.toString());
+                              setSelectedSuperdivision(
+                                superdivision.id.toString()
+                              );
                               setSelectedDivision(division.id.toString());
                               setSelectedClass(classData.id.toString());
                               setSelectedSubclass(subclass.id.toString());
@@ -167,24 +190,28 @@ function EditSpecificPlantPage() {
                               setSelectedSpeciesId(species.id.toString());
 
                               // Filter and set options for each level
-                              const filteredSuperdivisions = taxonomyData.superdivisions.filter(
-                                (sd) => sd.subkingdom_id === subkingdom.id
-                              );
+                              const filteredSuperdivisions =
+                                taxonomyData.superdivisions.filter(
+                                  (sd) => sd.subkingdom_id === subkingdom.id
+                                );
                               setSuperdivisions(filteredSuperdivisions);
 
-                              const filteredDivisions = taxonomyData.divisions.filter(
-                                (d) => d.superdivision_id === superdivision.id
-                              );
+                              const filteredDivisions =
+                                taxonomyData.divisions.filter(
+                                  (d) => d.superdivision_id === superdivision.id
+                                );
                               setDivisions(filteredDivisions);
 
-                              const filteredClasses = taxonomyData.classes.filter(
-                                (c) => c.division_id === division.id
-                              );
+                              const filteredClasses =
+                                taxonomyData.classes.filter(
+                                  (c) => c.division_id === division.id
+                                );
                               setClasses(filteredClasses);
 
-                              const filteredSubclasses = taxonomyData.subclasses.filter(
-                                (sc) => sc.class_id === classData.id
-                              );
+                              const filteredSubclasses =
+                                taxonomyData.subclasses.filter(
+                                  (sc) => sc.class_id === classData.id
+                                );
                               setSubclasses(filteredSubclasses);
 
                               const filteredOrders = taxonomyData.orders.filter(
@@ -192,19 +219,22 @@ function EditSpecificPlantPage() {
                               );
                               setOrders(filteredOrders);
 
-                              const filteredFamilies = taxonomyData.families.filter(
-                                (f) => f.order_id === order.id
-                              );
+                              const filteredFamilies =
+                                taxonomyData.families.filter(
+                                  (f) => f.order_id === order.id
+                                );
                               setFamilies(filteredFamilies);
 
-                              const filteredGenera = taxonomyData.genuses.filter(
-                                (g) => g.family_id === family.id
-                              );
+                              const filteredGenera =
+                                taxonomyData.genuses.filter(
+                                  (g) => g.family_id === family.id
+                                );
                               setGenera(filteredGenera);
 
-                              const filteredSpecies = taxonomyData.species.filter(
-                                (s) => s.genus_id === genus.id
-                              );
+                              const filteredSpecies =
+                                taxonomyData.species.filter(
+                                  (s) => s.genus_id === genus.id
+                                );
                               setSpecies(filteredSpecies);
                             }
                           }
@@ -270,7 +300,7 @@ function EditSpecificPlantPage() {
 
       // Update the specific plant with the new species_id
       await axiosClient.put(`/specific-plants/${id}`, {
-        species_id: parseInt(selectedSpeciesId)
+        species_id: parseInt(selectedSpeciesId),
       });
 
       navigate("/specific-plants");
@@ -284,7 +314,7 @@ function EditSpecificPlantPage() {
 
   // Replace the chemical_comp textarea with this new component
   const renderChemicalComponentsSelect = () => {
-    const filteredComponents = chemicalComponents.filter(comp => 
+    const filteredComponents = chemicalComponents.filter((comp) =>
       comp.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -313,23 +343,31 @@ function EditSpecificPlantPage() {
           {/* Checkbox list container with scrollbar */}
           <div className="max-h-60 overflow-y-auto space-y-2">
             {filteredComponents.map((component) => (
-              <div key={component.id} className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded">
+              <div
+                key={component.id}
+                className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded"
+              >
                 <input
                   type="checkbox"
                   id={`comp-${component.id}`}
                   value={component.id}
-                  checked={selectedChemicalComponents.includes(component.id.toString())}
+                  checked={selectedChemicalComponents.includes(
+                    component.id.toString()
+                  )}
                   onChange={(e) => {
                     const value = e.target.value;
-                    setSelectedChemicalComponents(prev =>
+                    setSelectedChemicalComponents((prev) =>
                       e.target.checked
                         ? [...prev, value]
-                        : prev.filter(id => id !== value)
+                        : prev.filter((id) => id !== value)
                     );
                   }}
                   className="h-4 w-4 text-green-600 rounded border-gray-300 focus:ring-green-500"
                 />
-                <label htmlFor={`comp-${component.id}`} className="text-sm text-gray-700 cursor-pointer select-none">
+                <label
+                  htmlFor={`comp-${component.id}`}
+                  className="text-sm text-gray-700 cursor-pointer select-none"
+                >
                   {component.name}
                 </label>
               </div>
@@ -648,6 +686,8 @@ function EditSpecificPlantPage() {
         />
       </div>
 
+      {renderChemicalComponentsSelect()}
+
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Budidaya
@@ -676,8 +716,6 @@ function EditSpecificPlantPage() {
         />
       </div>
 
-      {renderChemicalComponentsSelect()}
-
       {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
 
       <div className="flex justify-end space-x-4">
@@ -699,7 +737,6 @@ function EditSpecificPlantPage() {
     </form>
   );
 
-  // Render step two (classification)
   const renderStepTwo = () => (
     <form onSubmit={handleSubmitClassification} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
