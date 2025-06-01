@@ -22,6 +22,22 @@
           }
         },
         {
+          "client_id": "533251574081-54ur7q4uj86ch4o3k0ekqa59ihitq0b9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.usk.qflora",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "533251574081-ija2pjv8m5vo6rhpq3d407qp7rofu7qa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.usk.qflora",
+            "certificate_hash": "ca75886f8fa53bb49515cfae5968ba900ee12482"
+          }
+        },
+        {
           "client_id": "533251574081-k6ro02mrh45hji2ee5p4om39lqejk88k.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

@@ -61,8 +61,7 @@ export const AuthProvider = ({ children }: any) => {
 
   useEffect(() => {
     GoogleSignin.configure({
-      webClientId:
-        "533251574081-5694829mloelspotjjidlgopug870uuv.apps.googleusercontent.com",
+      webClientId: "533251574081-5694829mloelspotjjidlgopug870uuv.apps.googleusercontent.com",
       offlineAccess: false,
     });
 
@@ -157,8 +156,10 @@ export const AuthProvider = ({ children }: any) => {
       router.replace("../main/Home");
     } catch (error: any) {
       console.error("❌ Login Google error:", error);
+      console.log("DEBUG GoogleSignin error full:", JSON.stringify(error, null, 2));
       throw new Error("Login Google gagal. Coba lagi.");
     }
+    
   };
 
   const register = async (

@@ -15,10 +15,11 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/adaptive-icon.png",
-        "backgroundColor": "#ffffff",
-        "googleServicesFile": "./google-services.json"
+        "backgroundColor": "#ffffff"
       },
-      "package": "com.qflora.QFlora"
+      "package": "com.usk.qflora",
+      "googleServicesFile": "./android/app/google-services.json",
+      "sha1": "5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25"
     },
     "web": {
       "bundler": "metro",
