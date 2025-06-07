@@ -309,77 +309,48 @@ function TaxonomyViewPage() {
   };
 
   const TaxonomyCard = ({ data }) => (
-    <div className="bg-green-200 bg-opacity-35 rounded-lg shadow-md p-6 mb-6">
-      <div className="mb-4 border-b pb-3 flex justify-between items-start">
+    <div className="relative p-5 bg-green-50 rounded-lg border border-green-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+      <div className="flex justify-between items-start">
         <div>
-          <h3 className="text-xl font-semibold text-gray-800">
+          <h3 className="text-xl font-bold text-gray-800">
             {data.taxonomy.species.name}
           </h3>
-          <p className="text-gray-600 italic">{data.taxonomy.genus.name}</p>
+          <p className="text-sm text-gray-500 italic">
+            {data.taxonomy.genus.name}
+          </p>
         </div>
         <button
           onClick={() => handleDelete(data)}
-          className="text-red-600 hover:text-red-800 p-2"
-          title="Hapus klasifikasi"
+          className="p-2 text-red-500 rounded-full hover:bg-red-100 transition-colors"
+          aria-label="Delete taxonomy"
         >
-          <FaTrash size={18} />
+          <FaTrash />
         </button>
       </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <div className="flex items-center text-sm">
-            <span className="font-medium w-32">Kingdom</span>
-            <FaChevronRight className="mx-2 text-gray-400" />
-            <span>{data.taxonomy.kingdom}</span>
+
+      <div className="my-4 border-t border-green-200"></div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+        {Object.entries(data.taxonomy)
+          .filter(([, value]) => value && value.name)
+          .map(([key, value]) => (
+            <div key={key} className="flex items-center">
+              <span className="font-semibold capitalize text-gray-600 w-28">
+                {key.replace("_", " ")}
+              </span>
+              <FaChevronRight className="mx-2 text-gray-400" size={10} />
+              <span className="text-gray-800 truncate">{value.name}</span>
+            </div>
+          ))}
+        {data.taxonomy.kingdom && (
+          <div className="flex items-center">
+            <span className="font-semibold capitalize text-gray-600 w-28">
+              Kingdom
+            </span>
+            <FaChevronRight className="mx-2 text-gray-400" size={10} />
+            <span className="text-gray-800 truncate">{data.taxonomy.kingdom}</span>
           </div>
-          <div className="flex items-center text-sm">
-            <span className="font-medium w-32">Subkingdom</span>
-            <FaChevronRight className="mx-2 text-gray-400" />
-            <span>{data.taxonomy.subkingdom.name}</span>
-          </div>
-          <div className="flex items-center text-sm">
-            <span className="font-medium w-32">Superdivision</span>
-            <FaChevronRight className="mx-2 text-gray-400" />
-            <span>{data.taxonomy.superdivision.name}</span>
-          </div>
-          <div className="flex items-center text-sm">
-            <span className="font-medium w-32">Division</span>
-            <FaChevronRight className="mx-2 text-gray-400" />
-            <span>{data.taxonomy.division.name}</span>
-          </div>
-          <div className="flex items-center text-sm">
-            <span className="font-medium w-32">Class</span>
-            <FaChevronRight className="mx-2 text-gray-400" />
-            <span>{data.taxonomy.class.name}</span>
-          </div>
-        </div>
-        <div className="space-y-2">
-          <div className="flex items-center text-sm">
-            <span className="font-medium w-32">Subclass</span>
-            <FaChevronRight className="mx-2 text-gray-400" />
-            <span>{data.taxonomy.subclass.name}</span>
-          </div>
-          <div className="flex items-center text-sm">
-            <span className="font-medium w-32">Order</span>
-            <FaChevronRight className="mx-2 text-gray-400" />
-            <span>{data.taxonomy.order.name}</span>
-          </div>
-          <div className="flex items-center text-sm">
-            <span className="font-medium w-32">Family</span>
-            <FaChevronRight className="mx-2 text-gray-400" />
-            <span>{data.taxonomy.family.name}</span>
-          </div>
-          <div className="flex items-center text-sm">
-            <span className="font-medium w-32">Genus</span>
-            <FaChevronRight className="mx-2 text-gray-400" />
-            <span>{data.taxonomy.genus.name}</span>
-          </div>
-          <div className="flex items-center text-sm">
-            <span className="font-medium w-32">Species</span>
-            <FaChevronRight className="mx-2 text-gray-400" />
-            <span>{data.taxonomy.species.name}</span>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -431,49 +402,40 @@ function TaxonomyViewPage() {
 
   return (
     <AdminLayout>
-      <div className="mt-4 bg-white border-2 rounded-xl p-6 shadow font-Poppins">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-xl font-bold text-black">
+      <div className="mt-4 bg-white border-2 rounded-xl p-6 shadow-lg font-Poppins">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">
             Data Klasifikasi Taksonomi
           </h1>
           <Link
             to="/taxonomy/add"
-            className="px-4 py-2 text-sm text-white bg-[#004E1D] rounded hover:bg-green-700"
+            className="px-5 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
           >
             Tambah
           </Link>
         </div>
-
-        <div className="border-t border-gray-300 mb-6"></div>
-
+        
         <div className="mb-6">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Cari berdasarkan nama species, genus, atau family..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full p-3 pl-10 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block"
-            />
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-              </svg>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Cari berdasarkan nama species, genus, atau family..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+              />
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-4.35-4.35M16.65 10.35a6.3 6.3 0 11-12.6 0 6.3 6.3 0 0112.6 0z"></path></svg>
+              </div>
             </div>
           </div>
-        </div>
 
         {showDeleteModal && <DeleteModal />}
 
         {loading ? (
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Memuat data...</p>
-          </div>
+          <p className="text-center text-gray-500">Memuat data...</p>
         ) : error ? (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            {error}
-          </div>
+          <p className="text-center text-red-500">{error}</p>
         ) : filteredData.length === 0 ? (
           <div className="text-center py-8 text-gray-600">
             {searchTerm
@@ -481,7 +443,7 @@ function TaxonomyViewPage() {
               : "Belum ada data taksonomi"}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {filteredData.map((item, index) => (
               <TaxonomyCard key={index} data={item} />
             ))}

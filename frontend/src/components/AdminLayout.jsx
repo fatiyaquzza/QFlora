@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -8,6 +8,8 @@ import {
   MdPerson,
   MdScience,
   MdAccountTree,
+  MdMenu,
+  MdClose,
 } from "react-icons/md";
 
 const navItems = [
@@ -43,6 +45,7 @@ const navItems = [
 function AdminLayout({ children }) {
   const { logout, user } = useAuth();
   const location = useLocation();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const isPathActive = (path) => {
     if (path === "/") {
@@ -51,49 +54,81 @@ function AdminLayout({ children }) {
     return location.pathname.startsWith(path);
   };
 
-  return (
-    <div className="min-h-screen font-Poppins">
-      {/* Sidebar */}
-      <aside className="fixed top-0 left-0 h-screen w-64 bg-green-200 bg-opacity-35 drop-shadow-sm shadow-black py-6 z-10">
-        <h1 className="mb-10 text-2xl font-bold text-center text-black">
-          QFlora
-        </h1>
-        <nav className="flex flex-col gap-2 px-4 pb-20">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`flex items-center gap-3 px-3 py-4 rounded-md transition-all ${
-                isPathActive(item.path)
-                  ? "bg-green-900 text-white"
-                  : "text-black hover:bg-gray-100"
-              }`}
-            >
-              {item.icon}
-              <span className="text-sm font-medium uppercase">
-                {item.label}
-              </span>
-            </Link>
-          ))}
-        </nav>
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
 
-        {/* Logout button di bawah */}
+  const Sidebar = () => (
+    <aside
+      className={`fixed top-0 left-0 h-screen w-64 bg-green-100 shadow-xl z-20 transition-transform duration-300 ease-in-out transform lg:translate-x-0 ${
+        isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+      }`}
+    >
+      <div className="relative flex items-center justify-center h-20 px-4">
+        <h1 className="text-2xl font-bold text-green-900">QFlora</h1>
         <button
-          onClick={logout}
-          className="absolute bottom-4 left-4 right-4 px-3 py-4 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700"
+          className="absolute p-2 text-gray-600 rounded-full right-4 lg:hidden hover:bg-green-200"
+          onClick={toggleSidebar}
         >
-          Logout
+          <MdClose size={24} />
         </button>
-      </aside>
+      </div>
+      <nav className="flex flex-col gap-2 p-4">
+        {navItems.map((item) => (
+          <Link
+            key={item.path}
+            to={item.path}
+            onClick={() => setIsSidebarOpen(false)}
+            className={`flex items-center gap-3 px-3 py-3 rounded-md transition-all text-sm font-medium ${
+              isPathActive(item.path)
+                ? "bg-green-800 text-white shadow-sm"
+                : "text-gray-800 hover:bg-green-200"
+            }`}
+          >
+            {item.icon}
+            <span className="uppercase">{item.label}</span>
+          </Link>
+        ))}
+      </nav>
 
-      {/* Content - offset to right of fixed sidebar */}
-      <div className="pl-64 flex flex-col min-h-screen">
+      <button
+        onClick={logout}
+        className="absolute bottom-4 left-4 right-4 px-3 py-3 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700"
+      >
+        Logout
+      </button>
+    </aside>
+  );
+
+  // Overlay for mobile when sidebar is open
+  const Overlay = () => (
+    <div
+      className={`fixed inset-0 bg-black bg-opacity-30 z-10 lg:hidden transition-opacity duration-300 ${
+        isSidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+      }`}
+      onClick={toggleSidebar}
+    />
+  );
+
+  return (
+    <div className="min-h-screen font-Poppins bg-gray-50">
+      <Overlay />
+      <Sidebar />
+
+      {/* Content */}
+      <div className="lg:pl-64 flex flex-col min-h-screen">
         {/* Header */}
-        <header className="flex items-center justify-end px-6 py-5 bg-white border-b-2 drop-shadow-sm">
-          <div className="relative flex items-center gap-3">
+        <header className="flex items-center justify-between h-20 px-6 bg-white border-b">
+          <button
+            className="p-2 -ml-2 text-gray-600 rounded-md lg:hidden hover:bg-gray-100"
+            onClick={toggleSidebar}
+          >
+            <MdMenu size={24} />
+          </button>
+          <div className="flex items-center gap-3 ml-auto">
             <p className="text-sm font-semibold text-black">
               Halo,{" "}
-              <span className="font-medium text-gray-500">
+              <span className="font-medium text-gray-600">
                 Admin {user?.displayName}
               </span>
             </p>
@@ -101,7 +136,13 @@ function AdminLayout({ children }) {
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 p-6 overflow-y-auto bg-white">{children}</main>
+        <main className="flex-1 p-6 overflow-y-auto">{children}</main>
+
+        <footer className="px-6 py-4 mt-auto text-center bg-white border-t">
+          <p className="text-sm text-gray-600">
+            © 2025 QFlora. All Rights Reserved.
+          </p>
+        </footer>
       </div>
     </div>
   );
