@@ -3,10 +3,13 @@ import axiosClient from "../api/axiosClient";
 import Modal from "../components/Modal";
 import AdminLayout from "../components/AdminLayout";
 import { useNavigate } from "react-router-dom";
+import Fuse from 'fuse.js';
 
 function SpecificPlantsPage() {
   const navigate = useNavigate();
   const [plants, setPlants] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredPlants, setFilteredPlants] = useState([]);
   const [form] = useState({
     name: "",
     latin_name: "",
@@ -146,6 +149,28 @@ function SpecificPlantsPage() {
       });
   }, []);
 
+  useEffect(() => {
+    if (!searchTerm.trim() || plants.length === 0) {
+      setFilteredPlants(plants);
+      return;
+    }
+
+    const fuse = new Fuse(plants, {
+      keys: [
+        'name',
+        'verses.surah',
+        'verses.quran_verse'
+      ],
+      includeScore: true,
+      threshold: 0.4,
+      minMatchCharLength: 3,
+      ignoreLocation: true,
+    });
+
+    const results = fuse.search(searchTerm).map(result => result.item);
+    setFilteredPlants(results);
+  }, [searchTerm, plants]);
+
   const refreshData = () => {
     axiosClient.get("/specific-plants").then((res) => setPlants(res.data));
   };
@@ -256,6 +281,24 @@ function SpecificPlantsPage() {
               </button>
             </div>
           </div>
+
+          <div className="mb-6">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Cari berdasarkan nama tumbuhan atau ayat..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full p-3 pl-10 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block"
+              />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+
           <div className="border-t border-gray-300 mb-4"></div>
 
           <div className="overflow-x-auto ">
@@ -281,7 +324,7 @@ function SpecificPlantsPage() {
                 </tr>
               </thead>
               <tbody>
-                {plants.map((plant) => (
+                {filteredPlants.map((plant) => (
                   <tr
                     key={plant.id}
                     className="bg-white shadow rounded align-top"

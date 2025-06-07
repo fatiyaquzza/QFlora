@@ -3,12 +3,14 @@ import { Link } from "react-router-dom";
 import axiosClient from "../api/axiosClient";
 import AdminLayout from "../components/AdminLayout";
 import { FaChevronRight, FaTrash } from "react-icons/fa";
+import Fuse from 'fuse.js';
 
 function TaxonomyViewPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [taxonomyData, setTaxonomyData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filteredData, setFilteredData] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedSpecies, setSelectedSpecies] = useState(null);
   const [deleteStatus, setDeleteStatus] = useState({
@@ -19,6 +21,28 @@ function TaxonomyViewPage() {
   useEffect(() => {
     fetchTaxonomyData();
   }, []);
+
+  useEffect(() => {
+    if (!searchTerm.trim() || taxonomyData.length === 0) {
+      setFilteredData(taxonomyData);
+      return;
+    }
+
+    const fuse = new Fuse(taxonomyData, {
+      keys: [
+        'taxonomy.species.name',
+        'taxonomy.genus.name',
+        'taxonomy.family.name'
+      ],
+      includeScore: true,
+      threshold: 0.4,
+      minMatchCharLength: 3,
+      ignoreLocation: true,
+    });
+
+    const results = fuse.search(searchTerm).map(result => result.item);
+    setFilteredData(results);
+  }, [searchTerm, taxonomyData]);
 
   const fetchTaxonomyData = async () => {
     try {
@@ -96,17 +120,6 @@ function TaxonomyViewPage() {
       setLoading(false);
     }
   };
-
-  const filteredData = taxonomyData.filter(
-    (item) =>
-      item.taxonomy.species.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      item.taxonomy.genus.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      item.taxonomy.family.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const handleDelete = async (speciesData) => {
     setSelectedSpecies(speciesData);
@@ -434,13 +447,20 @@ function TaxonomyViewPage() {
         <div className="border-t border-gray-300 mb-6"></div>
 
         <div className="mb-6">
-          <input
-            type="text"
-            placeholder="Cari berdasarkan nama species, genus, atau family..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-3 border rounded-lg"
-          />
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Cari berdasarkan nama species, genus, atau family..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full p-3 pl-10 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block"
+            />
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+          </div>
         </div>
 
         {showDeleteModal && <DeleteModal />}

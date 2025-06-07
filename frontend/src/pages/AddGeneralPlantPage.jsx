@@ -39,6 +39,8 @@ function AddGeneralPlantPage() {
       setForm({ name: "", latin_name: "", image_url: "", overview: "" });
     } catch (err) {
       setError("Terjadi kesalahan saat menyimpan data.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -57,6 +59,13 @@ function AddGeneralPlantPage() {
               Kembali
             </button>
           </div>
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleAdd} className="space-y-4">
             {Object.keys(form).map((key) => (
               <div key={key}>

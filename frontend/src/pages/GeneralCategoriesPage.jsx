@@ -3,9 +3,12 @@ import axiosClient from "../api/axiosClient";
 import Modal from "../components/Modal";
 import AdminLayout from "../components/AdminLayout";
 import { useNavigate } from "react-router-dom";
+import Fuse from 'fuse.js';
 
 function GeneralCategoriesPage() {
   const [categories, setCategories] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredCategories, setFilteredCategories] = useState([]);
   const navigate = useNavigate();
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({
@@ -37,6 +40,8 @@ function GeneralCategoriesPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
 
+  const [excelFile, setExcelFile] = useState(null);
+
   const fetchCategories = async () => {
     const res = await axiosClient.get("/general-categories");
     setCategories(res.data);
@@ -45,6 +50,28 @@ function GeneralCategoriesPage() {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    if (!searchTerm.trim() || categories.length === 0) {
+      setFilteredCategories(categories);
+      return;
+    }
+
+    const fuse = new Fuse(categories, {
+      keys: [
+        'name',
+        'verses.surah',
+        'verses.quran_verse'
+      ],
+      includeScore: true,
+      threshold: 0.4,
+      minMatchCharLength: 3,
+      ignoreLocation: true,
+    });
+
+    const results = fuse.search(searchTerm).map(result => result.item);
+    setFilteredCategories(results);
+  }, [searchTerm, categories]);
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -123,8 +150,6 @@ function GeneralCategoriesPage() {
     fetchCategories();
   };
 
-  const [excelFile, setExcelFile] = useState(null);
-
   const handleExcelUpload = async () => {
     if (!excelFile) return alert("Pilih file Excel terlebih dahulu.");
     const formData = new FormData();
@@ -164,6 +189,23 @@ function GeneralCategoriesPage() {
             </div>
           </div>
 
+          <div className="mb-6">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Cari berdasarkan nama tumbuhan atau ayat..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full p-3 pl-10 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block"
+              />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+
           <div className="overflow-x-auto">
             <div className="border-t border-gray-300 mb-4"></div>
 
@@ -179,7 +221,7 @@ function GeneralCategoriesPage() {
                 </tr>
               </thead>
               <tbody>
-                {categories.map((cat) => (
+                {filteredCategories.map((cat) => (
                   <tr key={cat.id} className="bg-white shadow rounded">
                     <td className="px-2 py-4 min-w-20 w-20">{cat.name}</td>
                     <td className="px-2 py-4 min-w-40 w-40">
