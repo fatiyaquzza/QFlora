@@ -12,6 +12,7 @@ import TaxonomyViewPage from "./pages/TaxonomyViewPage";
 import AddSpecificPlantPage from "./pages/AddSpecificPlantPage";
 import EditSpecificPlantPage from "./pages/EditSpecificPlantPage";
 import AddGeneralPlantPage from "./pages/AddGeneralPlantPage";
+import EditGeneralPlantPage from "./pages/EditGeneralPlantPage";
 import AddChemicalPage from "./pages/AddChemicalPage";
 
 function App() {
@@ -97,6 +98,14 @@ function App() {
             element={
               <PrivateRoute>
                 <AddGeneralPlantPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/general-categories/edit/:id"
+            element={
+              <PrivateRoute>
+                <EditGeneralPlantPage />
               </PrivateRoute>
             }
           />

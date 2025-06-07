@@ -10,14 +10,6 @@ function GeneralCategoriesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCategories, setFilteredCategories] = useState([]);
   const navigate = useNavigate();
-  const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({
-    name: "",
-    latin_name: "",
-    image_url: "",
-    overview: "",
-  });
-  const [showForm, setShowForm] = useState(false);
 
   const [excelGeneralPlant, setExcelGeneralPlant] = useState(null);
   const [showUploadSelector, setShowUploadSelector] = useState(false);
@@ -72,21 +64,6 @@ function GeneralCategoriesPage() {
     const results = fuse.search(searchTerm).map(result => result.item);
     setFilteredCategories(results);
   }, [searchTerm, categories]);
-
-  const handleAdd = async (e) => {
-    e.preventDefault();
-    await axiosClient.post("/general-categories", form);
-    setForm({ name: "", latin_name: "", image_url: "", overview: "" });
-    setShowForm(false);
-    fetchCategories();
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await axiosClient.put(`/general-categories/${editing.id}`, editing);
-    setEditing(null);
-    fetchCategories();
-  };
 
   const handleDeleteClick = (cat) => {
     setCategoryToDelete(cat);
@@ -303,7 +280,7 @@ function GeneralCategoriesPage() {
                     <td className="px-2 py-4 min-w-40 w-40 text-center whitespace-nowrap">
                       <div className="flex flex-col items-center gap-2">
                         <button
-                          onClick={() => setEditing(cat)}
+                          onClick={() => navigate(`/general-categories/edit/${cat.id}`)}
                           className="px-3 py-1 text-white bg-blue-500 rounded"
                         >
                           Edit
@@ -322,78 +299,6 @@ function GeneralCategoriesPage() {
             </table>
           </div>
         </div>
-
-        {/* Modal Tambah/Edit Kategori */}
-        <Modal
-          show={showForm}
-          title="Tambah Kategori Umum"
-          onClose={() => setShowForm(false)}
-        >
-          <form onSubmit={handleAdd} className="space-y-3">
-            {Object.keys(form).map((key) => (
-              <input
-                key={key}
-                type="text"
-                className="w-full p-2 border rounded capitalize"
-                value={form[key]}
-                onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-                placeholder={key.replace(/_/g, " ")}
-              />
-            ))}
-            <div className="flex justify-end gap-2">
-              <button
-                type="button"
-                className="px-4 py-2 bg-gray-300 rounded"
-                onClick={() => setShowForm(false)}
-              >
-                Batal
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 text-white bg-green-600 rounded"
-              >
-                Tambah
-              </button>
-            </div>
-          </form>
-        </Modal>
-
-        {/* Modal Edit Kategori */}
-        <Modal
-          show={!!editing}
-          title={`Edit Kategori: ${editing?.name}`}
-          onClose={() => setEditing(null)}
-        >
-          <form onSubmit={handleSubmit} className="space-y-3">
-            {Object.keys(form).map((key) => (
-              <input
-                key={key}
-                type="text"
-                className="w-full p-2 border rounded"
-                value={editing?.[key] || ""}
-                onChange={(e) =>
-                  setEditing({ ...editing, [key]: e.target.value })
-                }
-                placeholder={key.replace(/_/g, " ")}
-              />
-            ))}
-            <div className="flex justify-end gap-2">
-              <button
-                type="button"
-                className="px-4 py-2 bg-gray-300 rounded"
-                onClick={() => setEditing(null)}
-              >
-                Batal
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 text-white bg-green-600 rounded"
-              >
-                Simpan
-              </button>
-            </div>
-          </form>
-        </Modal>
 
         {/* Modal Tambah/Edit Ayat */}
         <Modal
