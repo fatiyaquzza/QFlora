@@ -37,6 +37,7 @@ export interface SpecificPlant {
   arab_name: string;
   verses: SpecificVerse[];
   chemical_components: ChemicalComponent[];
+  varieties: string[];
 }
 
 // Default empty export since this is just a type definition file

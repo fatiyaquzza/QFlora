@@ -22,6 +22,10 @@ module.exports = (sequelize, DataTypes) => {
       origin: DataTypes.TEXT,
       cultivation: DataTypes.TEXT,
       source_ref: DataTypes.TEXT,
+      varieties: {
+        type: DataTypes.JSON,
+        defaultValue: [],
+      },
     },
     {
       tableName: "specific_plants",

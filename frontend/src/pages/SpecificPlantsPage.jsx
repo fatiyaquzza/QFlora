@@ -3,7 +3,7 @@ import axiosClient from "../api/axiosClient";
 import Modal from "../components/Modal";
 import AdminLayout from "../components/AdminLayout";
 import { useNavigate } from "react-router-dom";
-import Fuse from 'fuse.js';
+import Fuse from "fuse.js";
 
 function SpecificPlantsPage() {
   const navigate = useNavigate();
@@ -52,7 +52,9 @@ function SpecificPlantsPage() {
 
   const [plantTypes, setPlantTypes] = useState([]);
   const [chemicalComponents, setChemicalComponents] = useState([]);
-  const [selectedChemicalComponents, setSelectedChemicalComponents] = useState([]);
+  const [selectedChemicalComponents, setSelectedChemicalComponents] = useState(
+    []
+  );
 
   const handleUploadPlantExcel = async () => {
     if (!excelTanaman) return alert("Pilih file Excel terlebih dahulu.");
@@ -156,18 +158,14 @@ function SpecificPlantsPage() {
     }
 
     const fuse = new Fuse(plants, {
-      keys: [
-        'name',
-        'verses.surah',
-        'verses.quran_verse'
-      ],
+      keys: ["name", "verses.surah", "verses.quran_verse"],
       includeScore: true,
       threshold: 0.4,
       minMatchCharLength: 3,
       ignoreLocation: true,
     });
 
-    const results = fuse.search(searchTerm).map(result => result.item);
+    const results = fuse.search(searchTerm).map((result) => result.item);
     setFilteredPlants(results);
   }, [searchTerm, plants]);
 
@@ -179,7 +177,7 @@ function SpecificPlantsPage() {
     e.preventDefault();
     const { chemical_comp, ...editingData } = editing;
     editingData.chemical_component_ids = selectedChemicalComponents;
-    
+
     axiosClient.put(`/specific-plants/${editing.id}`, editingData).then(() => {
       refreshData();
       setEditing(null);
@@ -292,8 +290,19 @@ function SpecificPlantsPage() {
                 className="w-full p-3 pl-10 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block"
               />
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                <svg
+                  className="w-5 h-5 text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  ></path>
                 </svg>
               </div>
             </div>
@@ -320,232 +329,266 @@ function SpecificPlantsPage() {
                   <th className="px-4 py-2">Kandungan Kimia</th>
                   <th className="px-4 py-2">Budidaya</th>
                   <th className="px-4 py-2">Sumber Referensi</th>
+                  <th className="px-4 py-2">Varietas</th>
                   <th className="px-4 py-2 text-center">Aksi</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredPlants.map((plant) => (
-                  <tr
-                    key={plant.id}
-                    className="bg-white shadow rounded align-top"
-                  >
-                    <td className="px-4 py-4">
-                      <div
-                        className="min-h-40 overflow-y-auto pr-1"
-                        style={{ minHeight: "100px" }}
-                      >
-                        {plant.name}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div
-                        className="min-h-40 overflow-y-auto pr-1"
-                        style={{ minHeight: "100px" }}
-                      >
-                        {plant.latin_name}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div
-                        className="min-h-40 overflow-y-auto pr-1"
-                        style={{ minHeight: "100px" }}
-                      >
-                        {plant.eng_name}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div
-                        className="min-h-40 overflow-y-auto pr-1"
-                        style={{ minHeight: "100px" }}
-                      >
-                        {plant.arab_name}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 w-44 min-w-44">
-                      <img
-                        src={plant.image_url}
-                        className="w-40 h-40 object-cover rounded-md"
-                        alt="img"
-                      />
-                    </td>
-                    <td className="px-4 py-4 w-28">
-                      {getPlantTypeName(plant.plant_type_id)}
-                    </td>
-                    <td className="px-4 py-4 max-w-xs">
-                      <div
-                        className="max-h-64 overflow-y-auto pr-2 w-80"
-                        style={{ minHeight: "150px" }}
-                      >
-                        {plant.verses?.map((v) => (
-                          <div
-                            key={v.id}
-                            className="mb-3 border-b border-gray-200 pb-2 last:border-none"
-                          >
-                            <p>
-                              {" "}
-                              <b>
-                                {v.surah} - {v.verse_number}
-                              </b>
-                            </p>
-                            <p className="text-sm text-right">
-                              {v.quran_verse}
-                            </p>
-                            <p className="text-sm text-gray-700">
-                              {v.translation}
-                            </p>
-                            <audio controls className="w-full mt-1">
-                              <source src={v.audio_url} type="audio/mpeg" />
-                            </audio>
-                            {v.keyword_arab && (
-                              <p className="text-sm text-amber-800 mt-1">
-                                🔍{" "}
-                                <span className="font-semibold">
-                                  Kata kunci Arab:
-                                </span>{" "}
-                                <span className="bg-yellow-100 px-1 py-0.5 rounded text-black">
-                                  {v.keyword_arab}
-                                </span>
-                              </p>
-                            )}
-                            <div className="flex gap-2 mt-1">
-                              <button
-                                className="px-2 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
-                                onClick={() => {
-                                  setSelectedPlantId(plant.id);
-                                  setVerseEditing(v);
-                                }}
-                              >
-                                Edit
-                              </button>
-                              <button
-                                className="px-2 py-1 text-sm text-white bg-red-600 rounded hover:bg-red-700"
-                                onClick={() =>
-                                  handleDeleteVerse(plant.id, v.id)
-                                }
-                              >
-                                Hapus
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </td>
+                {filteredPlants.map((plant) => {
+                  let varieties = [];
+                  if (Array.isArray(plant.varieties)) {
+                    varieties = plant.varieties;
+                  } else if (typeof plant.varieties === 'string') {
+                    try {
+                      varieties = JSON.parse(plant.varieties);
+                    } catch (e) {
+                      // Keep varieties as empty array on parse error
+                    }
+                  }
 
-                    <td className="px-4 py-4 min-w-80 w-80">
-                      <div className="max-h-64 overflow-y-auto pr-2">
-                        {plant.species_id && taxonomyData[plant.species_id] ? (
-                          <div className="mb-2 text-sm">
-                            <p className="font-semibold text-green-700 mb-1">
-                              Klasifikasi Taksonomi:
-                            </p>
-                            <p>
-                              <span className="font-medium">Kingdom:</span>{" "}
-                              {taxonomyData[plant.species_id].kingdom}
-                            </p>
-                            <p>
-                              <span className="font-medium">Subkingdom:</span>{" "}
-                              {taxonomyData[plant.species_id].subkingdom}
-                            </p>
-                            <p>
-                              <span className="font-medium">
-                                Superdivision:
-                              </span>{" "}
-                              {taxonomyData[plant.species_id].superdivision}
-                            </p>
-                            <p>
-                              <span className="font-medium">Division:</span>{" "}
-                              {taxonomyData[plant.species_id].division}
-                            </p>
-                            <p>
-                              <span className="font-medium">Class:</span>{" "}
-                              {taxonomyData[plant.species_id].class}
-                            </p>
-                            <p>
-                              <span className="font-medium">Subclass:</span>{" "}
-                              {taxonomyData[plant.species_id].subclass}
-                            </p>
-                            <p>
-                              <span className="font-medium">Order:</span>{" "}
-                              {taxonomyData[plant.species_id].order}
-                            </p>
-                            <p>
-                              <span className="font-medium">Family:</span>{" "}
-                              {taxonomyData[plant.species_id].family}
-                            </p>
-                            <p>
-                              <span className="font-medium">Genus:</span>{" "}
-                              {taxonomyData[plant.species_id].genus}
-                            </p>
-                            <p>
-                              <span className="font-medium">Species:</span>{" "}
-                              {taxonomyData[plant.species_id].species}
-                            </p>
-                          </div>
-                        ) : (
-                          <p className="text-gray-500 italic">
-                            Tidak ada data klasifikasi
-                          </p>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 min-w-80 w-80">
-                      <div className="max-h-40 overflow-y-auto pr-1">
-                        {plant.description}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 min-w-80 w-80">
-                      <div className="max-h-40 overflow-y-auto pr-1">
-                        {plant.benefits}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 min-w-80 w-80">
-                      <div className="max-h-40 overflow-y-auto pr-1">
-                        {plant.characteristics}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 min-w-80 w-80">
-                      <div className="max-h-40 overflow-y-auto pr-1">
-                        {plant.origin}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 min-w-80 w-80">
-                      <div className="max-h-40 overflow-y-auto pr-1">
-                        {plant.chemical_components?.map((comp, index) => (
-                          <span key={comp.id}>
-                            {comp.name}
-                            {index < plant.chemical_components.length - 1 ? ', ' : ''}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 min-w-80 w-80">
-                      <div className="max-h-40 overflow-y-auto pr-1">
-                        {plant.cultivation}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 min-w-80 w-80">
-                      <div className="max-h-40 overflow-y-auto pr-1">
-                        {plant.source_ref}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 text-center min-w-40 w-40">
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => navigate(`/specific-plants/edit/${plant.id}`)}
-                          className="px-3 py-1 text-white bg-blue-600 rounded hover:bg-blue-700"
+                  return (
+                    <tr
+                      key={plant.id}
+                      className="bg-white shadow rounded align-top"
+                    >
+                      <td className="px-4 py-4">
+                        <div
+                          className="min-h-40 overflow-y-auto pr-1"
+                          style={{ minHeight: "100px" }}
                         >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDeleteClick(plant)}
-                          className="px-3 py-1 text-white bg-red-600 rounded hover:bg-red-700"
+                          {plant.name}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <div
+                          className="min-h-40 overflow-y-auto pr-1"
+                          style={{ minHeight: "100px" }}
                         >
-                          Hapus
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                          {plant.latin_name}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <div
+                          className="min-h-40 overflow-y-auto pr-1"
+                          style={{ minHeight: "100px" }}
+                        >
+                          {plant.eng_name}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <div
+                          className="min-h-40 overflow-y-auto pr-1"
+                          style={{ minHeight: "100px" }}
+                        >
+                          {plant.arab_name}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 w-44 min-w-44">
+                        <img
+                          src={plant.image_url}
+                          className="w-40 h-40 object-cover rounded-md"
+                          alt="img"
+                        />
+                      </td>
+                      <td className="px-4 py-4 w-28">
+                        {getPlantTypeName(plant.plant_type_id)}
+                      </td>
+                      <td className="px-4 py-4 max-w-xs">
+                        <div
+                          className="max-h-64 overflow-y-auto pr-2 w-80"
+                          style={{ minHeight: "150px" }}
+                        >
+                          {plant.verses?.map((v) => (
+                            <div
+                              key={v.id}
+                              className="mb-3 border-b border-gray-200 pb-2 last:border-none"
+                            >
+                              <p>
+                                {" "}
+                                <b>
+                                  {v.surah} - {v.verse_number}
+                                </b>
+                              </p>
+                              <p className="text-sm text-right">
+                                {v.quran_verse}
+                              </p>
+                              <p className="text-sm text-gray-700">
+                                {v.translation}
+                              </p>
+                              <audio controls className="w-full mt-1">
+                                <source src={v.audio_url} type="audio/mpeg" />
+                              </audio>
+                              {v.keyword_arab && (
+                                <p className="text-sm text-amber-800 mt-1">
+                                  🔍{" "}
+                                  <span className="font-semibold">
+                                    Kata kunci Arab:
+                                  </span>{" "}
+                                  <span className="bg-yellow-100 px-1 py-0.5 rounded text-black">
+                                    {v.keyword_arab}
+                                  </span>
+                                </p>
+                              )}
+                              <div className="flex gap-2 mt-1">
+                                <button
+                                  className="px-2 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
+                                  onClick={() => {
+                                    setSelectedPlantId(plant.id);
+                                    setVerseEditing(v);
+                                  }}
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  className="px-2 py-1 text-sm text-white bg-red-600 rounded hover:bg-red-700"
+                                  onClick={() =>
+                                    handleDeleteVerse(plant.id, v.id)
+                                  }
+                                >
+                                  Hapus
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </td>
+
+                      <td className="px-4 py-4 min-w-80 w-80">
+                        <div className="max-h-64 overflow-y-auto pr-2">
+                          {plant.species_id && taxonomyData[plant.species_id] ? (
+                            <div className="mb-2 text-sm">
+                              <p className="font-semibold text-green-700 mb-1">
+                                Klasifikasi Taksonomi:
+                              </p>
+                              <p>
+                                <span className="font-medium">Kingdom:</span>{" "}
+                                {taxonomyData[plant.species_id].kingdom}
+                              </p>
+                              <p>
+                                <span className="font-medium">Subkingdom:</span>{" "}
+                                {taxonomyData[plant.species_id].subkingdom}
+                              </p>
+                              <p>
+                                <span className="font-medium">
+                                  Superdivision:
+                                </span>{" "}
+                                {taxonomyData[plant.species_id].superdivision}
+                              </p>
+                              <p>
+                                <span className="font-medium">Division:</span>{" "}
+                                {taxonomyData[plant.species_id].division}
+                              </p>
+                              <p>
+                                <span className="font-medium">Class:</span>{" "}
+                                {taxonomyData[plant.species_id].class}
+                              </p>
+                              <p>
+                                <span className="font-medium">Subclass:</span>{" "}
+                                {taxonomyData[plant.species_id].subclass}
+                              </p>
+                              <p>
+                                <span className="font-medium">Order:</span>{" "}
+                                {taxonomyData[plant.species_id].order}
+                              </p>
+                              <p>
+                                <span className="font-medium">Family:</span>{" "}
+                                {taxonomyData[plant.species_id].family}
+                              </p>
+                              <p>
+                                <span className="font-medium">Genus:</span>{" "}
+                                {taxonomyData[plant.species_id].genus}
+                              </p>
+                              <p>
+                                <span className="font-medium">Species:</span>{" "}
+                                {taxonomyData[plant.species_id].species}
+                              </p>
+                            </div>
+                          ) : (
+                            <p className="text-gray-500 italic">
+                              Tidak ada data klasifikasi
+                            </p>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 min-w-80 w-80">
+                        <div className="max-h-40 overflow-y-auto pr-1">
+                          {plant.description}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 min-w-80 w-80">
+                        <div className="max-h-40 overflow-y-auto pr-1">
+                          {plant.benefits}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 min-w-80 w-80">
+                        <div className="max-h-40 overflow-y-auto pr-1">
+                          {plant.characteristics}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 min-w-80 w-80">
+                        <div className="max-h-40 overflow-y-auto pr-1">
+                          {plant.origin}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 min-w-80 w-80">
+                        <div className="max-h-40 overflow-y-auto pr-1">
+                          {plant.chemical_components?.map((comp, index) => (
+                            <span key={comp.id}>
+                              {comp.name}
+                              {index < plant.chemical_components.length - 1
+                                ? ", "
+                                : ""}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 min-w-80 w-80">
+                        <div className="max-h-40 overflow-y-auto pr-1">
+                          {plant.cultivation}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 min-w-80 w-80">
+                        <div className="max-h-40 overflow-y-auto pr-1">
+                          {plant.source_ref}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 min-w-80 w-80">
+                        <div className="max-h-40 overflow-y-auto pr-1">
+                          {varieties.length > 0 ? (
+                            <ul className="list-disc ml-5 text-sm text-gray-800">
+                              {varieties.map((item, index) => (
+                                <li key={index}>{item}</li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <span className="text-gray-500 italic text-sm">
+                              Tidak ada
+                            </span>
+                          )}
+                        </div>
+                      </td>
+
+                      <td className="px-4 py-4 text-center min-w-40 w-40">
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() =>
+                              navigate(`/specific-plants/edit/${plant.id}`)
+                            }
+                            className="px-3 py-1 text-white bg-blue-600 rounded hover:bg-blue-700"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick(plant)}
+                            className="px-3 py-1 text-white bg-red-600 rounded hover:bg-red-700"
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -816,11 +859,16 @@ function SpecificPlantsPage() {
                     multiple
                     value={selectedChemicalComponents}
                     onChange={(e) => {
-                      const selected = Array.from(e.target.selectedOptions, option => parseInt(option.value));
+                      const selected = Array.from(
+                        e.target.selectedOptions,
+                        (option) => parseInt(option.value)
+                      );
                       setSelectedChemicalComponents(selected);
                       setEditing({
                         ...editing,
-                        chemical_components: chemicalComponents.filter(comp => selected.includes(comp.id))
+                        chemical_components: chemicalComponents.filter((comp) =>
+                          selected.includes(comp.id)
+                        ),
                       });
                     }}
                     className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 min-h-[100px]"
@@ -832,7 +880,8 @@ function SpecificPlantsPage() {
                     ))}
                   </select>
                   <p className="text-sm text-gray-500 mt-1">
-                    Tekan Ctrl (Windows) atau Command (Mac) untuk memilih beberapa kandungan kimia
+                    Tekan Ctrl (Windows) atau Command (Mac) untuk memilih
+                    beberapa kandungan kimia
                   </p>
                 </div>
               );

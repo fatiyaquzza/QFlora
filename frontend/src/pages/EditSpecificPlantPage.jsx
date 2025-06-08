@@ -24,6 +24,8 @@ function EditSpecificPlantPage() {
     arab_name: "",
   });
 
+  const [varieties, setVarieties] = useState([""]);
+
   const [chemicalComponents, setChemicalComponents] = useState([]);
   const [selectedChemicalComponents, setSelectedChemicalComponents] = useState(
     []
@@ -72,6 +74,22 @@ function EditSpecificPlantPage() {
   // Add state for plant types
   const [plantTypes, setPlantTypes] = useState([]);
 
+  // Add variety handlers
+  const handleVarietyChange = (index, value) => {
+    const newVarieties = [...varieties];
+    newVarieties[index] = value;
+    setVarieties(newVarieties);
+  };
+
+  const addVariety = () => {
+    setVarieties([...varieties, ""]);
+  };
+
+  const removeVariety = (index) => {
+    const newVarieties = varieties.filter((_, i) => i !== index);
+    setVarieties(newVarieties);
+  };
+
   // Fetch plant data on component mount
   useEffect(() => {
     const fetchPlantData = async () => {
@@ -98,6 +116,22 @@ function EditSpecificPlantPage() {
 
         // Set form data
         setForm(plantRes.data);
+
+        // Set varieties (if exists in plant data, otherwise empty array)
+        const rawVarieties = plantRes.data.varieties;
+        if (Array.isArray(rawVarieties)) {
+          setVarieties(rawVarieties);
+        } else if (typeof rawVarieties === "string") {
+          try {
+            const parsed = JSON.parse(rawVarieties);
+            setVarieties(Array.isArray(parsed) ? parsed : []);
+          } catch (e) {
+            console.error("Gagal parse varieties:", e);
+            setVarieties([]);
+          }
+        } else {
+          setVarieties([]);
+        }
 
         // Set plant types
         setPlantTypes(typesRes.data);
@@ -294,19 +328,32 @@ function EditSpecificPlantPage() {
   const handleSubmitClassification = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
+
+    if (!selectedSpeciesId) {
+      setError("Silahkan pilih klasifikasi hingga tingkat spesies");
+      setIsLoading(false);
+      return;
+    }
 
     try {
-      console.log("Updating plant with species_id:", selectedSpeciesId);
+      // Filter out empty varieties
+      const nonEmptyVarieties = varieties.filter((v) => v.trim() !== "");
 
-      // Update the specific plant with the new species_id
-      await axiosClient.put(`/specific-plants/${id}`, {
-        species_id: parseInt(selectedSpeciesId),
-      });
+      const plantData = {
+        ...form,
+        species_id: selectedSpeciesId,
+        chemical_component_ids: selectedChemicalComponents,
+        varieties: nonEmptyVarieties,
+      };
 
+      await axiosClient.put(`/specific-plants/${id}`, plantData);
       navigate("/specific-plants");
     } catch (err) {
-      console.error("Error updating classification:", err);
-      setError("Gagal memperbarui klasifikasi. Silakan coba lagi.");
+      console.error("Error updating plant data:", err);
+      setError(
+        err.response?.data?.message || "Terjadi kesalahan saat menyimpan data"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -687,6 +734,42 @@ function EditSpecificPlantPage() {
       </div>
 
       {renderChemicalComponentsSelect()}
+
+      {/* Add Varieties Section */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Varietas (Opsional)
+        </label>
+        <div className="space-y-2">
+          {varieties.map((variety, index) => (
+            <div key={index} className="flex gap-2">
+              <input
+                type="text"
+                value={variety}
+                onChange={(e) => handleVarietyChange(index, e.target.value)}
+                className="flex-1 p-2 border rounded transition-colors border-gray-300 hover:border-gray-400"
+                placeholder={`Masukkan varietas ${index + 1}`}
+              />
+              {varieties.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeVariety(index)}
+                  className="px-3 py-2 text-white bg-red-500 rounded hover:bg-red-600"
+                >
+                  Hapus
+                </button>
+              )}
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={addVariety}
+            className="mt-2 px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
+          >
+            + Tambah Varietas
+          </button>
+        </div>
+      </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
