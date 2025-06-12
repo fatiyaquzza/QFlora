@@ -12,6 +12,8 @@ function TaxonomyViewPage() {
   const [filteredData, setFilteredData] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedSpecies, setSelectedSpecies] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(8);
   const [deleteStatus, setDeleteStatus] = useState({
     loading: false,
     message: "",
@@ -400,6 +402,67 @@ function TaxonomyViewPage() {
     </div>
   );
 
+  const Pagination = ({ totalItems }) => {
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const pageNumbers = [];
+
+    for (let i = 1; i <= totalPages; i++) {
+      pageNumbers.push(i);
+    }
+
+    const handlePageClick = (pageNumber) => {
+      setCurrentPage(pageNumber);
+      window.scrollTo(0, 0);
+    };
+
+    if (totalPages <= 1) return null;
+
+    return (
+      <div className="flex justify-center mt-8 space-x-2">
+        <button
+          onClick={() => handlePageClick(currentPage - 1)}
+          disabled={currentPage === 1}
+          className={`px-3 py-1 rounded ${
+            currentPage === 1
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-white text-gray-700 hover:bg-gray-50 border"
+          }`}
+        >
+          Previous
+        </button>
+        {pageNumbers.map((number) => (
+          <button
+            key={number}
+            onClick={() => handlePageClick(number)}
+            className={`px-3 py-1 rounded ${
+              currentPage === number
+                ? "bg-green-600 text-white"
+                : "bg-white text-gray-700 hover:bg-gray-50 border"
+            }`}
+          >
+            {number}
+          </button>
+        ))}
+        <button
+          onClick={() => handlePageClick(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className={`px-3 py-1 rounded ${
+            currentPage === totalPages
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-white text-gray-700 hover:bg-gray-50 border"
+          }`}
+        >
+          Next
+        </button>
+      </div>
+    );
+  };
+
+  // Get current items
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+
   return (
     <AdminLayout>
       <div className="mt-4 bg-white border-2 rounded-xl p-6 shadow-lg font-Poppins">
@@ -421,7 +484,10 @@ function TaxonomyViewPage() {
               type="text"
               placeholder="Cari berdasarkan nama species, genus, atau family..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1); // Reset to first page on search
+              }}
               className="w-full p-3 pl-10 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block"
             />
             <div className="absolute inset-y-0 left-0 flex items-center pl-3">
@@ -455,11 +521,21 @@ function TaxonomyViewPage() {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {filteredData.map((item, index) => (
-              <TaxonomyCard key={index} data={item} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {currentItems.map((item, index) => (
+                <TaxonomyCard key={index} data={item} />
+              ))}
+            </div>
+            <Pagination totalItems={filteredData.length} />
+            {filteredData.length > 0 && (
+              <div className="text-center text-sm text-gray-600 mt-4">
+                Menampilkan {indexOfFirstItem + 1} -{" "}
+                {Math.min(indexOfLastItem, filteredData.length)} dari{" "}
+                {filteredData.length} data
+              </div>
+            )}
+          </>
         )}
       </div>
     </AdminLayout>

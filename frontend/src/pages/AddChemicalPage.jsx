@@ -9,6 +9,8 @@ function AddChemicalPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [formError, setFormError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(12);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [componentToDelete, setComponentToDelete] = useState(null);
@@ -73,6 +75,67 @@ function AddChemicalPage() {
     }
   };
 
+  const Pagination = ({ totalItems }) => {
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const pageNumbers = [];
+
+    for (let i = 1; i <= totalPages; i++) {
+      pageNumbers.push(i);
+    }
+
+    const handlePageClick = (pageNumber) => {
+      setCurrentPage(pageNumber);
+      window.scrollTo(0, 0);
+    };
+
+    if (totalPages <= 1) return null;
+
+    return (
+      <div className="flex justify-center mt-8 space-x-2">
+        <button
+          onClick={() => handlePageClick(currentPage - 1)}
+          disabled={currentPage === 1}
+          className={`px-3 py-1 rounded ${
+            currentPage === 1
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-white text-gray-700 hover:bg-gray-50 border"
+          }`}
+        >
+          Previous
+        </button>
+        {pageNumbers.map((number) => (
+          <button
+            key={number}
+            onClick={() => handlePageClick(number)}
+            className={`px-3 py-1 rounded ${
+              currentPage === number
+                ? "bg-green-600 text-white"
+                : "bg-white text-gray-700 hover:bg-gray-50 border"
+            }`}
+          >
+            {number}
+          </button>
+        ))}
+        <button
+          onClick={() => handlePageClick(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className={`px-3 py-1 rounded ${
+            currentPage === totalPages
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-white text-gray-700 hover:bg-gray-50 border"
+          }`}
+        >
+          Next
+        </button>
+      </div>
+    );
+  };
+
+  // Get current items
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = chemComp.slice(indexOfFirstItem, indexOfLastItem);
+
   return (
     <AdminLayout>
       <div className="mt-4 bg-white border-2 rounded-xl p-6 shadow font-Poppins">
@@ -91,36 +154,45 @@ function AddChemicalPage() {
         <div className="border-t border-gray-300 mb-6"></div>
 
         {loading ? (
-  <div className="flex justify-center items-center py-8">
-    <div className="flex items-center space-x-2">
-      <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-blue-500"></div>
-      <span className="ml-2 text-gray-600">Memuat data komposisi kimia...</span>
-    </div>
-  </div>
-) : (
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-    {chemComp.map((c, i) => (
-      <div
-        key={c.id}
-        className="bg-green-50 p-4 rounded-md shadow flex justify-between items-center"
-      >
-        <div>
-          <p className="text-xs text-gray-500 font-medium">
-            {String(i + 1).padStart(2, "0")}
-          </p>
-          <p className="font-semibold text-black">{c.name}</p>
-        </div>
-        <button
-          onClick={() => handleDeleteClick(c)}
-          className="text-red-600 hover:text-red-800"
-        >
-          <FaTrash size={18} />
-        </button>
-      </div>
-    ))}
-  </div>
-)}
-
+          <div className="flex justify-center items-center py-8">
+            <div className="flex items-center space-x-2">
+              <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-blue-500"></div>
+              <span className="ml-2 text-gray-600">
+                Memuat data komposisi kimia...
+              </span>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {currentItems.map((c, i) => (
+                <div
+                  key={c.id}
+                  className="bg-green-50 p-4 rounded-md shadow flex justify-between items-center"
+                >
+                  <div>
+                    <p className="text-xs text-gray-500 font-medium">
+                      {String(indexOfFirstItem + i + 1).padStart(2, "0")}
+                    </p>
+                    <p className="font-semibold text-black">{c.name}</p>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteClick(c)}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    <FaTrash size={18} />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <Pagination totalItems={chemComp.length} />
+            {chemComp.length > 0 && (
+              <div className="text-center text-sm text-gray-600 mt-4">
+                Menampilkan {indexOfFirstItem + 1} - {Math.min(indexOfLastItem, chemComp.length)} dari {chemComp.length} data
+              </div>
+            )}
+          </>
+        )}
 
         {errorMessage && (
           <div className="p-3 mt-4 text-red-800 bg-red-100 rounded">
