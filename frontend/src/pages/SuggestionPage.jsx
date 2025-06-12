@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axiosClient from "../api/axiosClient";
 import AdminLayout from "../components/AdminLayout";
+import Modal from "../components/Modal";
 
 function SuggestionsPage() {
   const [suggestions, setSuggestions] = useState([]);
@@ -8,6 +9,8 @@ function SuggestionsPage() {
   const [editingSuggestion, setEditingSuggestion] = useState(null);
   const [statusValue, setStatusValue] = useState("");
   const [loading, setLoading] = useState(true);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [suggestionToDelete, setSuggestionToDelete] = useState(null);
 
   useEffect(() => {
     fetchSuggestions();
@@ -39,6 +42,25 @@ function SuggestionsPage() {
     }
   };
 
+  const handleDeleteClick = (suggestion) => {
+    setSuggestionToDelete(suggestion);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!suggestionToDelete) return;
+
+    try {
+      await axiosClient.delete(`/suggestions/${suggestionToDelete.id}`);
+      setShowDeleteModal(false);
+      setSuggestionToDelete(null);
+      fetchSuggestions();
+    } catch (err) {
+      console.error("❌ Gagal menghapus saran:", err);
+      setErrorMessage("Gagal menghapus saran.");
+    }
+  };
+
   return (
     <>
       <AdminLayout>
@@ -61,51 +83,66 @@ function SuggestionsPage() {
                   </tr>
                 </thead>
                 <tbody>
-  {loading ? (
-    <tr>
-      <td colSpan="6" className="py-6 text-center">
-        <div className="flex justify-center items-center">
-          <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-blue-500"></div>
-          <span className="ml-2 text-gray-600">Memuat data saran...</span>
-        </div>
-      </td>
-    </tr>
-  ) : suggestions.length === 0 ? (
-    <tr>
-      <td colSpan="6" className="text-center py-6 text-gray-500">
-        Tidak ada data saran.
-      </td>
-    </tr>
-  ) : (
-    suggestions.map((s) => (
-      <tr key={s.id} className="hover:bg-gray-50">
-        <td className="px-4 py-4">{s.user?.name || "-"}</td>
-        <td className="px-4 py-4">{s.user?.email || "-"}</td>
-        <td className="px-4 py-4">{s.suggestion_type?.name || "-"}</td>
-        <td className="px-4 py-4">{s.description}</td>
-        <td className="px-4 py-4">
-          {s.status === "Ditanggapi" ? (
-            <span className="font-semibold text-green-600">Sudah ✔</span>
-          ) : (
-            <span className="font-semibold text-yellow-600">Belum</span>
-          )}
-        </td>
-        <td className="px-4 py-4">
-          <button
-            className="px-3 py-1 text-white bg-blue-600 rounded"
-            onClick={() => {
-              setEditingSuggestion(s);
-              setStatusValue(s.status || "Belum");
-            }}
-          >
-            Ubah
-          </button>
-        </td>
-      </tr>
-    ))
-  )}
-</tbody>
-
+                  {loading ? (
+                    <tr>
+                      <td colSpan="6" className="py-6 text-center">
+                        <div className="flex justify-center items-center">
+                          <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-blue-500"></div>
+                          <span className="ml-2 text-gray-600">
+                            Memuat data saran...
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : suggestions.length === 0 ? (
+                    <tr>
+                      <td colSpan="6" className="text-center py-6 text-gray-500">
+                        Tidak ada data saran.
+                      </td>
+                    </tr>
+                  ) : (
+                    suggestions.map((s) => (
+                      <tr key={s.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-4">{s.user?.name || "-"}</td>
+                        <td className="px-4 py-4">{s.user?.email || "-"}</td>
+                        <td className="px-4 py-4">
+                          {s.suggestion_type?.name || "-"}
+                        </td>
+                        <td className="px-4 py-4">{s.description}</td>
+                        <td className="px-4 py-4">
+                          {s.status === "Ditanggapi" ? (
+                            <span className="font-semibold text-green-600">
+                              Sudah ✔
+                            </span>
+                          ) : (
+                            <span className="font-semibold text-yellow-600">
+                              Belum
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-4">
+                          <div className="flex gap-2">
+                            <button
+                              className="px-3 py-1 text-white bg-blue-600 rounded hover:bg-blue-700"
+                              onClick={() => {
+                                setEditingSuggestion(s);
+                                setStatusValue(s.status || "Belum");
+                              }}
+                            >
+                              Ubah
+                            </button>
+                            <button
+                              className="px-3 py-1 text-white bg-red-600 rounded hover:bg-red-700"
+                              onClick={() => handleDeleteClick(s)}
+                            >
+                              Hapus
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
               </table>
             </div>
           </div>
@@ -144,6 +181,40 @@ function SuggestionsPage() {
           </div>
         </div>
       )}
+
+      {/* Modal Konfirmasi Hapus */}
+      <Modal
+        show={showDeleteModal}
+        title="Konfirmasi Hapus"
+        onClose={() => {
+          setShowDeleteModal(false);
+          setSuggestionToDelete(null);
+        }}
+      >
+        <div className="space-y-4">
+          <p>
+            Apakah Anda yakin ingin menghapus saran dari{" "}
+            <span className="font-semibold text-red-600">
+              {suggestionToDelete?.user?.name || "Pengguna"}
+            </span>
+            ?
+          </p>
+          <div className="flex justify-end gap-2">
+            <button
+              className="px-4 py-2 bg-gray-300 rounded"
+              onClick={() => setShowDeleteModal(false)}
+            >
+              Batal
+            </button>
+            <button
+              className="px-4 py-2 text-white bg-red-600 rounded"
+              onClick={confirmDelete}
+            >
+              Hapus
+            </button>
+          </div>
+        </div>
+      </Modal>
 
       {/* Error Message */}
       {errorMessage && (

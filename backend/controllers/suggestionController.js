@@ -116,3 +116,21 @@ exports.getSuggestionTypes = async (req, res) => {
     res.status(500).json({ error: "Gagal mengambil tipe saran" });
   }
 };
+
+exports.deleteSuggestion = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const suggestion = await Suggestion.findByPk(id);
+    
+    if (!suggestion) {
+      return res.status(404).json({ error: "Saran tidak ditemukan" });
+    }
+
+    await suggestion.destroy();
+    res.json({ message: "Saran berhasil dihapus" });
+  } catch (err) {
+    console.error("❌ Gagal menghapus saran:", err);
+    res.status(500).json({ error: "Gagal menghapus saran" });
+  }
+};
