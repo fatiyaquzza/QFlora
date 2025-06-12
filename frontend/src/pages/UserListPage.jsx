@@ -8,16 +8,19 @@ function UserListPage() {
   const [editing, setEditing] = useState(null);
   const [confirmDeleteUser, setConfirmDeleteUser] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchUsers();
   }, []);
 
   const fetchUsers = () => {
+    setLoading(true); // mulai loading
     axiosClient
       .get("/users")
       .then((res) => setUsers(res.data.users))
-      .catch((err) => setErrorMessage("Gagal mengambil data user."));
+      .catch(() => setErrorMessage("Gagal mengambil data user."))
+      .finally(() => setLoading(false)); // selesai loading
   };
 
   const confirmDelete = (user) => {
@@ -70,29 +73,51 @@ function UserListPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((user) => (
-                    <tr key={user.uid} className="bg-white shadow rounded">
-                      <td className="px-4 py-4 break-all">{user.uid}</td>
-                      <td className="px-4 py-4">{user.email}</td>
-                      <td className="px-4 py-4">{user.displayName}</td>
-                      <td className="px-4 py-4">
-                        <div className="flex justify-center gap-2">
-                          <button
-                            onClick={() => setEditing(user)}
-                            className="px-3 py-1 text-white bg-blue-500 rounded hover:bg-blue-600"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => confirmDelete(user)}
-                            className="px-3 py-1 text-white bg-red-500 rounded hover:bg-red-600"
-                          >
-                            Hapus
-                          </button>
+                  {loading ? (
+                    <tr>
+                      <td colSpan="4">
+                        <div className="flex justify-center items-center py-6">
+                          <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-blue-500"></div>
+                          <span className="ml-2 text-gray-600">
+                            Memuat pengguna...
+                          </span>
                         </div>
                       </td>
                     </tr>
-                  ))}
+                  ) : users.length > 0 ? (
+                    users.map((user) => (
+                      <tr key={user.uid} className="bg-white shadow rounded">
+                        <td className="px-4 py-4 break-all">{user.uid}</td>
+                        <td className="px-4 py-4">{user.email}</td>
+                        <td className="px-4 py-4">{user.displayName}</td>
+                        <td className="px-4 py-4">
+                          <div className="flex justify-center gap-2">
+                            <button
+                              onClick={() => setEditing(user)}
+                              className="px-3 py-1 text-white bg-blue-500 rounded hover:bg-blue-600"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => confirmDelete(user)}
+                              className="px-3 py-1 text-white bg-red-500 rounded hover:bg-red-600"
+                            >
+                              Hapus
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="4"
+                        className="text-center py-6 text-gray-500"
+                      >
+                        Tidak ada pengguna yang ditemukan.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

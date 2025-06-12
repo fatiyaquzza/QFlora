@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import axiosClient from "../api/axiosClient";
 import AdminLayout from "../components/AdminLayout";
 import Modal from "../components/Modal";
-import { FaTrash } from "react-icons/fa"; 
+import { FaTrash } from "react-icons/fa";
 
 function AddChemicalPage() {
   const [chemComp, setchemComp] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [formError, setFormError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [componentToDelete, setComponentToDelete] = useState(null);
@@ -22,13 +23,17 @@ function AddChemicalPage() {
 
   const fetchChemComp = async () => {
     try {
+      setLoading(true);
       const res = await axiosClient.get("/api/chemical-components");
       setchemComp(res.data);
     } catch (err) {
       console.error("❌ Gagal mengambil data Komposisi Kimia:", err);
       setErrorMessage("Gagal mengambil data Komposisi Kimia.");
+    } finally {
+      setLoading(false);
     }
   };
+  
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -85,27 +90,37 @@ function AddChemicalPage() {
 
         <div className="border-t border-gray-300 mb-6"></div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {chemComp.map((c, i) => (
-            <div
-              key={c.id}
-              className="bg-green-50 p-4 rounded-md shadow flex justify-between items-center"
-            >
-              <div>
-                <p className="text-xs text-gray-500 font-medium">
-                  {String(i + 1).padStart(2, "0")}
-                </p>
-                <p className="font-semibold text-black">{c.name}</p>
-              </div>
-              <button
-                onClick={() => handleDeleteClick(c)}
-                className="text-red-600 hover:text-red-800"
-              >
-                <FaTrash size={18} />
-              </button>
-            </div>
-          ))}
+        {loading ? (
+  <div className="flex justify-center items-center py-8">
+    <div className="flex items-center space-x-2">
+      <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-blue-500"></div>
+      <span className="ml-2 text-gray-600">Memuat data komposisi kimia...</span>
+    </div>
+  </div>
+) : (
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+    {chemComp.map((c, i) => (
+      <div
+        key={c.id}
+        className="bg-green-50 p-4 rounded-md shadow flex justify-between items-center"
+      >
+        <div>
+          <p className="text-xs text-gray-500 font-medium">
+            {String(i + 1).padStart(2, "0")}
+          </p>
+          <p className="font-semibold text-black">{c.name}</p>
         </div>
+        <button
+          onClick={() => handleDeleteClick(c)}
+          className="text-red-600 hover:text-red-800"
+        >
+          <FaTrash size={18} />
+        </button>
+      </div>
+    ))}
+  </div>
+)}
+
 
         {errorMessage && (
           <div className="p-3 mt-4 text-red-800 bg-red-100 rounded">

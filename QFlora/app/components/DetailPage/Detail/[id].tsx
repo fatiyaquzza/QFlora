@@ -177,17 +177,6 @@ const Detail = () => {
             </Text>
           </View>
 
-          {plant.varieties && plant.varieties.length > 0 && (
-            <View className="p-5">
-              <Text className="mb-2 text-2xl font-poppinsBold">Varietas</Text>
-              {plant.varieties.map((variety, index) => (
-                <View key={index} className="mb-2 p-3 bg-gray-100 rounded-lg">
-                  <Text className="text-gray-800 font-poppins">{variety}</Text>
-                </View>
-              ))}
-            </View>
-          )}
-
           {(plant.verses || []).map((verse, index) => (
             <View className="px-4 mb-4" key={index}>
               <View className="p-4 bg-white border border-gray-200 shadow-sm rounded-xl">

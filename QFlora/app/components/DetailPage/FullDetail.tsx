@@ -53,6 +53,7 @@ const FullDetail = () => {
     komposisiKimia: false,
     prosesBudidaya: false,
     sumber: false,
+    varietas: false,
   });
   const { id } = useLocalSearchParams();
   const [plant, setPlant] = useState<SpecificPlant | null>(null);
@@ -110,6 +111,23 @@ const FullDetail = () => {
     }
   }, [favorites, plant]);
 
+  const getVarieties = (): string[] => {
+    if (!plant?.varieties) return [];
+
+    if (Array.isArray(plant.varieties)) return plant.varieties;
+
+    if (typeof plant.varieties === "string") {
+      try {
+        const parsed = JSON.parse(plant.varieties);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    return [];
+  };
+
   useEffect(() => {
     const fetchTaxonomyData = async () => {
       try {
@@ -127,13 +145,19 @@ const FullDetail = () => {
           const order = data.orders.find((o) => o.id === family.order_id);
           if (!order) return;
 
-          const subclass = data.subclasses.find((sc) => sc.id === order.subclass_id);
+          const subclass = data.subclasses.find(
+            (sc) => sc.id === order.subclass_id
+          );
           if (!subclass) return;
 
-          const classData = data.classes.find((c) => c.id === subclass.class_id);
+          const classData = data.classes.find(
+            (c) => c.id === subclass.class_id
+          );
           if (!classData) return;
 
-          const division = data.divisions.find((d) => d.id === classData.division_id);
+          const division = data.divisions.find(
+            (d) => d.id === classData.division_id
+          );
           if (!division) return;
 
           const superdivision = data.superdivisions.find(
@@ -274,7 +298,8 @@ const FullDetail = () => {
           </TouchableOpacity>
           {sections.komposisiKimia && (
             <View className="px-4 pb-4">
-              {plant?.chemical_components && plant.chemical_components.length > 0 ? (
+              {plant?.chemical_components &&
+              plant.chemical_components.length > 0 ? (
                 <View className="flex flex-wrap flex-row gap-2">
                   {plant.chemical_components.map((comp, index) => (
                     <View
@@ -318,41 +343,46 @@ const FullDetail = () => {
               color="#333"
             />
           </TouchableOpacity>
-          {sections.klasifikasi && plant?.species_id && taxonomyMap[plant.species_id] && (
-            <View className="px-4 pb-4">
-              <View className="border border-primary">
-                {[
-                  "kingdom",
-                  "subkingdom",
-                  "superdivision",
-                  "division",
-                  "class",
-                  "subclass",
-                  "order",
-                  "family",
-                  "genus",
-                  "species"
-                ].map((key) => {
-                  const value = taxonomyMap[plant.species_id][key as keyof typeof taxonomyMap[number]];
-                  if (!value) return null;
-                  
-                  return (
-                    <View
-                      key={key}
-                      className="flex-row border border-primary"
-                    >
-                      <Text className="w-1/3 p-2 text-sm text-white font-poppinsSemiBold bg-primary">
-                        {key.charAt(0).toUpperCase() + key.slice(1)}
-                      </Text>
-                      <Text className="w-2/3 p-2 text-sm text-black bg-white font-poppins">
-                        {value}
-                      </Text>
-                    </View>
-                  );
-                })}
+          {sections.klasifikasi &&
+            plant?.species_id &&
+            taxonomyMap[plant.species_id] && (
+              <View className="px-4 pb-4">
+                <View className="border border-primary">
+                  {[
+                    "kingdom",
+                    "subkingdom",
+                    "superdivision",
+                    "division",
+                    "class",
+                    "subclass",
+                    "order",
+                    "family",
+                    "genus",
+                    "species",
+                  ].map((key) => {
+                    const value =
+                      taxonomyMap[plant.species_id][
+                        key as keyof (typeof taxonomyMap)[number]
+                      ];
+                    if (!value) return null;
+
+                    return (
+                      <View
+                        key={key}
+                        className="flex-row border border-primary"
+                      >
+                        <Text className="w-1/3 p-2 text-sm text-white font-poppinsSemiBold bg-primary">
+                          {key.charAt(0).toUpperCase() + key.slice(1)}
+                        </Text>
+                        <Text className="w-2/3 p-2 text-sm text-black bg-white font-poppins">
+                          {value}
+                        </Text>
+                      </View>
+                    );
+                  })}
+                </View>
               </View>
-            </View>
-          )}
+            )}
         </View>
 
         <View className="mx-4 mb-3 overflow-hidden bg-white shadow-md rounded-xl">
@@ -383,6 +413,45 @@ const FullDetail = () => {
             </ImageBackground>
           )}
         </View>
+        <View className="mx-4 mb-3 bg-white rounded-xl shadow-md overflow-hidden">
+          <TouchableOpacity
+            onPress={() => toggleSection("varietas")}
+            className="flex-row items-center justify-between px-4 py-4"
+          >
+            <Text className="text-lg text-green-900 font-poppinsSemiBold">
+              Varietas
+            </Text>
+            <Ionicons
+              name={sections.asalUsul ? "chevron-up" : "chevron-down"}
+              size={24}
+              color="#333"
+            />
+          </TouchableOpacity>
+
+          {sections.varietas && (
+            <View className="px-4 pb-4 bg-white">
+              {getVarieties().length > 0 ? (
+                <View className="space-y-2">
+                  {getVarieties().map((variety, index) => (
+                    <View
+                      key={index}
+                      className="px-4 py-2 bg-softgreen border border-softgreen mb-4 rounded-lg"
+                    >
+                      <Text className="text-green-900 font-poppinsSemiBold ">
+                        • {variety}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              ) : (
+                <Text className="text-gray-700 font-poppins italic">
+                  Tidak ada varietas yang tersedia.
+                </Text>
+              )}
+            </View>
+          )}
+        </View>
+
         {/* Asal Usul */}
         <View className="mx-4 mb-3 overflow-hidden bg-white shadow-md rounded-xl">
           <TouchableOpacity

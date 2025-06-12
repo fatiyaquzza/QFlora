@@ -7,6 +7,7 @@ function SuggestionsPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [editingSuggestion, setEditingSuggestion] = useState(null);
   const [statusValue, setStatusValue] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchSuggestions();
@@ -14,11 +15,14 @@ function SuggestionsPage() {
 
   const fetchSuggestions = async () => {
     try {
+      setLoading(true);
       const res = await axiosClient.get("/suggestions");
       setSuggestions(res.data);
     } catch (err) {
       console.error("❌ Gagal mengambil data saran:", err);
       setErrorMessage("Gagal mengambil data saran.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -57,37 +61,51 @@ function SuggestionsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {suggestions.map((s) => (
-                    <tr key={s.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-4">{s.user?.name || "-"}</td>
-                      <td className="px-4 py-4">{s.user?.email || "-"}</td>
-                      <td className="px-4 py-4">{s.suggestion_type?.name || "-"}</td>
-                      <td className="px-4 py-4">{s.description}</td>
-                      <td className="px-4 py-4">
-                        {s.status === "Ditanggapi" ? (
-                          <span className="font-semibold text-green-600">
-                            Sudah ✔
-                          </span>
-                        ) : (
-                          <span className="font-semibold text-yellow-600">
-                            Belum
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-4 py-4">
-                        <button
-                          className="px-3 py-1 text-white bg-blue-600 rounded"
-                          onClick={() => {
-                            setEditingSuggestion(s);
-                            setStatusValue(s.status || "Belum");
-                          }}
-                        >
-                          Ubah
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+  {loading ? (
+    <tr>
+      <td colSpan="6" className="py-6 text-center">
+        <div className="flex justify-center items-center">
+          <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-blue-500"></div>
+          <span className="ml-2 text-gray-600">Memuat data saran...</span>
+        </div>
+      </td>
+    </tr>
+  ) : suggestions.length === 0 ? (
+    <tr>
+      <td colSpan="6" className="text-center py-6 text-gray-500">
+        Tidak ada data saran.
+      </td>
+    </tr>
+  ) : (
+    suggestions.map((s) => (
+      <tr key={s.id} className="hover:bg-gray-50">
+        <td className="px-4 py-4">{s.user?.name || "-"}</td>
+        <td className="px-4 py-4">{s.user?.email || "-"}</td>
+        <td className="px-4 py-4">{s.suggestion_type?.name || "-"}</td>
+        <td className="px-4 py-4">{s.description}</td>
+        <td className="px-4 py-4">
+          {s.status === "Ditanggapi" ? (
+            <span className="font-semibold text-green-600">Sudah ✔</span>
+          ) : (
+            <span className="font-semibold text-yellow-600">Belum</span>
+          )}
+        </td>
+        <td className="px-4 py-4">
+          <button
+            className="px-3 py-1 text-white bg-blue-600 rounded"
+            onClick={() => {
+              setEditingSuggestion(s);
+              setStatusValue(s.status || "Belum");
+            }}
+          >
+            Ubah
+          </button>
+        </td>
+      </tr>
+    ))
+  )}
+</tbody>
+
               </table>
             </div>
           </div>

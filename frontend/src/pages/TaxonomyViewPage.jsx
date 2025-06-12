@@ -3,11 +3,10 @@ import { Link } from "react-router-dom";
 import axiosClient from "../api/axiosClient";
 import AdminLayout from "../components/AdminLayout";
 import { FaChevronRight, FaTrash } from "react-icons/fa";
-import Fuse from 'fuse.js';
+import Fuse from "fuse.js";
 
 function TaxonomyViewPage() {
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [taxonomyData, setTaxonomyData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
@@ -30,9 +29,9 @@ function TaxonomyViewPage() {
 
     const fuse = new Fuse(taxonomyData, {
       keys: [
-        'taxonomy.species.name',
-        'taxonomy.genus.name',
-        'taxonomy.family.name'
+        "taxonomy.species.name",
+        "taxonomy.genus.name",
+        "taxonomy.family.name",
       ],
       includeScore: true,
       threshold: 0.4,
@@ -40,7 +39,7 @@ function TaxonomyViewPage() {
       ignoreLocation: true,
     });
 
-    const results = fuse.search(searchTerm).map(result => result.item);
+    const results = fuse.search(searchTerm).map((result) => result.item);
     setFilteredData(results);
   }, [searchTerm, taxonomyData]);
 
@@ -115,7 +114,6 @@ function TaxonomyViewPage() {
       setTaxonomyData(sortedData);
     } catch (err) {
       console.error("Error fetching taxonomy data:", err);
-      setError("Gagal memuat data taksonomi");
     } finally {
       setLoading(false);
     }
@@ -348,7 +346,9 @@ function TaxonomyViewPage() {
               Kingdom
             </span>
             <FaChevronRight className="mx-2 text-gray-400" size={10} />
-            <span className="text-gray-800 truncate">{data.taxonomy.kingdom}</span>
+            <span className="text-gray-800 truncate">
+              {data.taxonomy.kingdom}
+            </span>
           </div>
         )}
       </div>
@@ -414,33 +414,45 @@ function TaxonomyViewPage() {
             Tambah
           </Link>
         </div>
-        
+
         <div className="mb-6">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Cari berdasarkan nama species, genus, atau family..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
-              />
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3">
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-4.35-4.35M16.65 10.35a6.3 6.3 0 11-12.6 0 6.3 6.3 0 0112.6 0z"></path></svg>
-              </div>
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Cari berdasarkan nama species, genus, atau family..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full p-3 pl-10 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block"
+            />
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+              <svg
+                className="w-5 h-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M21 21l-4.35-4.35M16.65 10.35a6.3 6.3 0 11-12.6 0 6.3 6.3 0 0112.6 0z"
+                ></path>
+              </svg>
             </div>
           </div>
+        </div>
 
         {showDeleteModal && <DeleteModal />}
 
         {loading ? (
-          <p className="text-center text-gray-500">Memuat data...</p>
-        ) : error ? (
-          <p className="text-center text-red-500">{error}</p>
-        ) : filteredData.length === 0 ? (
-          <div className="text-center py-8 text-gray-600">
-            {searchTerm
-              ? "Tidak ada hasil yang cocok dengan pencarian"
-              : "Belum ada data taksonomi"}
+          <div className="flex justify-center items-center h-48">
+            <div className="flex items-center space-x-2">
+              <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-blue-500"></div>
+              <span className="ml-2 text-gray-600">
+                Memuat data klasifikasi...
+              </span>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
