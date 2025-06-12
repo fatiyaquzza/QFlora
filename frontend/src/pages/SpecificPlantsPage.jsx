@@ -34,6 +34,8 @@ function SpecificPlantsPage() {
 
   const [excelSpecific, setExcelSpecific] = useState(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [selectedVerse, setSelectedVerse] = useState(null);
+  const [showVerseDetailsModal, setShowVerseDetailsModal] = useState(false);
 
   const [verseEditing, setVerseEditing] = useState(null);
   const [newVerse] = useState({
@@ -376,49 +378,19 @@ function SpecificPlantsPage() {
                                 key={v.id}
                                 className="mb-3 border-b border-gray-200 pb-2 last:border-none"
                               >
-                                <p>
-                                  {" "}
-                                  <b>
+                                <div className="flex items-center justify-between">
+                                  <p className="font-medium">
                                     {v.surah} - {v.verse_number}
-                                  </b>
-                                </p>
-                                <p className="text-sm text-right">
-                                  {v.quran_verse}
-                                </p>
-                                <p className="text-sm text-gray-700">
-                                  {v.translation}
-                                </p>
-                                <audio controls className="w-full mt-1">
-                                  <source src={v.audio_url} type="audio/mpeg" />
-                                </audio>
-                                {v.keyword_arab && (
-                                  <p className="text-sm text-amber-800 mt-1">
-                                    🔍{" "}
-                                    <span className="font-semibold">
-                                      Kata kunci Arab:
-                                    </span>{" "}
-                                    <span className="bg-yellow-100 px-1 py-0.5 rounded text-black">
-                                      {v.keyword_arab}
-                                    </span>
                                   </p>
-                                )}
-                                <div className="flex gap-2 mt-1">
                                   <button
-                                    className="px-2 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
                                     onClick={() => {
                                       setSelectedPlantId(plant.id);
-                                      setVerseEditing(v);
+                                      setSelectedVerse(v);
+                                      setShowVerseDetailsModal(true);
                                     }}
+                                    className="px-2 py-1 text-sm text-blue-500 pr-4"
                                   >
-                                    Edit
-                                  </button>
-                                  <button
-                                    className="px-2 py-1 text-sm text-white bg-red-600 rounded hover:bg-red-700"
-                                    onClick={() =>
-                                      handleDeleteVerse(plant.id, v.id)
-                                    }
-                                  >
-                                    Hapus
+                                    Detail
                                   </button>
                                 </div>
                               </div>
@@ -781,6 +753,66 @@ function SpecificPlantsPage() {
             Update
           </button>
         </form>
+      </Modal>
+
+      <Modal
+        show={showVerseDetailsModal}
+        title={`Detail Ayat ${selectedVerse?.surah} - ${selectedVerse?.verse_number}`}
+        onClose={() => {
+          setShowVerseDetailsModal(false);
+          setSelectedVerse(null);
+        }}
+      >
+        {selectedVerse && (
+          <div className="space-y-4">
+            <div className="text-right text-lg mb-2">
+              {selectedVerse.quran_verse}
+            </div>
+            <div className="text-gray-700 mb-2">
+              {selectedVerse.translation}
+            </div>
+            <audio controls className="w-full mb-2">
+              <source src={selectedVerse.audio_url} type="audio/mpeg" />
+            </audio>
+            {selectedVerse.keyword_arab && (
+              <div className="text-amber-800 mb-4">
+                🔍 <span className="font-semibold">Kata kunci Arab:</span>{" "}
+                <span className="bg-yellow-100 px-1 py-0.5 rounded text-black">
+                  {selectedVerse.keyword_arab}
+                </span>
+              </div>
+            )}
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                className="px-3 py-1 text-white bg-blue-600 rounded hover:bg-blue-700"
+                onClick={() => {
+                  setVerseEditing(selectedVerse);
+                  setShowVerseDetailsModal(false);
+                }}
+              >
+                Edit
+              </button>
+              <button
+                className="px-3 py-1 text-white bg-red-600 rounded hover:bg-red-700"
+                onClick={() => {
+                  handleDeleteVerse(selectedPlantId, selectedVerse.id);
+                  setShowVerseDetailsModal(false);
+                }}
+              >
+                Hapus
+              </button>
+              <button
+                className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                onClick={() => {
+                  setShowVerseDetailsModal(false);
+                  setSelectedVerse(null);
+                }}
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        )}
       </Modal>
     </AdminLayout>
   );
