@@ -2,7 +2,15 @@ const express = require("express");
 const router = express.Router();
 const { PlantType } = require("../models");
 
-// Get all plant types
+/**
+ * @swagger
+ * /api/plant-types:
+ *   get:
+ *     summary: Get all plant types
+ *     responses:
+ *       200:
+ *         description: List of plant types
+ */
 router.get("/", async (req, res) => {
   try {
     const plantTypes = await PlantType.findAll();
@@ -12,7 +20,15 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Create a new plant type
+/**
+ * @swagger
+ * /api/plant-types:
+ *   post:
+ *     summary: Create a new plant type
+ *     responses:
+ *       201:
+ *         description: Plant type created
+ */
 router.post("/", async (req, res) => {
   try {
     const plantType = await PlantType.create(req.body);
@@ -22,7 +38,21 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Update a plant type
+/**
+ * @swagger
+ * /api/plant-types/{id}:
+ *   put:
+ *     summary: Update a plant type
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Plant type updated
+ */
 router.put("/:id", async (req, res) => {
   try {
     const plantType = await PlantType.findByPk(req.params.id);
@@ -36,7 +66,21 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// Delete a plant type
+/**
+ * @swagger
+ * /api/plant-types/{id}:
+ *   delete:
+ *     summary: Delete a plant type
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Plant type deleted
+ */
 router.delete("/:id", async (req, res) => {
   try {
     const plantType = await PlantType.findByPk(req.params.id);

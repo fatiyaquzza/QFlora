@@ -3,6 +3,8 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const sequelize = require("./config/db");
 const db = require("./models");
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
 
 dotenv.config();
 
@@ -12,6 +14,26 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(express.json());
 app.use(cors({ origin: "*" }));
+
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'QFLORA API',
+      version: '1.0.0',
+      description: 'API documentation for QFLORA',
+    },
+    servers: [
+      {
+        url: `http://localhost:${PORT}`,
+      },
+    ],
+  },
+  apis: ['./routes/*.js'], // You can add JSDoc comments in your route files for more details
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routes
 app.get("/", (req, res) => {

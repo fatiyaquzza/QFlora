@@ -4,6 +4,31 @@ const admin = require("firebase-admin");
 const firebaseAuth = require("../middleware/firebaseAuth");
 const path = require("path");
 
+/**
+ * @swagger
+ * /users:
+ *   get:
+ *     summary: Get all users
+ *     responses:
+ *       200:
+ *         description: List of users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 users:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       uid:
+ *                         type: string
+ *                       email:
+ *                         type: string
+ *                       displayName:
+ *                         type: string
+ */
 router.get("/", async (req, res) => {
   try {
     const listUsers = await admin.auth().listUsers(1000);
@@ -18,6 +43,33 @@ router.get("/", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /users/{uid}:
+ *   patch:
+ *     summary: Update a user's display name
+ *     parameters:
+ *       - in: path
+ *         name: uid
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               displayName:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User updated
+ *       500:
+ *         description: Failed to update user
+ */
 router.patch("/:uid", async (req, res) => {
   try {
     const { displayName } = req.body;
@@ -30,7 +82,24 @@ router.patch("/:uid", async (req, res) => {
   }
 });
 
-// DELETE /users/:uid
+/**
+ * @swagger
+ * /users/{uid}:
+ *   delete:
+ *     summary: Delete a user
+ *     parameters:
+ *       - in: path
+ *         name: uid
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: User deleted
+ *       500:
+ *         description: Failed to delete user
+ */
 router.delete("/:uid", async (req, res) => {
   try {
     await admin.auth().deleteUser(req.params.uid);
