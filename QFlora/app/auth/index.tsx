@@ -32,8 +32,8 @@ const Login: React.FC = () => {
       >
         <View className="items-center justify-center flex-1 px-6 bg-background">
           <Image
-            source={require("../../assets/images/logo.png")}
-            className="w-32 h-32 mb-6"
+            source={require("../../assets/images/logo3.png")}
+            className="w-44 h-44 mb-6"
           />
           <Text className="mb-2 text-3xl font-poppinsSemiBold">
             Selamat Datang
