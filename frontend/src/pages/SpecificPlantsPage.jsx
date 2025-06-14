@@ -63,7 +63,7 @@ function SpecificPlantsPage() {
           axiosClient.get("/api/plant-types"),
           axiosClient.get("/api/chemical-components"),
         ]);
-        setPlants(plantsRes.data);
+        setPlants(plantsRes.data.sort((a, b) => a.name.localeCompare(b.name)));
         setPlantTypes(typesRes.data);
         setChemicalComponents(chemicalsRes.data);
       } catch (err) {
@@ -156,7 +156,11 @@ function SpecificPlantsPage() {
   }, [searchTerm, plants]);
 
   const refreshData = () => {
-    axiosClient.get("/specific-plants").then((res) => setPlants(res.data));
+    axiosClient
+      .get("/specific-plants")
+      .then((res) =>
+        setPlants(res.data.sort((a, b) => a.name.localeCompare(b.name)))
+      );
   };
 
   const handleUpdate = (e) => {

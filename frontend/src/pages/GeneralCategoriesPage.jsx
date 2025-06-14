@@ -37,7 +37,8 @@ function GeneralCategoriesPage() {
     setLoading(true);
     try {
       const res = await axiosClient.get("/general-categories");
-      setCategories(res.data);
+      setCategories(res.data.sort((a, b) => a.name.localeCompare(b.name))
+      );
     } finally {
       setLoading(false);
     }

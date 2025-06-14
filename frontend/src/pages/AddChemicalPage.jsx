@@ -10,7 +10,7 @@ function AddChemicalPage() {
   const [formError, setFormError] = useState("");
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(12);
+  const [itemsPerPage] = useState(20);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [componentToDelete, setComponentToDelete] = useState(null);
@@ -35,7 +35,6 @@ function AddChemicalPage() {
       setLoading(false);
     }
   };
-  
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -188,7 +187,9 @@ function AddChemicalPage() {
             <Pagination totalItems={chemComp.length} />
             {chemComp.length > 0 && (
               <div className="text-center text-sm text-gray-600 mt-4">
-                Menampilkan {indexOfFirstItem + 1} - {Math.min(indexOfLastItem, chemComp.length)} dari {chemComp.length} data
+                Menampilkan {indexOfFirstItem + 1} -{" "}
+                {Math.min(indexOfLastItem, chemComp.length)} dari{" "}
+                {chemComp.length} data
               </div>
             )}
           </>
