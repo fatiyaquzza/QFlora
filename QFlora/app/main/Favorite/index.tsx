@@ -111,7 +111,7 @@ const Favorite = () => {
         </Text>
       </View>
 
-      <ScrollView>
+      <ScrollView className="bg-background">
         <View className="flex-1 px-3 pt-6 bg-background">
           {mappedPlants.length > 0 ? (
             <FavoriteCard

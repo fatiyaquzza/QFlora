@@ -92,7 +92,6 @@ const Home: React.FC = () => {
     setRefreshing(false);
   };
 
-  // 🔁 Mendapatkan plant dari dua list agar toggle tidak gagal
   const getPlantById = (id: string): Plant | undefined => {
     return allPlants.find((p) => p.id === id) || popularPlants.find((p) => p.id === id);
   };
