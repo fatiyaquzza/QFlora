@@ -37,8 +37,7 @@ function GeneralCategoriesPage() {
     setLoading(true);
     try {
       const res = await axiosClient.get("/general-categories");
-      setCategories(res.data.sort((a, b) => a.name.localeCompare(b.name))
-      );
+      setCategories(res.data.sort((a, b) => a.name.localeCompare(b.name)));
     } finally {
       setLoading(false);
     }
@@ -112,7 +111,7 @@ function GeneralCategoriesPage() {
     const formData = new FormData();
     formData.append("file", excelGeneralPlant);
     try {
-      await axiosClient.post("/api/import-general-plants", formData);
+      await axiosClient.post("/api/import-general-verses", formData);
       alert("Berhasil mengimpor kategori umum!");
       fetchCategories();
       setExcelGeneralPlant(null);

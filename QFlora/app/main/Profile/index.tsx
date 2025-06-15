@@ -9,7 +9,6 @@ import SearchPage from "../../components/DetailPage/Saran"
 const Profile = () => {
   const profile = require("../../../assets/images/logo.png");
   const { user, logout, loading } = useAuth();
-  // console.log("👤 Data user di Profile:", user);
 
   return (
     <>
