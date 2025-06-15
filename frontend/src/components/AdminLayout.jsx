@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -20,21 +20,28 @@ const navItems = [
     icon: <MdInventory2 size={20} />,
   },
   {
-    path: "/specific-plants",
     label: "Kategori Spesifik",
-    icon: <MdDescription size={20} />,
-  },
-  {
-    path: "/taxonomy",
-    label: "Klasifikasi",
     icon: <MdAccountTree size={20} />,
+    children: [
+      {
+        path: "/specific-plants",
+        label: "Tumbuhan Spesifik",
+      },
+      {
+        path: "/taxonomy",
+        label: "Klasifikasi",
+      },
+      {
+        path: "/chemical-comp",
+        label: "Komposisi Kimia",
+      },
+    ],
   },
   {
-    path: "/chemical-comp",
-    label: "Komposisi Kimia",
-    icon: <MdScience size={20} />,
+    path: "/users",
+    label: "Pengguna",
+    icon: <MdPerson size={20} />,
   },
-  { path: "/users", label: "Pengguna", icon: <MdPerson size={20} /> },
   {
     path: "/suggestions",
     label: "Saran",
@@ -47,6 +54,14 @@ function AdminLayout({ children }) {
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  const [openSubmenus, setOpenSubmenus] = useState({});
+  const toggleSubmenu = (label) => {
+    setOpenSubmenus((prev) => ({
+      ...prev,
+      [label]: prev[label] === false ? true : false,
+    }));
+  };
+
   const isPathActive = (path) => {
     if (path === "/") {
       return location.pathname === "/";
@@ -57,6 +72,19 @@ function AdminLayout({ children }) {
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+
+  useEffect(() => {
+    const defaultOpen = {};
+    navItems.forEach((item) => {
+      if (
+        item.children &&
+        item.children.some((child) => location.pathname.startsWith(child.path))
+      ) {
+        defaultOpen[item.label] = true;
+      }
+    });
+    setOpenSubmenus(defaultOpen);
+  }, [location.pathname]);
 
   const Sidebar = () => (
     <aside
@@ -74,21 +102,66 @@ function AdminLayout({ children }) {
         </button>
       </div>
       <nav className="flex flex-col gap-2 p-4">
-        {navItems.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            onClick={() => setIsSidebarOpen(false)}
-            className={`flex items-center gap-3 px-3 py-3 rounded-md transition-all text-sm font-medium ${
-              isPathActive(item.path)
-                ? "bg-green-800 text-white shadow-sm"
-                : "text-gray-800 hover:bg-green-200"
-            }`}
-          >
-            {item.icon}
-            <span className="uppercase">{item.label}</span>
-          </Link>
-        ))}
+        {navItems.map((item) =>
+          item.children ? (
+            <div key={item.label}>
+              <button
+                onClick={() => toggleSubmenu(item.label)}
+                className={`flex items-center justify-between w-full gap-3 px-3 py-3 rounded-md transition-all text-sm font-medium ${
+                  item.children.some((child) => isPathActive(child.path))
+                    ? "bg-green-800 text-white shadow-sm"
+                    : "text-gray-800 hover:bg-green-200"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  {item.icon}
+                  <span className="uppercase">{item.label}</span>
+                </div>
+                <span className="text-lg">
+                  {openSubmenus[item.label] ? "▾" : "▸"}
+                </span>
+              </button>
+              {openSubmenus[item.label] !== false &&
+                (openSubmenus[item.label] ||
+                  item.children.some((child) => isPathActive(child.path))) && (
+                  <div className="ml-1 mt-1 flex flex-col gap-1">
+                    {item.children.map((child) => (
+                      <Link
+                        key={child.path}
+                        to={child.path}
+                        onClick={() => {
+                          if (window.innerWidth < 1024) {
+                            setIsSidebarOpen(false);
+                          }
+                        }}
+                        className={`block px-3 py-2 text-sm font-medium rounded-md transition-all ${
+                          isPathActive(child.path)
+                            ? "bg-green-700 text-white"
+                            : "text-gray-800 hover:bg-green-100"
+                        }`}
+                      >
+                        {child.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+            </div>
+          ) : (
+            <Link
+              key={item.path}
+              to={item.path}
+              onClick={() => setIsSidebarOpen(false)}
+              className={`flex items-center gap-3 px-3 py-3 rounded-md transition-all text-sm font-medium font-Poppin ${
+                isPathActive(item.path)
+                  ? "bg-green-800 text-white shadow-sm"
+                  : "text-gray-800 hover:bg-green-200"
+              }`}
+            >
+              {item.icon}
+              <span className="uppercase">{item.label}</span>
+            </Link>
+          )
+        )}
       </nav>
 
       <button
