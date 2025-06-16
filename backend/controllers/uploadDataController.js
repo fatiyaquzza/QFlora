@@ -15,7 +15,15 @@ const importSpecificPlantVerses = async (req, res) => {
         .status(400)
         .json({ message: "File tidak ditemukan dalam request." });
     }
-
+    
+    if (!req.file.originalname.match(/\.(xls|xlsx)$/)) {
+      fs.unlinkSync(req.file.path);
+      return res
+        .status(400)
+        .json({
+          message: "Hanya file Excel (.xls, .xlsx) yang diperbolehkan.",
+        });
+    }
     const workbook = xlsx.readFile(req.file.path);
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const data = xlsx.utils.sheet_to_json(sheet);
@@ -97,7 +105,14 @@ const importGeneralVerses = async (req, res) => {
         .status(400)
         .json({ message: "File tidak ditemukan dalam request." });
     }
-
+    if (!req.file.originalname.match(/\.(xls|xlsx)$/)) {
+      fs.unlinkSync(req.file.path);
+      return res
+        .status(400)
+        .json({
+          message: "Hanya file Excel (.xls, .xlsx) yang diperbolehkan.",
+        });
+    }
     const workbook = xlsx.readFile(req.file.path);
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const data = xlsx.utils.sheet_to_json(sheet);
@@ -141,7 +156,9 @@ const importGeneralVerses = async (req, res) => {
 
         if (existingVerse) {
           console.warn(
-            `⚠️ Baris ${index + 2}: Ayat "${surah} - ${verse_number}" untuk kategori "${categoryName}" sudah ada`
+            `⚠️ Baris ${
+              index + 2
+            }: Ayat "${surah} - ${verse_number}" untuk kategori "${categoryName}" sudah ada`
           );
           continue;
         }

@@ -107,9 +107,21 @@ function GeneralCategoriesPage() {
   };
 
   const handleUploadGeneralPlant = async () => {
-    if (!excelGeneralPlant) return alert("Pilih file Excel terlebih dahulu.");
+    if (!excelGeneralPlant) {
+      return alert("Pilih file Excel terlebih dahulu.");
+    }
+
+    const validTypes = [
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-excel",
+    ];
+    if (!validTypes.includes(excelGeneralPlant.type)) {
+      return alert("Tipe file salah. Harap unggah file Excel (.xlsx / .xls).");
+    }
+
     const formData = new FormData();
     formData.append("file", excelGeneralPlant);
+
     try {
       await axiosClient.post("/api/import-general-verses", formData);
       alert("Berhasil mengimpor kategori umum!");

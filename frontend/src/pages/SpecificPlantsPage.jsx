@@ -205,7 +205,21 @@ function SpecificPlantsPage() {
   };
 
   const handleUploadSpecificExcel = async () => {
-    if (!excelSpecific) return alert("Pilih file Excel terlebih dahulu.");
+    if (!excelSpecific) {
+      return alert("Pilih file Excel terlebih dahulu.");
+    }
+
+    const validTypes = [
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-excel",
+    ];
+
+    if (!validTypes.includes(excelSpecific.type)) {
+      return alert(
+        "Tipe file salah. Harap unggah file Excel (.xlsx atau .xls)."
+      );
+    }
+
     const formData = new FormData();
     formData.append("file", excelSpecific);
 

@@ -29,9 +29,15 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const loginWithGoogle = async () => {
-    const result = await signInWithPopup(auth, googleProvider);
-    if (result.user.email !== ADMIN_EMAIL) {
-      throw new Error("Akun ini bukan admin QFLORA.");
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      if (result.user.email !== ADMIN_EMAIL) {
+        await result.user.delete(); 
+        throw new Error("Akun ini bukan admin QFLORA.");
+      }
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
   };
 
