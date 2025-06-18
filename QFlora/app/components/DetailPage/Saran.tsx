@@ -178,7 +178,7 @@ const Saran = () => {
                 }`}
               >
                 <Text className="text-lg text-center text-white font-poppinsSemiBold">
-                  Submit
+                  Kirim
                 </Text>
               </TouchableOpacity>
             </View>

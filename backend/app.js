@@ -3,13 +3,14 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const sequelize = require("./config/db");
 const db = require("./models");
-const swaggerUi = require('swagger-ui-express');
-const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require("swagger-ui-express");
+const swaggerJsdoc = require("swagger-jsdoc");
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const HOST = "0.0.0.0";
 
 // Middleware
 app.use(express.json());
@@ -17,11 +18,11 @@ app.use(cors({ origin: "*" }));
 
 const swaggerOptions = {
   definition: {
-    openapi: '3.0.0',
+    openapi: "3.0.0",
     info: {
-      title: 'QFLORA API',
-      version: '1.0.0',
-      description: 'API documentation for QFLORA',
+      title: "QFLORA API",
+      version: "1.0.0",
+      description: "API documentation for QFLORA",
     },
     servers: [
       {
@@ -29,11 +30,11 @@ const swaggerOptions = {
       },
     ],
   },
-  apis: ['./routes/*.js'], // You can add JSDoc comments in your route files for more details
+  apis: ["./routes/*.js"], // You can add JSDoc comments in your route files for more details
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routes
 app.get("/", (req, res) => {
@@ -48,11 +49,11 @@ app.get("/", (req, res) => {
 
     // Sync new tables first without forcing, so they exist for foreign keys
     await db.PlantType.sync();
-    await db.ChemicalComponent.sync(); 
+    await db.ChemicalComponent.sync();
     await db.SpecificPlantChemicalComponent.sync();
 
     // Sync SpecificPlant with alter:true to handle schema changes like column drops
-    await db.SpecificPlant.sync({ alter: true }); 
+    await db.SpecificPlant.sync({ alter: true });
 
     // Sync other taxonomy tables (assuming they don't need forced changes for this task)
     await db.Subkingdom.sync();
@@ -64,7 +65,7 @@ app.get("/", (req, res) => {
     await db.Family.sync();
     await db.Genus.sync();
     await db.Species.sync();
-    
+
     // Sync remaining tables
     await db.SpecificPlantVerse.sync();
     await db.GeneralCategory.sync();
@@ -76,7 +77,6 @@ app.get("/", (req, res) => {
     await db.Suggestion.sync();
 
     console.log("✅ All models synced.");
-
   } catch (error) {
     console.error("❌ Gagal sync model ke DB:", error);
     console.error("Detail error:", error.original || error);
@@ -84,8 +84,8 @@ app.get("/", (req, res) => {
 })();
 
 // Start Server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+app.listen(PORT, HOST, () => {
+  console.log(`🚀 Server is listening at http://${HOST}:${PORT}`);
 });
 
 const generalCategoryRoutes = require("./routes/generalCategories");
