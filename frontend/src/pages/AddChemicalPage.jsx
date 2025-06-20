@@ -139,18 +139,18 @@ function AddChemicalPage() {
     <AdminLayout>
       <div className="mt-4 bg-white border-2 rounded-xl p-6 shadow font-Poppins">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-xl font-bold text-black">
-            Daftar Komposisi Kimia
-          </h1>
+          <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+            <h1 className="text-xl font-semibold text-gray-800 whitespace-nowrap py-2">
+              Daftar Komposisi Kimia
+            </h1>
+          </div>
           <button
-            className="px-4 py-2 text-sm text-white bg-[#004E1D] rounded hover:bg-green-700"
+            className="px-4 py-2 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded-md"
             onClick={() => setShowForm(true)}
           >
-            Tambah
+            + Tambah
           </button>
         </div>
-
-        <div className="border-t border-gray-300 mb-6"></div>
 
         {loading ? (
           <div className="flex justify-center items-center py-8">

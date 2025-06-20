@@ -57,7 +57,7 @@ function GeneralCategoriesPage() {
       keys: ["name", "verses.surah", "verses.quran_verse"],
       includeScore: true,
       threshold: 0.4,
-      minMatchCharLength: 3,
+      minMatchCharLength: 2,
       ignoreLocation: true,
     });
 
@@ -143,150 +143,170 @@ function GeneralCategoriesPage() {
     <AdminLayout>
       <div className="mt-4 bg-white border-2 rounded-xl p-4 shadow overflow-x-auto font-Poppins">
         <div className="px-2 pt-2">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
-            <h1 className="text-xl font-bold text-black">
-              Daftar Kategori Umum
-            </h1>
-            <div className="flex gap-2">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+            {/* Judul + Search */}
+            <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+              <h1 className="text-xl font-semibold text-gray-800 whitespace-nowrap py-2">
+                Daftar Kategori Umum
+              </h1>
+            </div>
+
+            {/* Tombol Aksi */}
+            <div className="flex gap-3">
+              <div className="relative w-full md:w-64">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full py-2.5 pl-10 pr-4 text-sm text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg
+                    className="w-4 h-4 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+              </div>
               <button
-                className="px-4 py-2 text-sm text-white bg-blue-600 rounded hover:bg-green-700"
+                className="px-4 py-2 text-xs font-medium text-black bg-green-100 hover:bg-green-200 rounded-md"
                 onClick={() => setShowUploadModal(true)}
               >
                 Upload Ayat
               </button>
-
               <button
-                className="px-4 py-2 text-sm text-white bg-[#004E1D] rounded hover:bg-green-700"
+                className="px-4 py-2 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded-md"
                 onClick={() => navigate("/general-categories/add")}
               >
-                Tambah
+                + Tambah
               </button>
             </div>
           </div>
 
-          <div className="mb-6">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Cari berdasarkan nama tumbuhan atau ayat..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full p-3 pl-10 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block"
-              />
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg
-                  className="w-5 h-5 text-gray-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  ></path>
-                </svg>
-              </div>
-            </div>
-          </div>
-
           <div className="overflow-x-auto">
-            <div className="overflow-x-auto">
-              <div className="border-t border-gray-300 mb-4"></div>
-              {loading ? (
-                <div className="flex justify-center items-center py-6">
-                  <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-blue-500"></div>
-                  <span className="ml-2 text-gray-600">
-                    Memuat data kategori...
-                  </span>
-                </div>
-              ) : (
-                <table className="w-full text-sm text-left border-separate border-spacing-y-4">
-                  <thead className="text-gray-600">
-                    <tr>
-                      <th className="px-2 py-2">Name</th>
-                      <th className="px-2 py-2">Latin Name</th>
-                      <th className="px-2 py-2">Image</th>
-                      <th className="px-2 py-2">Overview</th>
-                      <th className="px-2 py-2">Ayat Al-Qur'an</th>
-                      <th className="px-2 py-2 text-center">Aksi</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredCategories.map((cat) => (
-                      <tr key={cat.id} className="bg-white shadow rounded">
-                        <td className="px-2 py-4 min-w-20 w-20">{cat.name}</td>
-                        <td className="px-2 py-4 min-w-40 w-40">
-                          {cat.latin_name}
-                        </td>
-                        <td className="px-2 py-4 min-w-44 w-44">
-                          <img
-                            src={cat.image_url}
-                            alt="img"
-                            className="object-cover w-40 h-40 rounded-md"
-                          />
-                        </td>
-                        <td className="px-2 py-4 min-w-40 w-40">
-                          {cat.overview}
-                        </td>
-                        <td className="px-2 py-4 min-w-40 w-60">
-                          <div className="max-h-64 overflow-y-auto pr-2 w-60">
-                            {cat.verses?.length > 0 ? (
-                              cat.verses.map((v) => (
-                                <div
-                                  key={v.id}
-                                  className="mb-2 pb-2 border-b border-gray-200"
-                                >
-                                  <div className="flex items-center justify-between">
-                                    <p className="font-medium">
-                                      {v.surah} - {v.verse_number}
-                                    </p>
-                                    <button
-                                      onClick={() => {
-                                        setSelectedCategoryId(cat.id);
-                                        setSelectedVerse(v);
-                                        setShowVerseDetailsModal(true);
-                                      }}
-                                      className="px-2 py-1 text-sm text-blue-500 pr-4"
-                                    >
-                                      Detail
-                                    </button>
-                                  </div>
+            {loading ? (
+              <div className="flex justify-center items-center py-6">
+                <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-blue-500"></div>
+                <span className="ml-2 text-gray-600">
+                  Memuat data kategori...
+                </span>
+              </div>
+            ) : (
+              <table className="w-full text-sm text-left table-auto border-collapse">
+                <thead className="bg-gray-50 text-gray-600 text-xs uppercase">
+                  <tr>
+                    <th className="px-4 py-3">Nama</th>
+                    <th className="px-4 py-3">Nama Latin</th>
+                    <th className="px-4 py-3">Gambar</th>
+                    <th className="px-4 py-3">Overview</th>
+                    <th className="px-4 py-3">Ayat Al-Qur'an</th>
+                    <th className="px-4 py-3 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredCategories.map((cat) => (
+                    <tr key={cat.id} className="border-b hover:bg-gray-50">
+                      <td className="px-4 py-3">{cat.name}</td>
+                      <td className="px-4 py-3">{cat.latin_name}</td>
+                      <td className="px-4 py-3 min-w-60 w-60">
+                        <img
+                          src={cat.image_url}
+                          alt="img"
+                          className="object-cover w-40 h-40 rounded-md"
+                        />
+                      </td>
+                      <td className="px-4 py-3">{cat.overview}</td>
+                      <td className="px-4 py-3">
+                        <div className="max-h-64 overflow-y-auto pr-2 w-60">
+                          {cat.verses?.length > 0 ? (
+                            cat.verses.map((v) => (
+                              <div
+                                key={v.id}
+                                className="mb-2 pb-2 border-b border-gray-200 last:border-none"
+                              >
+                                <div className="flex items-center justify-between">
+                                  <p className="font-medium text-sm">
+                                    {v.surah} - {v.verse_number}
+                                  </p>
+                                  <button
+                                    onClick={() => {
+                                      setSelectedCategoryId(cat.id);
+                                      setSelectedVerse(v);
+                                      setShowVerseDetailsModal(true);
+                                    }}
+                                    className="text-blue-600 text-xs hover:underline"
+                                  >
+                                    Detail
+                                  </button>
                                 </div>
-                              ))
-                            ) : (
-                              <span className="text-sm italic text-gray-400">
-                                Belum ada ayat
-                              </span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-2 py-4 min-w-40 w-40 text-center whitespace-nowrap">
-                          <div className="flex flex-col items-center gap-2">
-                            <button
-                              onClick={() =>
-                                navigate(`/general-categories/edit/${cat.id}`)
-                              }
-                              className="px-3 py-1 text-white bg-blue-500 rounded"
+                              </div>
+                            ))
+                          ) : (
+                            <span className="text-sm italic text-gray-400">
+                              Belum ada ayat
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-center whitespace-nowrap">
+                        <div className="flex justify-center gap-2">
+                          <button
+                            onClick={() =>
+                              navigate(`/specific-plants/edit/${cat.id}`)
+                            }
+                            className="flex items-center gap-1 px-3 py-1 text-xs bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition"
+                          >
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
                             >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleDeleteClick(cat)}
-                              className="px-3 py-1 text-white bg-red-500 rounded"
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15.232 5.232l3.536 3.536M9 13h6l3.536-3.536a2 2 0 00-2.828-2.828L9 13z"
+                              />
+                            </svg>
+                            Edit
+                          </button>
+
+                          <button
+                            onClick={() => handleDeleteClick(cat)}
+                            className="flex items-center gap-1 px-3 py-1 text-xs bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition"
+                          >
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
                             >
-                              Hapus
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+                            </svg>
+                            Hapus
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
 
@@ -461,13 +481,13 @@ function GeneralCategoriesPage() {
             </p>
             <div className="flex justify-end gap-2">
               <button
-                className="px-4 py-2 bg-gray-300 rounded"
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
                 onClick={() => setShowDeleteModal(false)}
               >
                 Batal
               </button>
               <button
-                className="px-4 py-2 text-white bg-red-600 rounded"
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md"
                 onClick={confirmDeleteCategory}
               >
                 Hapus
@@ -497,7 +517,7 @@ function GeneralCategoriesPage() {
               <p className="text-xs text-gray-500">atau klik tombol bawah</p>
               <button
                 type="button"
-                className="mt-2 px-3 py-1 text-sm bg-blue-100 text-blue-600 rounded"
+                className="mt-2 px-3 py-1 text-sm font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-md"
               >
                 Browse File
               </button>
@@ -516,7 +536,7 @@ function GeneralCategoriesPage() {
             )}
             <div className="flex justify-end gap-2">
               <button
-                className="px-4 py-2 bg-gray-300 rounded"
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
                 onClick={() => {
                   setShowUploadModal(false);
                   setExcelGeneralPlant(null);
@@ -525,7 +545,7 @@ function GeneralCategoriesPage() {
                 Batal
               </button>
               <button
-                className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-800"
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md"
                 onClick={handleUploadGeneralPlant}
               >
                 Selesai

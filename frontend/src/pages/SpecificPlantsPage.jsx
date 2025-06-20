@@ -242,56 +242,59 @@ function SpecificPlantsPage() {
     <AdminLayout>
       <div className="mt-4 bg-white border-2 rounded-xl p-4 shadow overflow-x-auto  font-Poppins">
         <div className="px-2 pt-2">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-xl font-bold text-black">
-              Daftar Kategori Spesifik
-            </h1>
-            <div className="flex gap-2">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+            {/* Judul + Search */}
+            <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+              <h1 className="text-xl font-semibold text-gray-800 whitespace-nowrap py-2">
+                Daftar Kategori Spesifik
+              </h1>
+            </div>
+
+            {/* Tombol Aksi + Search */}
+            <div className="flex gap-3">
+              {/* Search Input */}
+              <div className="relative w-full md:w-64">
+                <input
+                  type="text"
+                  placeholder="Cari berdasarkan nama tumbuhan atau ayat..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full py-2.5 pl-10 pr-4 text-sm text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg
+                    className="w-4 h-4 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Tombol Upload Ayat */}
               <button
-                className="px-4 py-2 text-sm text-white bg-blue-700 rounded hover:bg-green-700"
+                className="px-4 py-2 text-xs font-medium text-black bg-green-100 hover:bg-green-200 rounded-md"
                 onClick={() => setShowUploadModal(true)}
               >
                 Upload Ayat
               </button>
 
+              {/* Tombol Tambah */}
               <button
-                className="px-4 py-2 text-sm text-white bg-[#004E1D] rounded hover:bg-green-700"
+                className="px-4 py-2 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded-md"
                 onClick={() => navigate("/specific-plants/add")}
               >
-                Tambah
+                + Tambah
               </button>
             </div>
           </div>
-
-          <div className="mb-6">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Cari berdasarkan nama tumbuhan atau ayat..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full p-3 pl-10 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block"
-              />
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg
-                  className="w-5 h-5 text-gray-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  ></path>
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-300 mb-4"></div>
 
           <div className="overflow-x-auto ">
             {isLoading ? (
@@ -305,7 +308,7 @@ function SpecificPlantsPage() {
               </div>
             ) : (
               <table className="w-full text-sm text-left border-separate border-spacing-y-4">
-                <thead className="text-gray-700 border-b border-gray-300">
+                <thead className="bg-gray-50 text-gray-600 text-xs uppercase">
                   <tr>
                     <th className="px-4 py-2">Nama</th>
                     <th className="px-4 py-2">Latin</th>

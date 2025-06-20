@@ -56,26 +56,28 @@ function UserListPage() {
   return (
     <>
       <AdminLayout>
-        <div className="mt-4 bg-white border-2 rounded-xl p-4 shadow overflow-x-auto font-Poppins">
-          <div className="px-2 pt-2">
-            <h1 className="mb-6 text-xl font-bold text-black">
-              Daftar Akun Firebase
-            </h1>
-            <div className="border-t border-gray-300 mb-4"></div>
+        <div className="p-6">
+          <div className="bg-white rounded-xl shadow border px-6 py-4 font-Poppins">
+            <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+              <h1 className="text-xl font-semibold text-gray-800 py-2">
+                Daftar Pengguna
+              </h1>
+            </div>
+
             <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left border-separate border-spacing-y-4">
-                <thead className="text-gray-600">
+              <table className="w-full text-sm text-left table-auto border-collapse">
+                <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
                   <tr>
-                    <th className="px-4 py-2">UID</th>
-                    <th className="px-4 py-2">Email</th>
-                    <th className="px-4 py-2">Nama</th>
-                    <th className="px-4 py-2">Aksi</th>
+                    <th className="px-4 py-3">No</th>
+                    <th className="px-4 py-3">Profile</th>
+                    <th className="px-4 py-3">Email</th>
+                    <th className="px-4 py-3 text-center">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {loading ? (
                     <tr>
-                      <td colSpan="4">
+                      <td colSpan="5">
                         <div className="flex justify-center items-center py-6">
                           <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-blue-500"></div>
                           <span className="ml-2 text-gray-600">
@@ -85,23 +87,56 @@ function UserListPage() {
                       </td>
                     </tr>
                   ) : users.length > 0 ? (
-                    users.map((user) => (
-                      <tr key={user.uid} className="bg-white shadow rounded">
-                        <td className="px-4 py-4 break-all">{user.uid}</td>
-                        <td className="px-4 py-4">{user.email}</td>
-                        <td className="px-4 py-4">{user.displayName}</td>
-                        <td className="px-4 py-4">
+                    users.map((user, index) => (
+                      <tr
+                        key={user.uid}
+                        className={`border-b hover:bg-gray-50 transition`}
+                      >
+                        <td className="px-4 py-3">{index + 1}</td>
+                        <td className="px-4 py-3 flex items-center gap-3">
+                          <span className="font-medium text-gray-800">
+                            {user.displayName}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">{user.email}</td>
+                        <td className="px-4 py-3">
                           <div className="flex justify-center gap-2">
                             <button
                               onClick={() => setEditing(user)}
-                              className="px-3 py-1 text-white bg-blue-500 rounded hover:bg-blue-600"
+                              className="flex items-center gap-1 px-3 py-1 text-xs bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition"
                             >
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M15.232 5.232l3.536 3.536M9 13h6l3.536-3.536a2 2 0 00-2.828-2.828L9 13z"
+                                />
+                              </svg>
                               Edit
                             </button>
                             <button
                               onClick={() => confirmDelete(user)}
-                              className="px-3 py-1 text-white bg-red-500 rounded hover:bg-red-600"
+                              className="flex items-center gap-1 px-3 py-1 text-xs bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition"
                             >
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M6 18L18 6M6 6l12 12"
+                                />
+                              </svg>
                               Hapus
                             </button>
                           </div>
@@ -111,10 +146,10 @@ function UserListPage() {
                   ) : (
                     <tr>
                       <td
-                        colSpan="4"
+                        colSpan="5"
                         className="text-center py-6 text-gray-500"
                       >
-                        Tidak ada pengguna yang ditemukan.
+                        Tidak ada pengguna ditemukan.
                       </td>
                     </tr>
                   )}

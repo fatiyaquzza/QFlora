@@ -5,6 +5,9 @@ module.exports = {
       fontFamily: {
         Poppins: ["Poppins"],
       },
+      colors: {
+        primary: "#12321D",
+      },
     },
   },
   plugins: [],

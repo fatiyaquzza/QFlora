@@ -64,29 +64,29 @@ function SuggestionsPage() {
   return (
     <>
       <AdminLayout>
-        <div className="mt-4 bg-white border-2 rounded-xl p-4 shadow overflow-x-auto font-Poppins">
-          <div className="px-2 pt-2">
-            <h1 className="mb-6 text-xl font-bold text-black">
+        <div className="p-6 pb-10">
+          <div className="bg-white rounded-xl shadow border px-6 py-4 font-Poppins">
+            <h1 className="text-xl font-semibold text-gray-800 mb-6 py-2">
               Masukan Pengguna
             </h1>
-            <div className="border-t border-gray-300 mb-4"></div>
+
             <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left border-separate border-spacing-y-4">
-                <thead className="text-gray-600">
+              <table className="w-full text-sm text-left table-auto border-collapse">
+                <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
                   <tr>
-                    <th className="px-4 py-2">Nama</th>
-                    <th className="px-4 py-2">Email</th>
-                    <th className="px-4 py-2">Tipe</th>
-                    <th className="px-4 py-2">Deskripsi</th>
-                    <th className="px-4 py-2">Status</th>
-                    <th className="px-4 py-2">Aksi</th>
+                    <th className="px-4 py-3">Nama</th>
+                    <th className="px-4 py-3">Email</th>
+                    <th className="px-4 py-3">Tipe</th>
+                    <th className="px-4 py-3">Deskripsi</th>
+                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3 text-center">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
                   {loading ? (
                     <tr>
-                      <td colSpan="6" className="py-6 text-center">
-                        <div className="flex justify-center items-center">
+                      <td colSpan="6">
+                        <div className="flex justify-center items-center py-6">
                           <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-blue-500"></div>
                           <span className="ml-2 text-gray-600">
                             Memuat data saran...
@@ -96,45 +96,79 @@ function SuggestionsPage() {
                     </tr>
                   ) : suggestions.length === 0 ? (
                     <tr>
-                      <td colSpan="6" className="text-center py-6 text-gray-500">
+                      <td
+                        colSpan="6"
+                        className="text-center py-6 text-gray-500"
+                      >
                         Tidak ada data saran.
                       </td>
                     </tr>
                   ) : (
                     suggestions.map((s) => (
-                      <tr key={s.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-4">{s.user?.name || "-"}</td>
-                        <td className="px-4 py-4">{s.user?.email || "-"}</td>
-                        <td className="px-4 py-4">
+                      <tr
+                        key={s.id}
+                        className="border-b hover:bg-gray-50 transition"
+                      >
+                        <td className="px-4 py-3">{s.user?.name || "-"}</td>
+                        <td className="px-4 py-3">{s.user?.email || "-"}</td>
+                        <td className="px-4 py-3">
                           {s.suggestion_type?.name || "-"}
                         </td>
-                        <td className="px-4 py-4">{s.description}</td>
-                        <td className="px-4 py-4">
+                        <td className="px-4 py-3">{s.description}</td>
+                        <td className="px-4 py-3">
                           {s.status === "Ditanggapi" ? (
-                            <span className="font-semibold text-green-600">
-                              Sudah ✔
+                            <span className="text-green-600 font-semibold flex items-center gap-1">
+                              <span className="w-2 h-2 bg-green-500 rounded-full"></span>{" "}
+                              Sudah
                             </span>
                           ) : (
-                            <span className="font-semibold text-yellow-600">
+                            <span className="text-yellow-600 font-semibold flex items-center gap-1">
+                              <span className="w-2 h-2 bg-yellow-400 rounded-full"></span>{" "}
                               Belum
                             </span>
                           )}
                         </td>
-                        <td className="px-4 py-4">
-                          <div className="flex gap-2">
+                        <td className="px-4 py-3 text-center">
+                          <div className="flex justify-center gap-2">
                             <button
-                              className="px-3 py-1 text-white bg-blue-600 rounded hover:bg-blue-700"
+                              className="flex items-center gap-1 px-3 py-1 text-xs bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition"
                               onClick={() => {
                                 setEditingSuggestion(s);
                                 setStatusValue(s.status || "Belum");
                               }}
                             >
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M15.232 5.232l3.536 3.536M9 13h6l3.536-3.536a2 2 0 00-2.828-2.828L9 13z"
+                                />
+                              </svg>
                               Ubah
                             </button>
                             <button
-                              className="px-3 py-1 text-white bg-red-600 rounded hover:bg-red-700"
+                              className="flex items-center gap-1 px-3 py-1 text-xs bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition"
                               onClick={() => handleDeleteClick(s)}
                             >
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M6 18L18 6M6 6l12 12"
+                                />
+                              </svg>
                               Hapus
                             </button>
                           </div>
