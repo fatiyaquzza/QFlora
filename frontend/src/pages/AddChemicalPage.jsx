@@ -145,7 +145,7 @@ function AddChemicalPage() {
             </h1>
           </div>
           <button
-            className="px-4 py-2 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded-md"
+            className="px-4 py-3 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded-md"
             onClick={() => setShowForm(true)}
           >
             + Tambah

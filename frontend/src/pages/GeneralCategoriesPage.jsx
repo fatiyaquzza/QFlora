@@ -156,7 +156,7 @@ function GeneralCategoriesPage() {
               <div className="relative w-full md:w-64">
                 <input
                   type="text"
-                  placeholder="Search..."
+                  placeholder="Cari Tumbuhan..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full py-2.5 pl-10 pr-4 text-sm text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
